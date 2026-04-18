@@ -93,7 +93,7 @@ function mergeLocalizedCard(map, card) {
 // Returns: Map<oracleId, translatedCardObj>
 async function fetchTranslated(oracleIds, lang) {
   const translatedMap = new Map()
-  const BATCH = 50
+  const BATCH = 20 // Scryfall limits OR-query complexity to ~20 terms
 
   // Phase 1: unique=cards — fast, no pagination, 1 result per oracle ID
   for (let i = 0; i < oracleIds.length; i += BATCH) {
