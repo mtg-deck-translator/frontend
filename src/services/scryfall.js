@@ -87,15 +87,18 @@ async function fetchTranslated(oracleIds, lang) {
   for (let i = 0; i < oracleIds.length; i += BATCH) {
     const batch = oracleIds.slice(i, i + BATCH)
     const q = '(' + batch.map(id => `oracleid:${id}`).join(' or ') + `) lang:${lang}`
-    const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=cards`
+    const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=prints`
 
     const resp = await fetch(url, { headers: { 'Accept': 'application/json' } })
 
     if (resp.ok) {
       const data = await resp.json()
       for (const card of (data.data || [])) {
-        // Keep only the most recent French printing per oracle ID
-        if (!frenchMap.has(card.oracle_id)) {
+        const existing = frenchMap.get(card.oracle_id)
+        const hasLocalName = card.printed_name && card.printed_name !== card.name
+        const existingHasLocalName = existing?.printed_name && existing.printed_name !== existing.name
+        // Prefer cards with a truly localized printed_name over English-named prints
+        if (!existing || (!existingHasLocalName && hasLocalName)) {
           frenchMap.set(card.oracle_id, card)
         }
       }
