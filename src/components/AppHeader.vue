@@ -10,9 +10,14 @@
       </div>
 
       <nav class="header-actions">
+        <LanguageSelector
+          :model-value="language"
+          @update:model-value="$emit('update:language', $event)"
+        />
         <button
           class="icon-btn"
           :title="historyOpen ? 'Fermer l\'historique' : 'Historique'"
+          style="margin-left: 4px;"
           :aria-pressed="historyOpen"
           @click="$emit('toggle-history')"
         >
@@ -42,13 +47,15 @@
 
 <script setup>
 import { computed } from 'vue'
+import LanguageSelector from './LanguageSelector.vue'
 
 const props = defineProps({
   theme: String,
   historyOpen: Boolean,
+  language: String,
 })
 
-defineEmits(['toggle-theme', 'toggle-history'])
+defineEmits(['toggle-theme', 'toggle-history', 'update:language'])
 
 const isDark = computed(() => props.theme === 'dark')
 </script>

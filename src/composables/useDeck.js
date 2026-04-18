@@ -18,7 +18,7 @@ export function useDeck() {
   const deckName = ref('')
   const unparseableLines = ref([])
 
-  async function translate() {
+  async function translate(lang = 'fr') {
     status.value = 'fetching'
     error.value = null
     errorMeta.value = null
@@ -69,7 +69,7 @@ export function useDeck() {
     try {
       const translated = await translateBatch(rawCards, (current, total) => {
         progress.value = { current, total }
-      })
+      }, lang)
       cards.value = translated
       status.value = 'done'
     } catch (err) {
