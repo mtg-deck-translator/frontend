@@ -325,19 +325,18 @@ watch(deckId, () => { activeFilter.value = 'all' })
 /* Layout 2 colonnes */
 .results-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 24px;
+  grid-template-columns: 200px 1fr;
+  gap: 0;
   align-items: start;
 }
 
 @media (max-width: 768px) {
-  .results-layout {
-    grid-template-columns: 1fr;
-  }
+  .results-layout { grid-template-columns: 1fr; }
 }
 
 .results-main {
   min-width: 0;
+  padding-left: 24px;
 }
 
 /* Banners */
