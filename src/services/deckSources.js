@@ -1,11 +1,12 @@
 const BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 
-export function isArchidektUrl(url) { return /archidekt\.com\/decks\//i.test(url) }
-export function isMtgtop8Url(url)   { return /mtgtop8\.com\/event/i.test(url) }
-export function isMoxfieldUrl(url)  { return /moxfield\.com\/decks\//i.test(url) }
+export function isArchidektUrl(url)  { return /archidekt\.com\/decks\//i.test(url) }
+export function isMtgtop8Url(url)    { return /mtgtop8\.com\/event/i.test(url) }
+export function isMoxfieldUrl(url)   { return /moxfield\.com\/decks\//i.test(url) }
+export function isTappedoutUrl(url)  { return /tappedout\.net\/mtg-decks\//i.test(url) }
 
 export function isSupportedUrl(url) {
-  return isArchidektUrl(url) || isMtgtop8Url(url) || isMoxfieldUrl(url)
+  return isArchidektUrl(url) || isMtgtop8Url(url) || isMoxfieldUrl(url) || isTappedoutUrl(url)
 }
 
 export async function fetchDeckFromBackend(url) {
