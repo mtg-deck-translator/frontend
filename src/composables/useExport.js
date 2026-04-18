@@ -72,22 +72,5 @@ export function useExport(cards, checkedMap) {
     show('Téléchargement lancé', 'success')
   }
 
-  const CM_LANG_MAP = { fr: 'fr', de: 'de', it: 'it', es: 'es', pt: 'pt' }
-
-  async function buyCardmarket(lang) {
-    const missing = cards.value.filter(c => !checkedMap.value[c.queryName])
-    if (missing.length === 0) {
-      show('Aucune carte manquante !', 'success')
-      return
-    }
-
-    const text = missing.map(c => `${c.qty} ${c.displayName}`).join('\n')
-    try { await navigator.clipboard.writeText(text) } catch {}
-
-    const cmLang = CM_LANG_MAP[lang] || 'en'
-    window.open(`https://www.cardmarket.com/${cmLang}/Magic/Wants`, '_blank', 'noopener')
-    show('Liste copiée ! Collez-la dans Cardmarket → "Add from list"', 'success')
-  }
-
-  return { copyAll, copyMissing, downloadTxt, buyCardmarket }
+  return { copyAll, copyMissing, downloadTxt }
 }
