@@ -78,48 +78,71 @@ async function fetchCollection(queryNames) {
   return { byName, notFound }
 }
 
+function mergeLocalizedCard(map, card) {
+  const existing = map.get(card.oracle_id)
+  const hasLocalName = card.printed_name && card.printed_name !== card.name
+  const existingHasLocalName = existing?.printed_name && existing.printed_name !== existing.name
+  if (!existing || (!existingHasLocalName && hasLocalName)) {
+    map.set(card.oracle_id, card)
+  }
+}
+
 // Step 2: Fetch translated versions by oracle IDs in batches via /cards/search
+// Phase 1: unique=cards (1 result per oracle ID, no pagination risk from basic lands)
+// Phase 2: unique=prints retry for any card still missing a localized printed_name
 // Returns: Map<oracleId, translatedCardObj>
 async function fetchTranslated(oracleIds, lang) {
-  const frenchMap = new Map()
-  const BATCH = 20 // Scryfall limits OR-query complexity to ~20 terms
+  const translatedMap = new Map()
+  const BATCH = 50
 
+  // Phase 1: unique=cards — fast, no pagination, 1 result per oracle ID
   for (let i = 0; i < oracleIds.length; i += BATCH) {
     const batch = oracleIds.slice(i, i + BATCH)
     const q = '(' + batch.map(id => `oracleid:${id}`).join(' or ') + `) lang:${lang}`
-    const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=prints`
+    const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=cards`
 
     const resp = await fetch(url, { headers: { 'Accept': 'application/json' } })
-
     if (resp.ok) {
       const data = await resp.json()
-      for (const card of (data.data || [])) {
-        const existing = frenchMap.get(card.oracle_id)
-        const hasLocalName = card.printed_name && card.printed_name !== card.name
-        const existingHasLocalName = existing?.printed_name && existing.printed_name !== existing.name
-        // Prefer cards with a truly localized printed_name over English-named prints
-        if (!existing || (!existingHasLocalName && hasLocalName)) {
-          frenchMap.set(card.oracle_id, card)
-        }
-      }
-      // Handle pagination (shouldn't happen with unique=cards + <=30 IDs)
-      if (data.has_more && data.next_page) {
-        await delay(DELAY_MS)
-        const r2 = await fetch(data.next_page, { headers: { 'Accept': 'application/json' } })
-        if (r2.ok) {
-          const d2 = await r2.json()
-          for (const card of (d2.data || [])) {
-            if (!frenchMap.has(card.oracle_id)) frenchMap.set(card.oracle_id, card)
-          }
-        }
-      }
+      for (const card of (data.data || [])) mergeLocalizedCard(translatedMap, card)
     }
-    // If resp not ok (404 = no French found for any in batch), just continue
 
     if (i + BATCH < oracleIds.length) await delay(DELAY_MS)
   }
 
-  return frenchMap
+  // Phase 2: for cards with no localized printed_name, retry with unique=prints
+  // This catches cards like Vampiric Tutor where unique=cards picks a print with null printed_name
+  const needsBetterPrint = oracleIds.filter(id => {
+    const c = translatedMap.get(id)
+    return c && (!c.printed_name || c.printed_name === c.name)
+  })
+
+  if (needsBetterPrint.length > 0) {
+    const BATCH2 = 20
+    for (let i = 0; i < needsBetterPrint.length; i += BATCH2) {
+      const batch = needsBetterPrint.slice(i, i + BATCH2)
+      const q = '(' + batch.map(id => `oracleid:${id}`).join(' or ') + `) lang:${lang}`
+      const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=prints`
+
+      const resp = await fetch(url, { headers: { 'Accept': 'application/json' } })
+      if (resp.ok) {
+        const data = await resp.json()
+        for (const card of (data.data || [])) mergeLocalizedCard(translatedMap, card)
+        if (data.has_more && data.next_page) {
+          await delay(DELAY_MS)
+          const r2 = await fetch(data.next_page, { headers: { 'Accept': 'application/json' } })
+          if (r2.ok) {
+            const d2 = await r2.json()
+            for (const card of (d2.data || [])) mergeLocalizedCard(translatedMap, card)
+          }
+        }
+      }
+
+      if (i + BATCH2 < needsBetterPrint.length) await delay(DELAY_MS)
+    }
+  }
+
+  return translatedMap
 }
 
 export async function translateBatch(cards, onProgress, lang = 'fr') {
