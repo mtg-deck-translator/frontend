@@ -44,6 +44,9 @@
         <div class="deck-header">
           <h1 class="deck-name">{{ deckName }}</h1>
           <span class="deck-total tabular">{{ cards.length }} cartes</span>
+          <span v-if="totalPrice > 0" class="deck-price tabular">
+            {{ formatPrice(missingPrice) }} manquantes · {{ formatPrice(totalPrice) }} total
+          </span>
         </div>
 
         <div class="ownership-summary">
@@ -63,6 +66,7 @@
             @copy-missing="exportMissing"
             @download="exportDownload"
             @print="exportPrint"
+            @buy-cardmarket="exportBuyCardmarket"
           />
         </div>
 
@@ -118,9 +122,20 @@ const { checkedMap, toggle: toggleCard, setAll, reset: resetChecklist, ownedCoun
 
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 
-const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
+const { copyAll, copyMissing, downloadTxt, buyCardmarket } = useExport(cards, checkedMap)
 
 // --- Computed ---
+const totalPrice = computed(() =>
+  cards.value.reduce((sum, c) => sum + (c.price ?? 0) * c.qty, 0)
+)
+const missingPrice = computed(() =>
+  cards.value.filter(c => !checkedMap.value[c.queryName])
+    .reduce((sum, c) => sum + (c.price ?? 0) * c.qty, 0)
+)
+function formatPrice(val) {
+  return val.toFixed(2) + ' €'
+}
+
 const filterCounts = computed(() => {
   const missing = cards.value.filter(c => !checkedMap.value[c.queryName]).length
   const owned   = cards.value.filter(c => !!checkedMap.value[c.queryName]).length
@@ -180,6 +195,7 @@ function exportAll() { copyAll() }
 function exportMissing() { copyMissing() }
 function exportDownload() { downloadTxt(deckName.value) }
 function exportPrint() { window.print() }
+function exportBuyCardmarket() { buyCardmarket(language.value) }
 
 // Reset filter when deck changes
 watch(deckId, () => { activeFilter.value = 'all' })
@@ -219,6 +235,14 @@ watch(deckId, () => { activeFilter.value = 'all' })
   font-size: 13px;
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
+}
+
+.deck-price {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  margin-left: auto;
 }
 
 .ownership-summary {

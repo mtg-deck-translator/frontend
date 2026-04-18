@@ -30,11 +30,19 @@
       </svg>
       Imprimer A4
     </button>
+    <button class="export-btn export-btn--cardmarket" @click="$emit('buy-cardmarket')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="5.5" cy="11.5" r="1" fill="currentColor"/>
+        <circle cx="10.5" cy="11.5" r="1" fill="currentColor"/>
+        <path d="M1 1h2l1.5 6h6L12 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Acheter les manquantes
+    </button>
   </div>
 </template>
 
 <script setup>
-defineEmits(['copy-all', 'copy-missing', 'download', 'print'])
+defineEmits(['copy-all', 'copy-missing', 'download', 'print', 'buy-cardmarket'])
 </script>
 
 <style scoped>
@@ -63,5 +71,17 @@ defineEmits(['copy-all', 'copy-missing', 'download', 'print'])
   background: var(--surface-2);
   color: var(--text-1);
   border-color: var(--border-strong);
+}
+
+.export-btn--cardmarket {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.export-btn--cardmarket:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 </style>

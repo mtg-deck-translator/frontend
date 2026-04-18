@@ -212,7 +212,8 @@ export async function translateBatch(cards, onProgress, lang = 'fr') {
       category = card.category || deriveCategoryFromTypeLine(getCardTypeLine(enCard))
     }
 
-    return { ...card, frName, noFr, error, category, imageUrl }
+    const price = enCard?.prices?.eur ? parseFloat(enCard.prices.eur) : null
+    return { ...card, frName, noFr, error, category, imageUrl, price }
   })
 
   onProgress(total, total)
