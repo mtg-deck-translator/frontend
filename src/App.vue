@@ -80,6 +80,13 @@
       </template>
     </main>
 
+    <CardmarketPanel
+      :show="showCardmarket"
+      :cards="missingCards"
+      :lang="language"
+      @close="showCardmarket = false"
+    />
+
     <ToastNotification />
   </div>
 </template>
@@ -88,6 +95,7 @@
 import { ref, computed, watch } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
+import CardmarketPanel from './components/CardmarketPanel.vue'
 import InputPanel from './components/InputPanel.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import FilterTabs from './components/FilterTabs.vue'
@@ -106,6 +114,7 @@ import { getCachedCards, setCachedCards } from './services/storage.js'
 
 // --- State ---
 const showHistory = ref(false)
+const showCardmarket = ref(false)
 const activeFilter = ref('all')
 
 // --- Composables ---
@@ -122,7 +131,7 @@ const { checkedMap, toggle: toggleCard, setAll, reset: resetChecklist, ownedCoun
 
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 
-const { copyAll, copyMissing, downloadTxt, buyCardmarket } = useExport(cards, checkedMap)
+const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 
 // --- Computed ---
 const totalPrice = computed(() =>
@@ -136,11 +145,15 @@ function formatPrice(val) {
   return val.toFixed(2) + ' €'
 }
 
-const filterCounts = computed(() => {
-  const missing = cards.value.filter(c => !checkedMap.value[c.queryName]).length
-  const owned   = cards.value.filter(c => !!checkedMap.value[c.queryName]).length
-  return { all: cards.value.length, missing, owned }
-})
+const missingCards = computed(() =>
+  cards.value.filter(c => !checkedMap.value[c.queryName])
+)
+
+const filterCounts = computed(() => ({
+  all: cards.value.length,
+  missing: missingCards.value.length,
+  owned: cards.value.filter(c => !!checkedMap.value[c.queryName]).length,
+}))
 
 // --- Actions ---
 async function onTranslate() {
@@ -195,7 +208,12 @@ function exportAll() { copyAll() }
 function exportMissing() { copyMissing() }
 function exportDownload() { downloadTxt(deckName.value) }
 function exportPrint() { window.print() }
-function exportBuyCardmarket() { buyCardmarket(language.value) }
+async function exportBuyCardmarket() {
+  if (missingCards.value.length === 0) return
+  const text = missingCards.value.map(c => `${c.qty} ${c.displayName}`).join('\n')
+  try { await navigator.clipboard.writeText(text) } catch {}
+  showCardmarket.value = true
+}
 
 // Reset filter when deck changes
 watch(deckId, () => { activeFilter.value = 'all' })
