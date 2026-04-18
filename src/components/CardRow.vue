@@ -31,6 +31,21 @@
 
     <span class="en-name" :class="{ strikethrough: isChecked }">{{ card.displayName }}</span>
 
+    <span v-if="card.price != null" class="price-tag tabular">{{ formatPrice(card.price) }}</span>
+    <a
+      v-if="!card.error"
+      :href="cardmarketUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="cm-link"
+      title="Voir sur Cardmarket"
+      @click.stop
+    >
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M8 1h3v3M11 1L6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
     <span v-if="card.noFr" class="no-fr-badge">EN only</span>
     <span v-if="card.error" class="error-badge" title="Erreur Scryfall">!</span>
 
@@ -58,6 +73,16 @@ const props = defineProps({
 })
 
 defineEmits(['toggle'])
+
+function formatPrice(price) {
+  if (price === 0) return '< 0.01 €'
+  return price.toFixed(2) + ' €'
+}
+
+const cardmarketUrl = computed(() => {
+  const name = encodeURIComponent(props.card.frName)
+  return `https://www.cardmarket.com/en/Magic/Products/Singles?searchString=${name}`
+})
 
 const isCommander = computed(() => props.card.category === 'Commander')
 
@@ -179,6 +204,32 @@ const previewStyle = computed(() => {
 
 .en-name.strikethrough {
   text-decoration: line-through;
+}
+
+.price-tag {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+.cm-link {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.card-row:hover .cm-link {
+  opacity: 1;
+}
+
+.cm-link:hover {
+  color: var(--accent);
 }
 
 .no-fr-badge,
