@@ -1,6 +1,6 @@
 const PREFIX = 'mtg-translator:'
 
-function safeGet(key, fallback = null) {
+export function safeGet(key, fallback = null) {
   try {
     const val = localStorage.getItem(PREFIX + key)
     return val !== null ? JSON.parse(val) : fallback
@@ -9,7 +9,7 @@ function safeGet(key, fallback = null) {
   }
 }
 
-function safeSet(key, value) {
+export function safeSet(key, value) {
   try {
     localStorage.setItem(PREFIX + key, JSON.stringify(value))
     return true

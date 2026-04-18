@@ -78,15 +78,15 @@ async function fetchCollection(queryNames) {
   return { byName, notFound }
 }
 
-// Step 2: Fetch French versions by oracle IDs in batches via /cards/search
-// Returns: Map<oracleId, frenchCardObj>
-async function fetchFrench(oracleIds) {
+// Step 2: Fetch translated versions by oracle IDs in batches via /cards/search
+// Returns: Map<oracleId, translatedCardObj>
+async function fetchTranslated(oracleIds, lang) {
   const frenchMap = new Map()
   const BATCH = 20 // Scryfall limits OR-query complexity to ~20 terms
 
   for (let i = 0; i < oracleIds.length; i += BATCH) {
     const batch = oracleIds.slice(i, i + BATCH)
-    const q = '(' + batch.map(id => `oracleid:${id}`).join(' or ') + ') lang:fr'
+    const q = '(' + batch.map(id => `oracleid:${id}`).join(' or ') + `) lang:${lang}`
     const url = `${BASE}/cards/search?q=${encodeURIComponent(q)}&unique=cards`
 
     const resp = await fetch(url, { headers: { 'Accept': 'application/json' } })
@@ -119,7 +119,7 @@ async function fetchFrench(oracleIds) {
   return frenchMap
 }
 
-export async function translateBatch(cards, onProgress) {
+export async function translateBatch(cards, onProgress, lang = 'fr') {
   const total = cards.length
 
   // Deduplicate query names for API efficiency
@@ -147,7 +147,7 @@ export async function translateBatch(cards, onProgress) {
   let frenchMap = new Map()
   if (oracleIds.length > 0) {
     try {
-      frenchMap = await fetchFrench(oracleIds)
+      frenchMap = await fetchTranslated(oracleIds, lang)
     } catch {
       frenchMap = new Map()
     }

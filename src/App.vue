@@ -3,8 +3,10 @@
     <AppHeader
       :theme="theme"
       :history-open="showHistory"
+      v-model:language="language"
       @toggle-theme="toggleTheme"
       @toggle-history="showHistory = !showHistory"
+      @update:language="setLanguage"
     />
 
     <Transition name="history-fade">
@@ -91,6 +93,7 @@ import HistoryPanel from './components/HistoryPanel.vue'
 import ToastNotification from './components/ToastNotification.vue'
 
 import { useDeck } from './composables/useDeck.js'
+import { useLanguage } from './composables/useLanguage.js'
 import { useChecklist } from './composables/useChecklist.js'
 import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
@@ -103,6 +106,7 @@ const activeFilter = ref('all')
 
 // --- Composables ---
 const { theme, toggle: toggleTheme } = useTheme()
+const { language, setLanguage } = useLanguage()
 
 const {
   inputMode, urlInput, pasteInput,
@@ -127,7 +131,7 @@ const filterCounts = computed(() => {
 async function onTranslate() {
   activeFilter.value = 'all'
   resetChecklist()
-  const extra = await translate()
+  const extra = await translate(language.value)
 
   if (status.value === 'done') {
     setCachedCards(deckId.value, cards.value)
