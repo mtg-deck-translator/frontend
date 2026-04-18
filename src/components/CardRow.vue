@@ -80,7 +80,7 @@ function formatPrice(price) {
 }
 
 const cardmarketUrl = computed(() => {
-  const name = encodeURIComponent(props.card.frName)
+  const name = encodeURIComponent(props.card.displayName)
   return `https://www.cardmarket.com/en/Magic/Products/Singles?searchString=${name}`
 })
 
