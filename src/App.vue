@@ -47,15 +47,6 @@
           <span v-if="totalPrice > 0" class="deck-price tabular">
             {{ formatPrice(missingPrice) }} manquantes · {{ formatPrice(totalPrice) }} total
           </span>
-          <button class="share-btn" title="Partager ce deck" @click="showShare = true">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-              <circle cx="11.5" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.3"/>
-              <circle cx="11.5" cy="12.5" r="1.8" stroke="currentColor" stroke-width="1.3"/>
-              <circle cx="3.5" cy="7.5" r="1.8" stroke="currentColor" stroke-width="1.3"/>
-              <path d="M5.2 6.6l4.6-2.8M5.2 8.4l4.6 2.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-            Partager
-          </button>
         </div>
 
         <div class="ownership-summary">
@@ -96,24 +87,15 @@
       @close="showCardmarket = false"
     />
 
-    <SharePanel
-      :show="showShare"
-      :deck-name="deckName"
-      :cards="cards"
-      :lang="language"
-      @close="showShare = false"
-    />
-
     <ToastNotification />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
 import CardmarketPanel from './components/CardmarketPanel.vue'
-import SharePanel from './components/SharePanel.vue'
 import InputPanel from './components/InputPanel.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import FilterTabs from './components/FilterTabs.vue'
@@ -133,7 +115,6 @@ import { getCachedCards, setCachedCards } from './services/storage.js'
 // --- State ---
 const showHistory = ref(false)
 const showCardmarket = ref(false)
-const showShare = ref(false)
 const activeFilter = ref('all')
 
 // --- Composables ---
@@ -204,7 +185,6 @@ function onLoadFromHistory(entry) {
 
   const cached = getCachedCards(entry.deckId)
   if (cached) {
-    // Restaurer depuis le cache — pas d'appels API
     deckId.value = entry.deckId
     deckName.value = entry.deckName
     cards.value = cached
@@ -213,7 +193,6 @@ function onLoadFromHistory(entry) {
     return
   }
 
-  // Pas de cache — relancer la traduction
   if (entry.inputMode === 'url') {
     loadFromHistory(entry)
   } else {
@@ -236,24 +215,6 @@ async function exportBuyCardmarket() {
 
 // Reset filter when deck changes
 watch(deckId, () => { activeFilter.value = 'all' })
-
-// Load shared deck from ?deck=ID on startup
-const BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
-onMounted(async () => {
-  const id = new URLSearchParams(window.location.search).get('deck')
-  if (!id) return
-  try {
-    const resp = await fetch(`${BACKEND}/api/share/${id}`)
-    if (!resp.ok) return
-    const data = await resp.json()
-    deckName.value = data.deckName
-    cards.value = data.cards
-    status.value = 'done'
-    activeFilter.value = 'all'
-    if (data.lang) setLanguage(data.lang)
-    window.history.replaceState({}, '', window.location.pathname)
-  } catch {}
-})
 </script>
 
 <style scoped>
@@ -297,27 +258,6 @@ onMounted(async () => {
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
-}
-
-.share-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-2);
-  background: var(--surface);
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-  margin-left: auto;
-}
-
-.share-btn:hover {
-  background: var(--surface-2);
-  color: var(--text-1);
-  border-color: var(--border-strong);
 }
 
 .ownership-summary {
