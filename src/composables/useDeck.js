@@ -1,9 +1,7 @@
 import { ref } from 'vue'
 import { parsePastedList } from '../services/parser.js'
 import { translateBatch } from '../services/scryfall.js'
-import { fetchDeck as fetchArchidektDeck } from '../services/archidekt.js'
-import { isMtgtop8Url, fetchDeck as fetchMtgtop8Deck } from '../services/mtgtop8.js'
-import { isMoxfieldUrl, fetchDeck as fetchMoxfieldDeck } from '../services/moxfield.js'
+import { fetchDeckFromBackend, isSupportedUrl } from '../services/deckSources.js'
 import { hashString } from '../services/storage.js'
 
 export function useDeck() {
@@ -36,11 +34,7 @@ export function useDeck() {
     try {
       if (inputMode.value === 'url') {
         const trimmedUrl = urlInput.value.trim()
-        let fetcher
-        if (isMtgtop8Url(trimmedUrl)) fetcher = fetchMtgtop8Deck
-        else if (isMoxfieldUrl(trimmedUrl)) fetcher = fetchMoxfieldDeck
-        else fetcher = fetchArchidektDeck
-        const result = await fetcher(trimmedUrl)
+        const result = await fetchDeckFromBackend(trimmedUrl)
         rawCards = result.cards
         resolvedDeckId = result.deckId
         resolvedDeckName = result.deckName
