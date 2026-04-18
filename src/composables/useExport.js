@@ -81,7 +81,7 @@ export function useExport(cards, checkedMap) {
       return
     }
 
-    const text = missing.map(c => `${c.qty} ${c.frName}`).join('\n')
+    const text = missing.map(c => `${c.qty} ${c.displayName}`).join('\n')
     try { await navigator.clipboard.writeText(text) } catch {}
 
     const cmLang = CM_LANG_MAP[lang] || 'en'
