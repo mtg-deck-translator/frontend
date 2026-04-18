@@ -35,14 +35,7 @@
       </div>
 
       <div v-if="status === 'error'" class="error-banner">
-        <template v-if="errorMeta?.type === 'MOXFIELD_BLOCKED'">
-          Moxfield protège son API via Cloudflare — accès direct impossible.
-          <br>
-          <strong>Solution :</strong> ouvrez votre deck sur Moxfield →
-          <a :href="errorMeta.deckUrl" target="_blank" rel="noopener" class="error-link">ouvrir le deck</a>
-          → bouton <strong>Export</strong> → <strong>MTGO</strong> → copiez le texte → utilisez "Coller une liste".
-        </template>
-        <template v-else>{{ error }}</template>
+        {{ error }}
       </div>
 
       <template v-if="status === 'done'">
