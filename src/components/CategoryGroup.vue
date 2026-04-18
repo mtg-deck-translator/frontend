@@ -1,5 +1,5 @@
 <template>
-  <div class="category-group" :style="{ '--index': index }">
+  <div class="category-group" :style="{ '--index': index }" :id="`cat-${category}`">
     <div class="category-header">
       <div class="header-top">
         <h2 class="category-title">{{ categoryFr }}</h2>

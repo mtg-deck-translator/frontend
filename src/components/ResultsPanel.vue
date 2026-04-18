@@ -12,7 +12,7 @@
     />
 
     <p v-if="visibleGroups.length === 0" class="empty-state">
-      Aucune carte dans cette vue.
+      {{ search ? 'Aucune carte ne correspond à la recherche.' : 'Aucune carte dans cette vue.' }}
     </p>
   </div>
 </template>
@@ -27,14 +27,27 @@ const props = defineProps({
   cards: Array,
   checkedMap: Object,
   filter: String,
+  search: { type: String, default: '' },
+  sort: { type: String, default: 'category' },
 })
 
 defineEmits(['toggle', 'set-all'])
 
 const filteredCards = computed(() => {
-  if (props.filter === 'missing') return props.cards.filter(c => !props.checkedMap[c.queryName])
-  if (props.filter === 'owned')   return props.cards.filter(c => !!props.checkedMap[c.queryName])
-  return props.cards
+  let list = props.cards
+
+  if (props.filter === 'missing') list = list.filter(c => !props.checkedMap[c.queryName])
+  else if (props.filter === 'owned') list = list.filter(c => !!props.checkedMap[c.queryName])
+
+  if (props.search) {
+    const q = props.search.toLowerCase()
+    list = list.filter(c =>
+      c.frName?.toLowerCase().includes(q) ||
+      c.displayName?.toLowerCase().includes(q)
+    )
+  }
+
+  return list
 })
 
 const visibleGroups = computed(() => {
@@ -47,10 +60,15 @@ const visibleGroups = computed(() => {
 
   return CATEGORY_ORDER
     .filter(cat => groups[cat]?.length)
-    .map(cat => ({
-      category: cat,
-      cards: groups[cat].slice().sort((a, b) => a.frName.localeCompare(b.frName, 'fr')),
-    }))
+    .map(cat => {
+      const cards = groups[cat].slice()
+      if (props.sort === 'price') {
+        cards.sort((a, b) => (b.price ?? -1) - (a.price ?? -1))
+      } else {
+        cards.sort((a, b) => a.frName.localeCompare(b.frName, 'fr'))
+      }
+      return { category: cat, cards }
+    })
 })
 </script>
 
