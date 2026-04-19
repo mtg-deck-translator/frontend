@@ -1,38 +1,52 @@
 <template>
-  <section class="input-panel">
-    <div class="mode-toggle" role="group" aria-label="Mode de saisie">
-      <button
-        class="mode-btn"
-        :class="{ active: mode === 'url' }"
-        :aria-pressed="mode === 'url'"
-        @click="$emit('update:mode', 'url')"
-      >
-        {{ labels.mode_url || 'URL (Archidekt / MTGTOP8)' }}
-      </button>
-      <button
-        class="mode-btn"
-        :class="{ active: mode === 'paste' }"
-        :aria-pressed="mode === 'paste'"
-        @click="$emit('update:mode', 'paste')"
-      >
-        {{ labels.mode_paste || 'Coller une liste' }}
-      </button>
-    </div>
+  <div class="glass-input" :class="{ 'paste-mode': mode === 'paste' }">
 
-    <!-- URL mode: input + button inline -->
-    <div v-if="mode === 'url'" class="url-row">
-      <input
-        ref="urlRef"
-        type="url"
-        class="text-input"
-        placeholder="https://archidekt.com/decks/… ou moxfield.com/decks/…"
-        :value="url"
-        :disabled="isLoading"
-        @input="$emit('update:url', $event.target.value)"
-        @keydown.enter="$emit('translate')"
-      />
+    <!-- Barre principale : toggle + input/placeholder + bouton -->
+    <div class="glass-bar">
+
+      <div class="glass-toggle" role="group">
+        <button
+          class="gt-btn"
+          :class="{ active: mode === 'url' }"
+          :aria-pressed="mode === 'url'"
+          @click="$emit('update:mode', 'url')"
+        >URL</button>
+        <button
+          class="gt-btn"
+          :class="{ active: mode === 'paste' }"
+          :aria-pressed="mode === 'paste'"
+          @click="$emit('update:mode', 'paste')"
+        >{{ labels.mode_paste_short || 'Liste' }}</button>
+      </div>
+
+      <!-- Champ URL -->
+      <div v-if="mode === 'url'" class="glass-field">
+        <svg class="glass-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input
+          ref="urlRef"
+          type="url"
+          class="glass-url"
+          placeholder="https://archidekt.com/decks/…"
+          :value="url"
+          :disabled="isLoading"
+          @input="$emit('update:url', $event.target.value)"
+          @keydown.enter="$emit('translate')"
+        />
+      </div>
+
+      <!-- Placeholder paste mode dans la barre -->
+      <div v-else class="glass-field glass-field-muted">
+        <svg class="glass-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <path d="M2.5 4h10M2.5 7.5h7M2.5 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span class="glass-paste-hint">{{ paste ? paste.split('\n')[0] + '…' : (labels.paste_hint || 'Collez votre liste ci-dessous…') }}</span>
+      </div>
+
       <button
-        class="translate-btn"
+        class="glass-btn"
         :disabled="isLoading || isEmpty"
         @click="$emit('translate')"
       >
@@ -41,11 +55,11 @@
       </button>
     </div>
 
-    <!-- Paste mode: textarea + button below -->
-    <div v-else class="paste-area">
+    <!-- Zone textarea (paste mode) -->
+    <div v-if="mode === 'paste'" class="glass-paste-area">
       <textarea
         ref="pasteRef"
-        class="text-input textarea"
+        class="glass-textarea"
         :value="paste"
         :disabled="isLoading"
         spellcheck="false"
@@ -55,19 +69,9 @@
         @keydown.ctrl.enter.prevent="$emit('translate')"
         @keydown.meta.enter.prevent="$emit('translate')"
       />
-      <div class="actions">
-        <button
-          class="translate-btn"
-          :disabled="isLoading || isEmpty"
-          @click="$emit('translate')"
-        >
-          <span v-if="isLoading" class="btn-spinner" aria-hidden="true"/>
-          {{ buttonLabel }}
-        </button>
-      </div>
     </div>
 
-  </section>
+  </div>
 </template>
 
 <script setup>
@@ -94,14 +98,14 @@ const isEmpty = computed(() => {
 })
 
 const buttonLabel = computed(() => {
-  if (props.status === 'fetching') return props.labels.btn_fetching || 'Récupération...'
-  if (props.status === 'translating') return props.labels.btn_translating || 'Traduction...'
+  if (props.status === 'fetching') return props.labels.btn_fetching || 'Récupération…'
+  if (props.status === 'translating') return props.labels.btn_translating || 'Traduction…'
   return props.labels.btn_translate || 'Traduire'
 })
 
 const textareaPlaceholder = `4 Island
 1x Lightning Bolt
-1x Frolicking Familiar // Blow Off Steam (woe) 226
+1x Frolicking Familiar // Blow Off Steam
 // Les commentaires sont ignorés
 1 Sol Ring`
 
@@ -125,130 +129,166 @@ watch(() => props.mode, (mode) => {
 </script>
 
 <style scoped>
-.input-panel {
-  padding: 32px 0 24px;
+/* ── Glassmorphism container ─────────────────────────── */
+.glass-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+/* ── Barre principale ────────────────────────────────── */
+.glass-bar {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.mode-toggle {
-  display: flex;
-  gap: 2px;
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
-  padding: 3px;
-  width: fit-content;
-}
-
-.mode-btn {
-  padding: 6px 14px;
-  border-radius: calc(var(--radius-lg) - 2px);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.mode-btn.active {
-  background: var(--surface);
-  color: var(--text-1);
-  box-shadow: var(--shadow-sm);
-}
-
-/* URL mode: inline row */
-.url-row {
-  display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 6px;
+  padding: 8px;
 }
 
-.url-row .text-input {
+/* Toggle URL / Liste */
+.glass-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 11px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.gt-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.gt-btn.active {
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
+}
+
+.gt-btn:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Champ input */
+.glass-field {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
   min-width: 0;
 }
 
-/* Paste mode */
-.paste-area {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.glass-field-muted { opacity: 0.5; }
+
+.glass-icon {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
-.text-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  font-size: 14px;
-  color: var(--text-1);
+.glass-url {
+  flex: 1;
+  background: transparent;
+  border: none;
   outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-size: 15px;
+  color: #fff;
+  min-width: 0;
 }
 
-.text-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+.glass-url::placeholder { color: rgba(255, 255, 255, 0.25); }
+.glass-url:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.glass-paste-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.text-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.textarea {
-  min-height: 160px;
-  resize: vertical;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.translate-btn {
+/* Bouton Traduire */
+.glass-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 20px;
-  background: var(--accent);
-  color: white;
-  border-radius: var(--radius-md);
+  padding: 11px 24px;
+  background: #4F46E5;
+  color: #fff;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  box-shadow: 0 4px 18px rgba(79, 70, 229, 0.45);
 }
 
-.translate-btn:hover:not(:disabled) {
-  opacity: 0.9;
+.glass-btn:hover:not(:disabled) {
+  background: #4338CA;
+  box-shadow: 0 6px 28px rgba(79, 70, 229, 0.6);
+  transform: translateY(-1px);
 }
 
-.translate-btn:active:not(:disabled) {
+.glass-btn:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.translate-btn:disabled {
-  opacity: 0.4;
+.glass-btn:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* Spinner */
 .btn-spinner {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Zone textarea ───────────────────────────────────── */
+.glass-paste-area {
+  padding: 0 8px 8px;
 }
+
+.glass-textarea {
+  width: 100%;
+  min-height: 160px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  padding: 14px 16px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.glass-textarea:focus {
+  border-color: rgba(79, 70, 229, 0.45);
+}
+
+.glass-textarea::placeholder { color: rgba(255, 255, 255, 0.18); }
+.glass-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
