@@ -135,6 +135,8 @@ function scrollToCategory(category) {
 .search-input {
   flex: 1;
   background: transparent;
+  border: none;
+  outline: none;
   font-size: 13px;
   color: var(--text-1);
   min-width: 0;

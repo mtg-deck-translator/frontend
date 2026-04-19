@@ -116,17 +116,27 @@ a {
 
   /* Masquer tout le chrome UI */
   .app-header,
+  .deck-sidebar,
   .input-panel,
+  .input-page,
   .progress-wrap,
   .warning-banner,
   .error-banner,
-  .ownership-summary,
-  .results-toolbar,
   .export-panel,
   .history-overlay,
   .toast-container,
   .card-preview {
     display: none !important;
+  }
+
+  /* Layout : annuler le grid, le main prend toute la largeur */
+  .deck-layout {
+    display: block !important;
+  }
+
+  .deck-main {
+    padding: 0 !important;
+    width: 100% !important;
   }
 
   body {
