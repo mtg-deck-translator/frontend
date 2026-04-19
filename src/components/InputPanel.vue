@@ -7,7 +7,7 @@
         :aria-pressed="mode === 'url'"
         @click="$emit('update:mode', 'url')"
       >
-        URL (Archidekt / MTGTOP8)
+        {{ labels.mode_url || 'URL (Archidekt / MTGTOP8)' }}
       </button>
       <button
         class="mode-btn"
@@ -15,13 +15,13 @@
         :aria-pressed="mode === 'paste'"
         @click="$emit('update:mode', 'paste')"
       >
-        Coller une liste
+        {{ labels.mode_paste || 'Coller une liste' }}
       </button>
     </div>
 
-    <div class="input-area">
+    <!-- URL mode: input + button inline -->
+    <div v-if="mode === 'url'" class="url-row">
       <input
-        v-if="mode === 'url'"
         ref="urlRef"
         type="url"
         class="text-input"
@@ -31,9 +31,19 @@
         @input="$emit('update:url', $event.target.value)"
         @keydown.enter="$emit('translate')"
       />
+      <button
+        class="translate-btn"
+        :disabled="isLoading || isEmpty"
+        @click="$emit('translate')"
+      >
+        <span v-if="isLoading" class="btn-spinner" aria-hidden="true"/>
+        {{ buttonLabel }}
+      </button>
+    </div>
 
+    <!-- Paste mode: textarea + button below -->
+    <div v-else class="paste-area">
       <textarea
-        v-else
         ref="pasteRef"
         class="text-input textarea"
         :value="paste"
@@ -45,19 +55,18 @@
         @keydown.ctrl.enter.prevent="$emit('translate')"
         @keydown.meta.enter.prevent="$emit('translate')"
       />
+      <div class="actions">
+        <button
+          class="translate-btn"
+          :disabled="isLoading || isEmpty"
+          @click="$emit('translate')"
+        >
+          <span v-if="isLoading" class="btn-spinner" aria-hidden="true"/>
+          {{ buttonLabel }}
+        </button>
+      </div>
     </div>
 
-    <div class="actions">
-      <button
-        class="translate-btn"
-        :disabled="isLoading || isEmpty"
-        @click="$emit('translate')"
-      >
-        <span v-if="status === 'fetching'" class="btn-spinner" aria-hidden="true"/>
-        <span v-else-if="status === 'translating'" class="btn-spinner" aria-hidden="true"/>
-        {{ buttonLabel }}
-      </button>
-    </div>
   </section>
 </template>
 
@@ -69,6 +78,7 @@ const props = defineProps({
   url: String,
   paste: String,
   status: String,
+  labels: { type: Object, default: () => ({}) },
 })
 
 defineEmits(['update:mode', 'update:url', 'update:paste', 'translate'])
@@ -84,9 +94,9 @@ const isEmpty = computed(() => {
 })
 
 const buttonLabel = computed(() => {
-  if (props.status === 'fetching') return 'Récupération...'
-  if (props.status === 'translating') return 'Traduction...'
-  return 'Traduire'
+  if (props.status === 'fetching') return props.labels.btn_fetching || 'Récupération...'
+  if (props.status === 'translating') return props.labels.btn_translating || 'Traduction...'
+  return props.labels.btn_translate || 'Traduire'
 })
 
 const textareaPlaceholder = `4 Island
@@ -95,7 +105,6 @@ const textareaPlaceholder = `4 Island
 // Les commentaires sont ignorés
 1 Sol Ring`
 
-// Ctrl/Cmd+K focuses the active input
 function handleGlobalKey(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
@@ -107,7 +116,6 @@ function handleGlobalKey(e) {
 onMounted(() => document.addEventListener('keydown', handleGlobalKey))
 onUnmounted(() => document.removeEventListener('keydown', handleGlobalKey))
 
-// Auto-focus when switching modes
 watch(() => props.mode, (mode) => {
   setTimeout(() => {
     if (mode === 'url') urlRef.value?.focus()
@@ -146,6 +154,25 @@ watch(() => props.mode, (mode) => {
   background: var(--surface);
   color: var(--text-1);
   box-shadow: var(--shadow-sm);
+}
+
+/* URL mode: inline row */
+.url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.url-row .text-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Paste mode */
+.paste-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .text-input {
@@ -194,6 +221,8 @@ watch(() => props.mode, (mode) => {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
