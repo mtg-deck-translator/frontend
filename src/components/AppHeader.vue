@@ -1,6 +1,6 @@
 <template>
   <header class="app-header">
-    <div class="container header-inner">
+    <div class="header-inner">
       <div class="brand">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <rect x="2" y="2" width="16" height="16" rx="3" stroke="var(--accent)" stroke-width="1.5"/>
@@ -76,6 +76,7 @@ const isDark = computed(() => props.theme === 'dark')
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  padding: 0 20px;
 }
 
 .brand {
