@@ -19,41 +19,51 @@
       />
     </Transition>
 
-    <!-- Pre-translation: landing page -->
+    <!-- Pre-translation: landing page — toujours sombre -->
     <div v-if="status !== 'done'" class="input-page">
 
-      <!-- Hero section — dark, pleine largeur, avec art MTG en fond -->
-      <section class="lp-hero-section">
-        <div v-if="heroArtUrl" class="lp-hero-art" :style="{ backgroundImage: `url(${heroArtUrl})` }"/>
-        <div class="lp-hero-inner">
-          <div class="lp-badge">Magic: The Gathering</div>
-          <h1 class="lp-title">{{ i18n.hero_title_1 }}<br><span class="lp-accent">{{ i18n.hero_title_2 }}</span></h1>
-          <p class="lp-sub">{{ i18n.hero_sub }}</p>
+      <!-- Orbes de fond (CSS uniquement, position: fixed → pas de resize) -->
+      <div class="lp-orb lp-orb-1" aria-hidden="true"/>
+      <div class="lp-orb lp-orb-2" aria-hidden="true"/>
 
-          <div class="input-wrap">
-            <InputPanel
-              v-model:mode="inputMode"
-              v-model:url="urlInput"
-              v-model:paste="pasteInput"
-              :status="status"
-              :labels="i18n"
-              @translate="onTranslate"
-            />
-            <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
-            <div v-if="unparseableLines.length && status !== 'idle'" class="warning-banner">
-              {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '...' : '' }}
-            </div>
-            <div v-if="status === 'error'" class="error-banner">{{ error }}</div>
+      <!-- Colonne centrale -->
+      <div class="lp-center">
+
+        <!-- Hero -->
+        <div class="lp-hero">
+          <div class="lp-badge">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M5 1l1 3h3l-2.5 1.8.9 3L5 7.1 2.6 8.8l.9-3L1 4h3z" fill="currentColor"/>
+            </svg>
+            Magic: The Gathering
           </div>
+          <h1 class="lp-title">
+            {{ i18n.hero_title_1 }}<br>
+            <span class="lp-gradient">{{ i18n.hero_title_2 }}</span>
+          </h1>
+          <p class="lp-sub">{{ i18n.hero_sub }}</p>
         </div>
-      </section>
 
-      <!-- Contenu sous le hero -->
-      <div class="lp-content">
+        <!-- Input glassmorphism -->
+        <div class="input-wrap">
+          <InputPanel
+            v-model:mode="inputMode"
+            v-model:url="urlInput"
+            v-model:paste="pasteInput"
+            :status="status"
+            :labels="i18n"
+            @translate="onTranslate"
+          />
+          <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
+          <div v-if="unparseableLines.length && status !== 'idle'" class="lp-banner lp-banner-warn">
+            {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '…' : '' }}
+          </div>
+          <div v-if="status === 'error'" class="lp-banner lp-banner-err">{{ error }}</div>
+        </div>
 
-        <!-- Features -->
+        <!-- Feature cards -->
         <div class="lp-features">
-          <div class="lp-feat">
+          <div class="lp-feat lp-feat-blue">
             <div class="lf-icon">
               <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
@@ -64,7 +74,7 @@
               <span class="lf-desc">{{ i18n.feat_url_desc }}</span>
             </div>
           </div>
-          <div class="lp-feat">
+          <div class="lp-feat lp-feat-purple">
             <div class="lf-icon">
               <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
@@ -76,7 +86,7 @@
               <span class="lf-desc">{{ i18n.feat_lang_desc }}</span>
             </div>
           </div>
-          <div class="lp-feat">
+          <div class="lp-feat lp-feat-green">
             <div class="lf-icon">
               <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
@@ -93,8 +103,19 @@
         <!-- Decks récents -->
         <div v-if="history.length" class="lp-recent">
           <div class="lp-recent-hd">
-            <span class="lp-recent-title">{{ i18n.recent }}</span>
-            <button class="lp-recent-clear" @click="clearHistory">{{ i18n.clear_all }}</button>
+            <span class="lp-recent-title">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+              {{ i18n.recent }}
+            </span>
+            <button class="lp-recent-clear" @click="clearHistory">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2 3h8M4.5 3V2h3v1M5 5.5v3M7 5.5v3M3 3l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ i18n.clear_all }}
+            </button>
           </div>
           <div class="lp-recent-grid">
             <button
@@ -110,24 +131,12 @@
               />
               <div class="ldc-body">
                 <div class="ldc-top">
-                  <svg v-if="entry.inputMode === 'url'" width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
-                    <path d="M5 3H3a2 2 0 0 0 0 4h2M7 3h2a2 2 0 0 1 0 4H7M4 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                  </svg>
-                  <svg v-else width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
-                    <path d="M2 4h8M2 7h6M2 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                  </svg>
                   <span class="ldc-date">{{ formatDate(entry.date) }}</span>
                 </div>
                 <span class="ldc-name">{{ entry.deckName }}</span>
                 <div class="ldc-footer">
                   <span class="ldc-count tabular">{{ entry.totalCount }} {{ i18n.cards }}</span>
                   <span v-if="entry.ownedCount > 0" class="ldc-owned tabular">{{ entry.ownedCount }} {{ i18n.owned }}</span>
-                </div>
-                <div class="ldc-progress-track">
-                  <div
-                    class="ldc-progress-fill"
-                    :style="{ width: (entry.totalCount ? entry.ownedCount / entry.totalCount * 100 : 0) + '%' }"
-                  />
                 </div>
               </div>
             </button>
@@ -258,7 +267,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const LANDING_I18N = {
   fr: {
@@ -269,8 +278,9 @@ const LANDING_I18N = {
     feat_coll: 'Suivi de collection', feat_coll_desc: 'Importez votre CSV Manabox, DragonShield ou Moxfield pour voir quelles cartes vous possédez déjà.',
     recent: 'Decks récents', clear_all: 'Effacer tout', cards: 'cartes', owned: 'possédées',
     today: "Aujourd'hui", yesterday: 'Hier', days_ago: n => `Il y a ${n}j`,
-    mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Coller une liste',
-    btn_translate: 'Traduire', btn_fetching: 'Récupération...', btn_translating: 'Traduction...',
+    mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Coller une liste', mode_paste_short: 'Liste',
+    paste_hint: 'Collez votre liste ci-dessous…',
+    btn_translate: 'Traduire', btn_fetching: 'Récupération…', btn_translating: 'Traduction…',
   },
   de: {
     hero_title_1: 'Übersetze deine Decks', hero_title_2: 'in deine Sprache',
@@ -280,7 +290,7 @@ const LANDING_I18N = {
     feat_coll: 'Sammlungs-Tracking', feat_coll_desc: 'Importiere dein Manabox-, DragonShield- oder Moxfield-CSV und sieh welche Karten du bereits besitzt.',
     recent: 'Letzte Decks', clear_all: 'Alle löschen', cards: 'Karten', owned: 'besessen',
     today: 'Heute', yesterday: 'Gestern', days_ago: n => `Vor ${n} Tagen`,
-    mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Liste einfügen',
+    mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Liste einfügen', mode_paste_short: 'Liste',
     btn_translate: 'Übersetzen', btn_fetching: 'Laden...', btn_translating: 'Übersetzen...',
   },
   it: {
@@ -380,18 +390,6 @@ const CATEGORY_FR = {
   Sorcery: 'Rituel', Artifact: 'Artefact', Enchantment: 'Enchantement',
   Planeswalker: 'Planeswalker', Land: 'Terrain', Other: 'Autre', Maybeboard: 'Maybeboard',
 }
-
-// --- Hero art ---
-const heroArtUrl = ref(null)
-onMounted(async () => {
-  try {
-    const r = await fetch('https://api.scryfall.com/cards/random?q=is:commander+order:edhrec+rarity:m')
-    if (r.ok) {
-      const d = await r.json()
-      heroArtUrl.value = d.image_uris?.art_crop ?? d.card_faces?.[0]?.image_uris?.art_crop ?? null
-    }
-  } catch {}
-})
 
 // --- State ---
 const showHistory = ref(false)
@@ -543,299 +541,285 @@ watch(deckId, () => { activeFilter.value = 'all' })
 <style scoped>
 .app { min-height: 100vh; }
 
-/* ── Landing page ──────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   LANDING PAGE — toujours sombre, indépendant du thème
+   ══════════════════════════════════════════════════════════ */
+
 .input-page {
   min-height: calc(100vh - var(--header-height));
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* ── Hero section ─────────────────────────────────────── */
-.lp-hero-section {
   position: relative;
-  width: 100%;
-  background: linear-gradient(160deg, #0b1525 0%, #172540 50%, #0d1e38 100%);
+  background: #030712;
   display: flex;
   justify-content: center;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: hidden;
 }
 
-.lp-hero-art {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center 30%;
-  opacity: 0.22;
-  filter: saturate(0.4) brightness(0.5);
+/* Orbes lumineux — position: fixed → ne bougent pas au resize */
+.lp-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+.lp-orb-1 {
+  top: -20%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(67, 56, 202, 0.22) 0%, transparent 65%);
+  filter: blur(1px);
+}
+.lp-orb-2 {
+  bottom: 0;
+  right: -15%;
+  width: 45%;
+  height: 55%;
+  background: radial-gradient(circle, rgba(109, 40, 217, 0.14) 0%, transparent 65%);
+  filter: blur(1px);
 }
 
-.lp-hero-inner {
+/* Colonne centrale */
+.lp-center {
   position: relative;
   z-index: 1;
-  max-width: 660px;
   width: 100%;
-  padding: 72px 24px 56px;
+  max-width: 800px;
+  padding: 80px 24px 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 60px;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.lp-hero {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 640px;
 }
 
 .lp-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 14px;
-  background: rgba(79, 127, 255, 0.15);
-  border: 1px solid rgba(79, 127, 255, 0.25);
-  color: rgba(160, 200, 255, 0.85);
+  gap: 7px;
+  padding: 5px 16px;
+  background: rgba(79, 70, 229, 0.14);
+  border: 1px solid rgba(79, 70, 229, 0.28);
+  color: rgba(165, 180, 252, 0.9);
   border-radius: 9999px;
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .lp-title {
-  font-size: clamp(28px, 4.5vw, 46px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  color: #fff;
+  font-size: clamp(32px, 5vw, 54px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  color: #f8fafc;
+  margin: 0;
 }
 
-.lp-accent { color: #6fa3ff; }
+.lp-gradient {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #818cf8 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
 .lp-sub {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.52);
+  font-size: 16px;
+  color: rgba(148, 163, 184, 0.82);
   line-height: 1.7;
-  max-width: 440px;
+  max-width: 460px;
 }
 
-/* Input wrap — sur fond sombre */
+/* ── Input wrap ───────────────────────────────────────── */
 .input-wrap {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
 }
 
-/* InputPanel sur fond sombre : overrides ciblés */
-.lp-hero-inner :deep(.input-panel) {
-  padding-top: 12px;
-  padding-bottom: 0;
-  gap: 10px;
+.lp-banner {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid;
 }
-.lp-hero-inner :deep(.mode-toggle) {
-  background: rgba(255, 255, 255, 0.08);
-}
-.lp-hero-inner :deep(.mode-btn) {
-  color: rgba(255, 255, 255, 0.45);
-}
-.lp-hero-inner :deep(.mode-btn.active) {
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  box-shadow: none;
-}
-.lp-hero-inner :deep(.text-input) {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: transparent;
-  color: #0f172a;
-}
-.lp-hero-inner :deep(.text-input::placeholder) {
-  color: rgba(0, 0, 0, 0.35);
-}
-.lp-hero-inner :deep(.text-input:focus) {
-  background: #fff;
-  border-color: #4F7FFF;
-  box-shadow: 0 0 0 3px rgba(79, 127, 255, 0.25);
-}
-.lp-hero-inner .warning-banner {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.28);
+.lp-banner-warn {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
   color: #fbbf24;
 }
-.lp-hero-inner .error-banner {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.28);
+.lp-banner-err {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
   color: #fca5a5;
-}
-
-/* ── Contenu sous le hero ─────────────────────────────── */
-.lp-content {
-  width: 100%;
-  max-width: 800px;
-  align-self: center;
-  padding: 40px 24px 72px;
-  display: flex;
-  flex-direction: column;
-  gap: 44px;
 }
 
 /* ── Feature cards ────────────────────────────────────── */
 .lp-features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 14px;
+  width: 100%;
 }
 
 .lp-feat {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 22px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top-width: 2px;
-  border-radius: var(--radius-lg);
-  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  gap: 16px;
+  padding: 24px 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
-.lp-feat:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-  transform: translateY(-1px);
-}
-
-/* Accent couleur par feature */
-.lp-feat:nth-child(1) { border-top-color: #4F7FFF; }
-.lp-feat:nth-child(2) { border-top-color: #8B5CF6; }
-.lp-feat:nth-child(3) { border-top-color: #10B981; }
+.lp-feat:hover { transform: translateY(-3px); }
+.lp-feat-blue:hover  { border-color: rgba(59,130,246,0.4); box-shadow: 0 0 32px rgba(59,130,246,0.12); background: rgba(59,130,246,0.03); }
+.lp-feat-purple:hover { border-color: rgba(168,85,247,0.4); box-shadow: 0 0 32px rgba(168,85,247,0.12); background: rgba(168,85,247,0.03); }
+.lp-feat-green:hover  { border-color: rgba(16,185,129,0.4); box-shadow: 0 0 32px rgba(16,185,129,0.12); background: rgba(16,185,129,0.03); }
 
 .lf-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
   flex-shrink: 0;
 }
-.lp-feat:nth-child(1) .lf-icon { background: rgba(79, 127, 255, 0.1); color: #4F7FFF; }
-.lp-feat:nth-child(2) .lf-icon { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
-.lp-feat:nth-child(3) .lf-icon { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+.lp-feat-blue  .lf-icon { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.lp-feat-purple .lf-icon { background: rgba(168,85,247,0.12); color: #c084fc; }
+.lp-feat-green  .lf-icon { background: rgba(16,185,129,0.12); color: #34d399; }
 
-.lf-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.lf-body { display: flex; flex-direction: column; gap: 8px; }
 
 .lf-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-1);
-  letter-spacing: -0.01em;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.02em;
 }
 
 .lf-desc {
   font-size: 13px;
-  color: var(--text-2);
-  line-height: 1.55;
+  color: rgba(148, 163, 184, 0.78);
+  line-height: 1.6;
 }
 
 /* ── Recent history ───────────────────────────────────── */
 .lp-recent {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .lp-recent-hd {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .lp-recent-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-1);
-  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.02em;
 }
 
 .lp-recent-clear {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
-  color: var(--text-3);
-  transition: color var(--transition-fast);
+  color: rgba(148, 163, 184, 0.45);
+  transition: color 0.15s;
 }
-.lp-recent-clear:hover { color: var(--error); }
+.lp-recent-clear:hover { color: #f87171; }
 
 .lp-recent-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
 }
 
 /* Deck card */
 .lp-deck-card {
   position: relative;
+  min-height: 140px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
-  text-align: left;
-  padding: 14px 16px;
-  min-height: 130px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
-
 .lp-deck-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px rgba(79, 127, 255, 0.14);
-  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 4px 28px rgba(99, 102, 241, 0.18);
+  transform: translateY(-3px);
 }
 
-/* Background art */
+/* Art — plus visible sur fond sombre */
 .ldc-art {
   position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center 20%;
-  opacity: 0.13;
-  filter: saturate(0.65) brightness(1.05);
-  transition: opacity 300ms ease;
+  opacity: 0.28;
+  filter: saturate(0.65);
+  transition: opacity 0.3s;
 }
+.lp-deck-card:hover .ldc-art { opacity: 0.45; }
 
-.lp-deck-card:hover .ldc-art {
-  opacity: 0.26;
-}
-
-/* Content above art */
+/* Body avec gradient pour lisibilité */
 .ldc-body {
   position: relative;
   z-index: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  padding: 14px 16px;
+  background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3) 0%, rgba(3, 7, 18, 0.72) 100%);
 }
 
-.ldc-top {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.ldc-src-icon { color: var(--text-3); flex-shrink: 0; }
+.ldc-top { display: flex; align-items: center; gap: 5px; }
 
 .ldc-date {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--text-3);
+  color: rgba(148, 163, 184, 0.65);
+  background: rgba(3, 7, 18, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .ldc-name {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-1);
+  font-weight: 700;
+  color: #f1f5f9;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -853,27 +837,13 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .ldc-count {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--text-3);
+  color: rgba(148, 163, 184, 0.55);
 }
 
 .ldc-owned {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--success);
-}
-
-.ldc-progress-track {
-  height: 2px;
-  background: var(--border);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.ldc-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 9999px;
-  transition: width 600ms ease;
+  color: #34d399;
 }
 
 /* ── Deck layout: sidebar + main ────────────────────── */
