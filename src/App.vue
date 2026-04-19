@@ -19,8 +19,17 @@
       />
     </Transition>
 
-    <!-- Pre-translation: input centré, spacieux -->
+    <!-- Pre-translation: landing page -->
     <div v-if="status !== 'done'" class="input-page">
+
+      <!-- Hero -->
+      <div class="lp-hero">
+        <div class="lp-badge">Magic: The Gathering</div>
+        <h1 class="lp-title">Traduisez vos decks<br><span class="lp-accent">dans votre langue</span></h1>
+        <p class="lp-sub">Importez un deck depuis Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou collez votre liste. Noms traduits en quelques secondes via Scryfall.</p>
+      </div>
+
+      <!-- Input -->
       <div class="input-wrap">
         <InputPanel
           v-model:mode="inputMode"
@@ -35,6 +44,83 @@
         </div>
         <div v-if="status === 'error'" class="error-banner">{{ error }}</div>
       </div>
+
+      <!-- Features -->
+      <div class="lp-features">
+        <div class="lp-feat">
+          <div class="lf-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="lf-body">
+            <span class="lf-title">Import URL</span>
+            <span class="lf-desc">Archidekt · Moxfield · MTGTOP8 · Tappedout</span>
+          </div>
+        </div>
+        <div class="lp-feat">
+          <div class="lf-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6M8 2c2 2 3 4 3 6s-1 4-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="lf-body">
+            <span class="lf-title">15 langues</span>
+            <span class="lf-desc">FR · DE · ES · IT · PT · JA · KO · RU · ZH…</span>
+          </div>
+        </div>
+        <div class="lp-feat">
+          <div class="lf-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="lf-body">
+            <span class="lf-title">Suivi de collection</span>
+            <span class="lf-desc">Cochez vos cartes · Import CSV Manabox</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decks récents -->
+      <div v-if="history.length" class="lp-recent">
+        <div class="lp-recent-hd">
+          <span class="lp-recent-title">Decks récents</span>
+          <button class="lp-recent-clear" @click="clearHistory">Effacer tout</button>
+        </div>
+        <div class="lp-recent-grid">
+          <button
+            v-for="entry in history.slice(0, 6)"
+            :key="entry.deckId"
+            class="lp-deck-card"
+            @click="onLoadFromHistory(entry)"
+          >
+            <div class="ldc-top">
+              <svg v-if="entry.inputMode === 'url'" width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
+                <path d="M5 3H3a2 2 0 0 0 0 4h2M7 3h2a2 2 0 0 1 0 4H7M4 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <svg v-else width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
+                <path d="M2 4h8M2 7h6M2 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <span class="ldc-date">{{ formatDate(entry.date) }}</span>
+            </div>
+            <span class="ldc-name">{{ entry.deckName }}</span>
+            <div class="ldc-footer">
+              <span class="ldc-count tabular">{{ entry.totalCount }} cartes</span>
+              <span v-if="entry.ownedCount > 0" class="ldc-owned tabular">{{ entry.ownedCount }} possédées</span>
+            </div>
+            <div class="ldc-progress-track">
+              <div
+                class="ldc-progress-fill"
+                :style="{ width: (entry.totalCount ? entry.ownedCount / entry.totalCount * 100 : 0) + '%' }"
+              />
+            </div>
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <!-- Post-translation: app shell full-width -->
@@ -306,6 +392,15 @@ async function exportBuyCardmarket() {
   showCardmarket.value = true
 }
 
+function formatDate(iso) {
+  const d = new Date(iso)
+  const diffDays = Math.floor((Date.now() - d) / 86400000)
+  if (diffDays === 0) return "Aujourd'hui"
+  if (diffDays === 1) return "Hier"
+  if (diffDays < 7) return `Il y a ${diffDays}j`
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
 function applyCollection() {
   const map = getCollectionMap()
   if (!map) return
@@ -319,21 +414,231 @@ watch(deckId, () => { activeFilter.value = 'all' })
 <style scoped>
 .app { min-height: 100vh; }
 
-/* ── Page input ────────────────────────────────────────── */
+/* ── Landing page ──────────────────────────────────────── */
 .input-page {
   min-height: calc(100vh - var(--header-height));
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 72px 24px 60px;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px 80px;
+  gap: 36px;
 }
 
+/* Hero */
+.lp-hero {
+  text-align: center;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.lp-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.lp-title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: var(--text-1);
+}
+
+.lp-accent { color: var(--accent); }
+
+.lp-sub {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+/* Input */
 .input-wrap {
   width: 100%;
   max-width: 580px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+}
+
+/* Features */
+.lp-features {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 680px;
+}
+
+.lp-feat {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-width: 200px;
+  flex: 1;
+  max-width: 240px;
+}
+
+.lf-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.lf-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.lf-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.lf-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Recent history */
+.lp-recent {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-recent-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lp-recent-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+
+.lp-recent-clear {
+  font-size: 12px;
+  color: var(--text-3);
+  transition: color var(--transition-fast);
+}
+.lp-recent-clear:hover { color: var(--error); }
+
+.lp-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+/* Deck card */
+.lp-deck-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.lp-deck-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(79, 127, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.ldc-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ldc-src-icon { color: var(--text-3); flex-shrink: 0; }
+
+.ldc-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.ldc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.ldc-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ldc-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.ldc-owned {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--success);
+}
+
+.ldc-progress-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.ldc-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 9999px;
+  transition: width 600ms ease;
 }
 
 /* ── Deck layout: sidebar + main ────────────────────── */
