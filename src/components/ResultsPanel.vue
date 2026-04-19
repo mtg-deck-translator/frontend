@@ -8,7 +8,7 @@
       :checked-map="checkedMap"
       :index="i"
       @toggle="$emit('toggle', $event)"
-      @set-all="$emit('set-all', $event[0], $event[1])"
+      @set-all="(keys, val) => $emit('set-all', keys, val)"
     />
 
     <p v-if="visibleGroups.length === 0" class="empty-state">
