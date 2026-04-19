@@ -99,6 +99,11 @@
           @update:sort="sort = $event"
           @update:filter="activeFilter = $event"
         />
+
+        <div class="sidebar-sep" />
+
+        <!-- Import collection -->
+        <CollectionImport @apply="applyCollection" />
       </aside>
 
       <!-- Contenu principal -->
@@ -157,6 +162,7 @@ import { ref, computed, watch } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
 import CardmarketPanel from './components/CardmarketPanel.vue'
+import CollectionImport from './components/CollectionImport.vue'
 import ColumnsPanel from './components/ColumnsPanel.vue'
 import InputPanel from './components/InputPanel.vue'
 import ProgressBar from './components/ProgressBar.vue'
@@ -173,6 +179,8 @@ import { useChecklist } from './composables/useChecklist.js'
 import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
 import { useExport } from './composables/useExport.js'
+import { useCollection } from './composables/useCollection.js'
+import { matchDeckToCollection } from './services/collectionParser.js'
 import { getCachedCards, setCachedCards } from './services/storage.js'
 
 const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other', 'Maybeboard']
@@ -204,6 +212,7 @@ const {
 const { checkedMap, toggle: toggleCard, setAll, reset: resetChecklist, ownedCount } = useChecklist(deckId)
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
+const { getMap: getCollectionMap } = useCollection()
 
 // --- Computed ---
 const totalPrice = computed(() =>
@@ -295,6 +304,13 @@ async function exportBuyCardmarket() {
   const text = missingCards.value.map(c => `${c.qty} ${c.displayName}`).join('\n')
   try { await navigator.clipboard.writeText(text) } catch {}
   showCardmarket.value = true
+}
+
+function applyCollection() {
+  const map = getCollectionMap()
+  if (!map) return
+  const owned = matchDeckToCollection(cards.value, map)
+  setAll([...owned], true)
 }
 
 watch(deckId, () => { activeFilter.value = 'all' })
