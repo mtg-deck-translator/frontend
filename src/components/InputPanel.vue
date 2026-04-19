@@ -25,7 +25,7 @@
         ref="urlRef"
         type="url"
         class="text-input"
-        placeholder="archidekt.com/decks/… · moxfield.com/decks/… · mtgtop8.com/event?e=…&d=…"
+        placeholder="https://archidekt.com/decks/… ou moxfield.com/decks/…"
         :value="url"
         :disabled="isLoading"
         @input="$emit('update:url', $event.target.value)"
