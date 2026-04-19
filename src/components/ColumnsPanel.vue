@@ -75,10 +75,10 @@ function groupPrice(group) {
 }
 
 .col {
-  min-width: 175px;
+  min-width: 210px;
   flex-shrink: 0;
-  padding-right: 16px;
-  margin-right: 16px;
+  padding-right: 20px;
+  margin-right: 20px;
   border-right: 1px solid var(--border);
 }
 
