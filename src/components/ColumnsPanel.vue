@@ -89,15 +89,13 @@ function groupPrice(group) {
 }
 
 .col-header {
-  position: sticky;
-  top: var(--header-height);
-  background: var(--bg);
-  padding: 6px 0 10px;
-  z-index: 10;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 6px;
+  padding: 0 0 10px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
 }
 
 .col-title {

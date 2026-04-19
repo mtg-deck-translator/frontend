@@ -22,7 +22,6 @@
             :class="{ checked: checkedMap[card.queryName] }"
             @click="$emit('toggle', card.queryName)"
             @mouseenter="hoveredCard = card"
-            @mouseleave="hoveredCard = null"
           >
             <div class="tile-img-wrap">
               <img
@@ -56,25 +55,23 @@
 
     <!-- Panneau zoom à droite -->
     <div class="zoom-panel">
-      <Transition name="zoom-fade">
-        <div v-if="hoveredCard" class="zoom-inner" :key="hoveredCard.queryName">
-          <img
-            v-if="hoveredCard.imageUrl"
-            :src="hoveredCard.imageUrl"
-            :alt="hoveredCard.frName"
-            class="zoom-img"
-          />
-          <div v-else class="zoom-placeholder">
-            <span>{{ hoveredCard.frName }}</span>
-          </div>
-          <div class="zoom-info">
-            <span class="zoom-name">{{ hoveredCard.frName }}</span>
-            <span v-if="hoveredCard.displayName !== hoveredCard.frName" class="zoom-en">{{ hoveredCard.displayName }}</span>
-            <span v-if="hoveredCard.price != null" class="zoom-price tabular">{{ formatPrice(hoveredCard.price) }}</span>
-          </div>
+      <div v-if="hoveredCard" class="zoom-inner">
+        <img
+          v-if="hoveredCard.imageUrl"
+          :src="hoveredCard.imageUrl"
+          :alt="hoveredCard.frName"
+          class="zoom-img"
+        />
+        <div v-else class="zoom-placeholder">
+          <span>{{ hoveredCard.frName }}</span>
         </div>
-      </Transition>
-      <div v-if="!hoveredCard" class="zoom-empty">
+        <div class="zoom-info">
+          <span class="zoom-name">{{ hoveredCard.frName }}</span>
+          <span v-if="hoveredCard.displayName !== hoveredCard.frName" class="zoom-en">{{ hoveredCard.displayName }}</span>
+          <span v-if="hoveredCard.price != null" class="zoom-price tabular">{{ formatPrice(hoveredCard.price) }}</span>
+        </div>
+      </div>
+      <div v-else class="zoom-empty">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
           <rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
         </svg>
@@ -352,14 +349,4 @@ function groupPrice(group) {
   font-size: 14px;
 }
 
-/* Zoom transition */
-.zoom-fade-enter-active,
-.zoom-fade-leave-active {
-  transition: opacity 120ms ease, transform 120ms ease;
-}
-.zoom-fade-enter-from,
-.zoom-fade-leave-to {
-  opacity: 0;
-  transform: scale(0.97);
-}
 </style>
