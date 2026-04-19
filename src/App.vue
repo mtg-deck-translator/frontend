@@ -265,7 +265,7 @@ const LANDING_I18N = {
     hero_title_1: 'Traduisez vos decks', hero_title_2: 'dans votre langue',
     hero_sub: 'Importez un deck depuis Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou collez votre liste. Noms traduits en quelques secondes via Scryfall.',
     feat_url: 'Import URL', feat_url_desc: 'Collez une URL Archidekt, Moxfield, MTGTOP8 ou Tappedout et obtenez la liste traduite instantanément.',
-    feat_lang: '15 langues', feat_lang_desc: 'Français, Allemand, Espagnol, Italien, Portugais, Japonais, Coréen, Russe et plus encore.',
+    feat_lang: '8 langues', feat_lang_desc: 'Français, Allemand, Espagnol, Italien, Portugais, Japonais, Coréen, Russe et plus encore.',
     feat_coll: 'Suivi de collection', feat_coll_desc: 'Importez votre CSV Manabox, DragonShield ou Moxfield pour voir quelles cartes vous possédez déjà.',
     recent: 'Decks récents', clear_all: 'Effacer tout', cards: 'cartes', owned: 'possédées',
     today: "Aujourd'hui", yesterday: 'Hier', days_ago: n => `Il y a ${n}j`,
@@ -276,7 +276,7 @@ const LANDING_I18N = {
     hero_title_1: 'Übersetze deine Decks', hero_title_2: 'in deine Sprache',
     hero_sub: 'Importiere ein Deck von Archidekt, Moxfield, MTGTOP8 oder Tappedout — oder füge deine Liste ein. Namen werden in Sekunden via Scryfall übersetzt.',
     feat_url: 'URL-Import', feat_url_desc: 'Füge eine Archidekt-, Moxfield-, MTGTOP8- oder Tappedout-URL ein und erhalte sofort die übersetzte Liste.',
-    feat_lang: '15 Sprachen', feat_lang_desc: 'Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch, Japanisch, Koreanisch, Russisch und mehr.',
+    feat_lang: '8 Sprachen', feat_lang_desc: 'Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch, Japanisch, Koreanisch, Russisch und mehr.',
     feat_coll: 'Sammlungs-Tracking', feat_coll_desc: 'Importiere dein Manabox-, DragonShield- oder Moxfield-CSV und sieh welche Karten du bereits besitzt.',
     recent: 'Letzte Decks', clear_all: 'Alle löschen', cards: 'Karten', owned: 'besessen',
     today: 'Heute', yesterday: 'Gestern', days_ago: n => `Vor ${n} Tagen`,
@@ -287,7 +287,7 @@ const LANDING_I18N = {
     hero_title_1: 'Traduci i tuoi deck', hero_title_2: 'nella tua lingua',
     hero_sub: 'Importa un deck da Archidekt, Moxfield, MTGTOP8 o Tappedout — oppure incolla la tua lista. Nomi tradotti in pochi secondi tramite Scryfall.',
     feat_url: 'Import URL', feat_url_desc: 'Incolla un URL Archidekt, Moxfield, MTGTOP8 o Tappedout e ottieni istantaneamente la lista tradotta.',
-    feat_lang: '15 lingue', feat_lang_desc: 'Francese, Tedesco, Spagnolo, Italiano, Portoghese, Giapponese, Coreano, Russo e altro.',
+    feat_lang: '8 lingue', feat_lang_desc: 'Francese, Tedesco, Spagnolo, Italiano, Portoghese, Giapponese, Coreano, Russo e altro.',
     feat_coll: 'Traccia collezione', feat_coll_desc: 'Importa il tuo CSV Manabox, DragonShield o Moxfield per vedere quali carte possiedi già.',
     recent: 'Deck recenti', clear_all: 'Cancella tutto', cards: 'carte', owned: 'possedute',
     today: 'Oggi', yesterday: 'Ieri', days_ago: n => `${n} giorni fa`,
@@ -298,7 +298,7 @@ const LANDING_I18N = {
     hero_title_1: 'Traduce tus mazos', hero_title_2: 'a tu idioma',
     hero_sub: 'Importa un mazo desde Archidekt, Moxfield, MTGTOP8 o Tappedout — o pega tu lista. Nombres traducidos en segundos con Scryfall.',
     feat_url: 'Import URL', feat_url_desc: 'Pega una URL de Archidekt, Moxfield, MTGTOP8 o Tappedout y obtén la lista traducida al instante.',
-    feat_lang: '15 idiomas', feat_lang_desc: 'Francés, Alemán, Español, Italiano, Portugués, Japonés, Coreano, Ruso y más.',
+    feat_lang: '8 idiomas', feat_lang_desc: 'Francés, Alemán, Español, Italiano, Portugués, Japonés, Coreano, Ruso y más.',
     feat_coll: 'Seguimiento de colección', feat_coll_desc: 'Importa tu CSV de Manabox, DragonShield o Moxfield para ver qué cartas ya posees.',
     recent: 'Mazos recientes', clear_all: 'Borrar todo', cards: 'cartas', owned: 'poseídas',
     today: 'Hoy', yesterday: 'Ayer', days_ago: n => `Hace ${n} días`,
@@ -309,7 +309,7 @@ const LANDING_I18N = {
     hero_title_1: 'Traduza seus decks', hero_title_2: 'no seu idioma',
     hero_sub: 'Importe um deck do Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou cole sua lista. Nomes traduzidos em segundos via Scryfall.',
     feat_url: 'Import URL', feat_url_desc: 'Cole uma URL do Archidekt, Moxfield, MTGTOP8 ou Tappedout e obtenha a lista traduzida instantaneamente.',
-    feat_lang: '15 idiomas', feat_lang_desc: 'Francês, Alemão, Espanhol, Italiano, Português, Japonês, Coreano, Russo e mais.',
+    feat_lang: '8 idiomas', feat_lang_desc: 'Francês, Alemão, Espanhol, Italiano, Português, Japonês, Coreano, Russo e mais.',
     feat_coll: 'Rastrear coleção', feat_coll_desc: 'Importe seu CSV do Manabox, DragonShield ou Moxfield para ver quais cartas você já possui.',
     recent: 'Decks recentes', clear_all: 'Limpar tudo', cards: 'cartas', owned: 'possuídas',
     today: 'Hoje', yesterday: 'Ontem', days_ago: n => `Há ${n} dias`,
@@ -320,7 +320,7 @@ const LANDING_I18N = {
     hero_title_1: 'デッキを翻訳する', hero_title_2: 'あなたの言語で',
     hero_sub: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けるか、リストを直接入力。Scryfallで数秒で翻訳。',
     feat_url: 'URLインポート', feat_url_desc: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けると即座に翻訳済みリストを取得。',
-    feat_lang: '15言語', feat_lang_desc: 'フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、日本語、韓国語、ロシア語など。',
+    feat_lang: '8言語', feat_lang_desc: 'フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、日本語、韓国語、ロシア語など。',
     feat_coll: 'コレクション管理', feat_coll_desc: 'Manabox、DragonShield、MoxfieldのCSVをインポートして所持カードを確認。',
     recent: '最近のデッキ', clear_all: 'すべて削除', cards: 'カード', owned: '所有',
     today: '今日', yesterday: '昨日', days_ago: n => `${n}日前`,
@@ -331,7 +331,7 @@ const LANDING_I18N = {
     hero_title_1: '덱을 번역하세요', hero_title_2: '당신의 언어로',
     hero_sub: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout에서 덱을 가져오거나 목록을 붙여넣으세요. Scryfall로 몇 초 만에 번역됩니다.',
     feat_url: 'URL 가져오기', feat_url_desc: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout URL을 붙여넣으면 즉시 번역된 목록을 얻을 수 있습니다.',
-    feat_lang: '15개 언어', feat_lang_desc: '프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 일본어, 한국어, 러시아어 등.',
+    feat_lang: '8개 언어', feat_lang_desc: '프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 일본어, 한국어, 러시아어 등.',
     feat_coll: '컬렉션 추적', feat_coll_desc: 'Manabox, DragonShield 또는 Moxfield CSV를 가져와 이미 보유한 카드를 확인하세요.',
     recent: '최근 덱', clear_all: '모두 지우기', cards: '카드', owned: '보유',
     today: '오늘', yesterday: '어제', days_ago: n => `${n}일 전`,
@@ -342,7 +342,7 @@ const LANDING_I18N = {
     hero_title_1: 'Переводите свои деки', hero_title_2: 'на ваш язык',
     hero_sub: 'Импортируйте дек с Archidekt, Moxfield, MTGTOP8 или Tappedout — или вставьте список. Названия переведены за секунды через Scryfall.',
     feat_url: 'Импорт URL', feat_url_desc: 'Вставьте URL Archidekt, Moxfield, MTGTOP8 или Tappedout и мгновенно получите переведённый список.',
-    feat_lang: '15 языков', feat_lang_desc: 'Французский, Немецкий, Испанский, Итальянский, Португальский, Японский, Корейский, Русский и другие.',
+    feat_lang: '8 языков', feat_lang_desc: 'Французский, Немецкий, Испанский, Итальянский, Португальский, Японский, Корейский, Русский и другие.',
     feat_coll: 'Отслеживание коллекции', feat_coll_desc: 'Импортируйте CSV из Manabox, DragonShield или Moxfield чтобы видеть уже имеющиеся карты.',
     recent: 'Последние деки', clear_all: 'Очистить всё', cards: 'карт', owned: 'есть',
     today: 'Сегодня', yesterday: 'Вчера', days_ago: n => `${n} дн. назад`,
@@ -551,15 +551,15 @@ watch(deckId, () => { activeFilter.value = 'all' })
   align-items: stretch;
 }
 
-/* ── Hero section — sombre, pleine largeur ────────────── */
+/* ── Hero section ─────────────────────────────────────── */
 .lp-hero-section {
   position: relative;
   width: 100%;
-  min-height: 62vh;
-  background: linear-gradient(160deg, #0c1628 0%, #182a44 55%, #0e2038 100%);
+  background: linear-gradient(160deg, #0b1525 0%, #172540 50%, #0d1e38 100%);
   display: flex;
   justify-content: center;
   overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .lp-hero-art {
@@ -567,32 +567,20 @@ watch(deckId, () => { activeFilter.value = 'all' })
   inset: 0;
   background-size: cover;
   background-position: center 30%;
-  opacity: 0.3;
-  filter: saturate(0.45) brightness(0.55);
-}
-
-/* gradient en bas pour fondre l'art dans le reste de la page */
-.lp-hero-section::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(to bottom, transparent, var(--bg));
-  z-index: 1;
+  opacity: 0.22;
+  filter: saturate(0.4) brightness(0.5);
 }
 
 .lp-hero-inner {
   position: relative;
-  z-index: 2;
-  max-width: 680px;
+  z-index: 1;
+  max-width: 660px;
   width: 100%;
-  padding: 80px 24px 72px;
+  padding: 72px 24px 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   text-align: center;
 }
 
@@ -600,41 +588,82 @@ watch(deckId, () => { activeFilter.value = 'all' })
   display: inline-flex;
   align-items: center;
   padding: 4px 14px;
-  background: rgba(79, 127, 255, 0.18);
-  border: 1px solid rgba(79, 127, 255, 0.3);
-  color: rgba(180, 210, 255, 0.92);
+  background: rgba(79, 127, 255, 0.15);
+  border: 1px solid rgba(79, 127, 255, 0.25);
+  color: rgba(160, 200, 255, 0.85);
   border-radius: 9999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .lp-title {
-  font-size: clamp(30px, 5vw, 48px);
+  font-size: clamp(28px, 4.5vw, 46px);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
   color: #fff;
 }
 
-.lp-accent { color: #7aadff; }
+.lp-accent { color: #6fa3ff; }
 
 .lp-sub {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.52);
   line-height: 1.7;
-  max-width: 480px;
+  max-width: 440px;
 }
 
 /* Input wrap — sur fond sombre */
 .input-wrap {
   width: 100%;
-  max-width: 620px;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* InputPanel sur fond sombre : overrides ciblés */
+.lp-hero-inner :deep(.input-panel) {
+  padding-top: 12px;
+  padding-bottom: 0;
+  gap: 10px;
+}
+.lp-hero-inner :deep(.mode-toggle) {
+  background: rgba(255, 255, 255, 0.08);
+}
+.lp-hero-inner :deep(.mode-btn) {
+  color: rgba(255, 255, 255, 0.45);
+}
+.lp-hero-inner :deep(.mode-btn.active) {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  box-shadow: none;
+}
+.lp-hero-inner :deep(.text-input) {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: transparent;
+  color: #0f172a;
+}
+.lp-hero-inner :deep(.text-input::placeholder) {
+  color: rgba(0, 0, 0, 0.35);
+}
+.lp-hero-inner :deep(.text-input:focus) {
+  background: #fff;
+  border-color: #4F7FFF;
+  box-shadow: 0 0 0 3px rgba(79, 127, 255, 0.25);
+}
+.lp-hero-inner .warning-banner {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+}
+.lp-hero-inner .error-banner {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #fca5a5;
 }
 
 /* ── Contenu sous le hero ─────────────────────────────── */
@@ -642,17 +671,17 @@ watch(deckId, () => { activeFilter.value = 'all' })
   width: 100%;
   max-width: 800px;
   align-self: center;
-  padding: 52px 24px 80px;
+  padding: 40px 24px 72px;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 44px;
 }
 
 /* ── Feature cards ────────────────────────────────────── */
 .lp-features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  gap: 12px;
 }
 
 .lp-feat {
@@ -662,26 +691,32 @@ watch(deckId, () => { activeFilter.value = 'all' })
   padding: 22px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
+  border-top-width: 2px;
   border-radius: var(--radius-lg);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.lp-feat:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
 }
 
-.lp-feat:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px rgba(79, 127, 255, 0.1);
-}
+/* Accent couleur par feature */
+.lp-feat:nth-child(1) { border-top-color: #4F7FFF; }
+.lp-feat:nth-child(2) { border-top-color: #8B5CF6; }
+.lp-feat:nth-child(3) { border-top-color: #10B981; }
 
 .lf-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-md);
-  background: var(--accent-subtle);
-  color: var(--accent);
   flex-shrink: 0;
 }
+.lp-feat:nth-child(1) .lf-icon { background: rgba(79, 127, 255, 0.1); color: #4F7FFF; }
+.lp-feat:nth-child(2) .lf-icon { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.lp-feat:nth-child(3) .lf-icon { background: rgba(16, 185, 129, 0.1); color: #10B981; }
 
 .lf-body {
   display: flex;
