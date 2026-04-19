@@ -22,113 +22,119 @@
     <!-- Pre-translation: landing page -->
     <div v-if="status !== 'done'" class="input-page">
 
-      <!-- Hero -->
-      <div class="lp-hero">
-        <div class="lp-badge">Magic: The Gathering</div>
-        <h1 class="lp-title">{{ i18n.hero_title_1 }}<br><span class="lp-accent">{{ i18n.hero_title_2 }}</span></h1>
-        <p class="lp-sub">{{ i18n.hero_sub }}</p>
-      </div>
+      <!-- Hero section — dark, pleine largeur, avec art MTG en fond -->
+      <section class="lp-hero-section">
+        <div v-if="heroArtUrl" class="lp-hero-art" :style="{ backgroundImage: `url(${heroArtUrl})` }"/>
+        <div class="lp-hero-inner">
+          <div class="lp-badge">Magic: The Gathering</div>
+          <h1 class="lp-title">{{ i18n.hero_title_1 }}<br><span class="lp-accent">{{ i18n.hero_title_2 }}</span></h1>
+          <p class="lp-sub">{{ i18n.hero_sub }}</p>
 
-      <!-- Input -->
-      <div class="input-wrap">
-        <InputPanel
-          v-model:mode="inputMode"
-          v-model:url="urlInput"
-          v-model:paste="pasteInput"
-          :status="status"
-          :labels="i18n"
-          @translate="onTranslate"
-        />
-        <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
-        <div v-if="unparseableLines.length && status !== 'idle'" class="warning-banner">
-          {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '...' : '' }}
-        </div>
-        <div v-if="status === 'error'" class="error-banner">{{ error }}</div>
-      </div>
-
-      <!-- Features -->
-      <div class="lp-features">
-        <div class="lp-feat">
-          <div class="lf-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="lf-body">
-            <span class="lf-title">{{ i18n.feat_url }}</span>
-            <span class="lf-desc">{{ i18n.feat_url_desc }}</span>
-          </div>
-        </div>
-        <div class="lp-feat">
-          <div class="lf-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6M8 2c2 2 3 4 3 6s-1 4-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="lf-body">
-            <span class="lf-title">{{ i18n.feat_lang }}</span>
-            <span class="lf-desc">{{ i18n.feat_lang_desc }}</span>
-          </div>
-        </div>
-        <div class="lp-feat">
-          <div class="lf-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="lf-body">
-            <span class="lf-title">{{ i18n.feat_coll }}</span>
-            <span class="lf-desc">{{ i18n.feat_coll_desc }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Decks récents -->
-      <div v-if="history.length" class="lp-recent">
-        <div class="lp-recent-hd">
-          <span class="lp-recent-title">{{ i18n.recent }}</span>
-          <button class="lp-recent-clear" @click="clearHistory">{{ i18n.clear_all }}</button>
-        </div>
-        <div class="lp-recent-grid">
-          <button
-            v-for="entry in history.slice(0, 6)"
-            :key="entry.deckId"
-            class="lp-deck-card"
-            @click="onLoadFromHistory(entry)"
-          >
-            <div
-              v-if="entry.coverImageUrl"
-              class="ldc-art"
-              :style="{ backgroundImage: `url(${entry.coverImageUrl})` }"
+          <div class="input-wrap">
+            <InputPanel
+              v-model:mode="inputMode"
+              v-model:url="urlInput"
+              v-model:paste="pasteInput"
+              :status="status"
+              :labels="i18n"
+              @translate="onTranslate"
             />
-            <div class="ldc-body">
-              <div class="ldc-top">
-                <svg v-if="entry.inputMode === 'url'" width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
-                  <path d="M5 3H3a2 2 0 0 0 0 4h2M7 3h2a2 2 0 0 1 0 4H7M4 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-                <svg v-else width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
-                  <path d="M2 4h8M2 7h6M2 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-                <span class="ldc-date">{{ formatDate(entry.date) }}</span>
-              </div>
-              <span class="ldc-name">{{ entry.deckName }}</span>
-              <div class="ldc-footer">
-                <span class="ldc-count tabular">{{ entry.totalCount }} {{ i18n.cards }}</span>
-                <span v-if="entry.ownedCount > 0" class="ldc-owned tabular">{{ entry.ownedCount }} {{ i18n.owned }}</span>
-              </div>
-              <div class="ldc-progress-track">
-                <div
-                  class="ldc-progress-fill"
-                  :style="{ width: (entry.totalCount ? entry.ownedCount / entry.totalCount * 100 : 0) + '%' }"
-                />
-              </div>
+            <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
+            <div v-if="unparseableLines.length && status !== 'idle'" class="warning-banner">
+              {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '...' : '' }}
             </div>
-          </button>
+            <div v-if="status === 'error'" class="error-banner">{{ error }}</div>
+          </div>
         </div>
-      </div>
+      </section>
 
+      <!-- Contenu sous le hero -->
+      <div class="lp-content">
+
+        <!-- Features -->
+        <div class="lp-features">
+          <div class="lp-feat">
+            <div class="lf-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="lf-body">
+              <span class="lf-title">{{ i18n.feat_url }}</span>
+              <span class="lf-desc">{{ i18n.feat_url_desc }}</span>
+            </div>
+          </div>
+          <div class="lp-feat">
+            <div class="lf-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6M8 2c2 2 3 4 3 6s-1 4-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="lf-body">
+              <span class="lf-title">{{ i18n.feat_lang }}</span>
+              <span class="lf-desc">{{ i18n.feat_lang_desc }}</span>
+            </div>
+          </div>
+          <div class="lp-feat">
+            <div class="lf-icon">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="lf-body">
+              <span class="lf-title">{{ i18n.feat_coll }}</span>
+              <span class="lf-desc">{{ i18n.feat_coll_desc }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decks récents -->
+        <div v-if="history.length" class="lp-recent">
+          <div class="lp-recent-hd">
+            <span class="lp-recent-title">{{ i18n.recent }}</span>
+            <button class="lp-recent-clear" @click="clearHistory">{{ i18n.clear_all }}</button>
+          </div>
+          <div class="lp-recent-grid">
+            <button
+              v-for="entry in history.slice(0, 6)"
+              :key="entry.deckId"
+              class="lp-deck-card"
+              @click="onLoadFromHistory(entry)"
+            >
+              <div
+                v-if="getCoverForEntry(entry)"
+                class="ldc-art"
+                :style="{ backgroundImage: `url(${getCoverForEntry(entry)})` }"
+              />
+              <div class="ldc-body">
+                <div class="ldc-top">
+                  <svg v-if="entry.inputMode === 'url'" width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
+                    <path d="M5 3H3a2 2 0 0 0 0 4h2M7 3h2a2 2 0 0 1 0 4H7M4 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                  <svg v-else width="12" height="12" viewBox="0 0 12 12" fill="none" class="ldc-src-icon">
+                    <path d="M2 4h8M2 7h6M2 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                  <span class="ldc-date">{{ formatDate(entry.date) }}</span>
+                </div>
+                <span class="ldc-name">{{ entry.deckName }}</span>
+                <div class="ldc-footer">
+                  <span class="ldc-count tabular">{{ entry.totalCount }} {{ i18n.cards }}</span>
+                  <span v-if="entry.ownedCount > 0" class="ldc-owned tabular">{{ entry.ownedCount }} {{ i18n.owned }}</span>
+                </div>
+                <div class="ldc-progress-track">
+                  <div
+                    class="ldc-progress-fill"
+                    :style="{ width: (entry.totalCount ? entry.ownedCount / entry.totalCount * 100 : 0) + '%' }"
+                  />
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- Post-translation: app shell full-width -->
@@ -252,15 +258,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const LANDING_I18N = {
   fr: {
     hero_title_1: 'Traduisez vos decks', hero_title_2: 'dans votre langue',
     hero_sub: 'Importez un deck depuis Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou collez votre liste. Noms traduits en quelques secondes via Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 langues', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Suivi de collection', feat_coll_desc: 'Cochez vos cartes · Import CSV Manabox',
+    feat_url: 'Import URL', feat_url_desc: 'Collez une URL Archidekt, Moxfield, MTGTOP8 ou Tappedout et obtenez la liste traduite instantanément.',
+    feat_lang: '15 langues', feat_lang_desc: 'Français, Allemand, Espagnol, Italien, Portugais, Japonais, Coréen, Russe et plus encore.',
+    feat_coll: 'Suivi de collection', feat_coll_desc: 'Importez votre CSV Manabox, DragonShield ou Moxfield pour voir quelles cartes vous possédez déjà.',
     recent: 'Decks récents', clear_all: 'Effacer tout', cards: 'cartes', owned: 'possédées',
     today: "Aujourd'hui", yesterday: 'Hier', days_ago: n => `Il y a ${n}j`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Coller une liste',
@@ -269,9 +275,9 @@ const LANDING_I18N = {
   de: {
     hero_title_1: 'Übersetze deine Decks', hero_title_2: 'in deine Sprache',
     hero_sub: 'Importiere ein Deck von Archidekt, Moxfield, MTGTOP8 oder Tappedout — oder füge deine Liste ein. Namen werden in Sekunden via Scryfall übersetzt.',
-    feat_url: 'URL-Import', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 Sprachen', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Sammlungs-Tracking', feat_coll_desc: 'Karten abhaken · CSV-Import Manabox',
+    feat_url: 'URL-Import', feat_url_desc: 'Füge eine Archidekt-, Moxfield-, MTGTOP8- oder Tappedout-URL ein und erhalte sofort die übersetzte Liste.',
+    feat_lang: '15 Sprachen', feat_lang_desc: 'Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch, Japanisch, Koreanisch, Russisch und mehr.',
+    feat_coll: 'Sammlungs-Tracking', feat_coll_desc: 'Importiere dein Manabox-, DragonShield- oder Moxfield-CSV und sieh welche Karten du bereits besitzt.',
     recent: 'Letzte Decks', clear_all: 'Alle löschen', cards: 'Karten', owned: 'besessen',
     today: 'Heute', yesterday: 'Gestern', days_ago: n => `Vor ${n} Tagen`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Liste einfügen',
@@ -280,9 +286,9 @@ const LANDING_I18N = {
   it: {
     hero_title_1: 'Traduci i tuoi deck', hero_title_2: 'nella tua lingua',
     hero_sub: 'Importa un deck da Archidekt, Moxfield, MTGTOP8 o Tappedout — oppure incolla la tua lista. Nomi tradotti in pochi secondi tramite Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 lingue', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Traccia collezione', feat_coll_desc: 'Segna le tue carte · Import CSV Manabox',
+    feat_url: 'Import URL', feat_url_desc: 'Incolla un URL Archidekt, Moxfield, MTGTOP8 o Tappedout e ottieni istantaneamente la lista tradotta.',
+    feat_lang: '15 lingue', feat_lang_desc: 'Francese, Tedesco, Spagnolo, Italiano, Portoghese, Giapponese, Coreano, Russo e altro.',
+    feat_coll: 'Traccia collezione', feat_coll_desc: 'Importa il tuo CSV Manabox, DragonShield o Moxfield per vedere quali carte possiedi già.',
     recent: 'Deck recenti', clear_all: 'Cancella tutto', cards: 'carte', owned: 'possedute',
     today: 'Oggi', yesterday: 'Ieri', days_ago: n => `${n} giorni fa`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Incolla lista',
@@ -291,9 +297,9 @@ const LANDING_I18N = {
   es: {
     hero_title_1: 'Traduce tus mazos', hero_title_2: 'a tu idioma',
     hero_sub: 'Importa un mazo desde Archidekt, Moxfield, MTGTOP8 o Tappedout — o pega tu lista. Nombres traducidos en segundos con Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 idiomas', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Seguimiento de colección', feat_coll_desc: 'Marca tus cartas · Import CSV Manabox',
+    feat_url: 'Import URL', feat_url_desc: 'Pega una URL de Archidekt, Moxfield, MTGTOP8 o Tappedout y obtén la lista traducida al instante.',
+    feat_lang: '15 idiomas', feat_lang_desc: 'Francés, Alemán, Español, Italiano, Portugués, Japonés, Coreano, Ruso y más.',
+    feat_coll: 'Seguimiento de colección', feat_coll_desc: 'Importa tu CSV de Manabox, DragonShield o Moxfield para ver qué cartas ya posees.',
     recent: 'Mazos recientes', clear_all: 'Borrar todo', cards: 'cartas', owned: 'poseídas',
     today: 'Hoy', yesterday: 'Ayer', days_ago: n => `Hace ${n} días`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Pegar lista',
@@ -302,9 +308,9 @@ const LANDING_I18N = {
   pt: {
     hero_title_1: 'Traduza seus decks', hero_title_2: 'no seu idioma',
     hero_sub: 'Importe um deck do Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou cole sua lista. Nomes traduzidos em segundos via Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 idiomas', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Rastrear coleção', feat_coll_desc: 'Marque suas cartas · Import CSV Manabox',
+    feat_url: 'Import URL', feat_url_desc: 'Cole uma URL do Archidekt, Moxfield, MTGTOP8 ou Tappedout e obtenha a lista traduzida instantaneamente.',
+    feat_lang: '15 idiomas', feat_lang_desc: 'Francês, Alemão, Espanhol, Italiano, Português, Japonês, Coreano, Russo e mais.',
+    feat_coll: 'Rastrear coleção', feat_coll_desc: 'Importe seu CSV do Manabox, DragonShield ou Moxfield para ver quais cartas você já possui.',
     recent: 'Decks recentes', clear_all: 'Limpar tudo', cards: 'cartas', owned: 'possuídas',
     today: 'Hoje', yesterday: 'Ontem', days_ago: n => `Há ${n} dias`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Colar lista',
@@ -312,10 +318,10 @@ const LANDING_I18N = {
   },
   ja: {
     hero_title_1: 'デッキを翻訳する', hero_title_2: 'あなたの言語で',
-    hero_sub: 'Archidekt、Moxfield、MTGTOP8、Tappedoutからデッキをインポート、またはリストを貼り付け。Scryfallで数秒で翻訳。',
-    feat_url: 'URLインポート', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15言語', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'コレクション管理', feat_coll_desc: 'カードをチェック · Manabox CSVインポート',
+    hero_sub: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けるか、リストを直接入力。Scryfallで数秒で翻訳。',
+    feat_url: 'URLインポート', feat_url_desc: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けると即座に翻訳済みリストを取得。',
+    feat_lang: '15言語', feat_lang_desc: 'フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、日本語、韓国語、ロシア語など。',
+    feat_coll: 'コレクション管理', feat_coll_desc: 'Manabox、DragonShield、MoxfieldのCSVをインポートして所持カードを確認。',
     recent: '最近のデッキ', clear_all: 'すべて削除', cards: 'カード', owned: '所有',
     today: '今日', yesterday: '昨日', days_ago: n => `${n}日前`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'リストを貼り付け',
@@ -324,9 +330,9 @@ const LANDING_I18N = {
   ko: {
     hero_title_1: '덱을 번역하세요', hero_title_2: '당신의 언어로',
     hero_sub: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout에서 덱을 가져오거나 목록을 붙여넣으세요. Scryfall로 몇 초 만에 번역됩니다.',
-    feat_url: 'URL 가져오기', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15개 언어', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: '컬렉션 추적', feat_coll_desc: '카드 체크 · Manabox CSV 가져오기',
+    feat_url: 'URL 가져오기', feat_url_desc: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout URL을 붙여넣으면 즉시 번역된 목록을 얻을 수 있습니다.',
+    feat_lang: '15개 언어', feat_lang_desc: '프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 일본어, 한국어, 러시아어 등.',
+    feat_coll: '컬렉션 추적', feat_coll_desc: 'Manabox, DragonShield 또는 Moxfield CSV를 가져와 이미 보유한 카드를 확인하세요.',
     recent: '최근 덱', clear_all: '모두 지우기', cards: '카드', owned: '보유',
     today: '오늘', yesterday: '어제', days_ago: n => `${n}일 전`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: '목록 붙여넣기',
@@ -335,9 +341,9 @@ const LANDING_I18N = {
   ru: {
     hero_title_1: 'Переводите свои деки', hero_title_2: 'на ваш язык',
     hero_sub: 'Импортируйте дек с Archidekt, Moxfield, MTGTOP8 или Tappedout — или вставьте список. Названия переведены за секунды через Scryfall.',
-    feat_url: 'Импорт URL', feat_url_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout',
-    feat_lang: '15 языков', feat_lang_desc: 'FR · DE · ES · IT · PT · JA · KO · RU · ZH…',
-    feat_coll: 'Отслеживание коллекции', feat_coll_desc: 'Отмечайте карты · Импорт CSV Manabox',
+    feat_url: 'Импорт URL', feat_url_desc: 'Вставьте URL Archidekt, Moxfield, MTGTOP8 или Tappedout и мгновенно получите переведённый список.',
+    feat_lang: '15 языков', feat_lang_desc: 'Французский, Немецкий, Испанский, Итальянский, Португальский, Японский, Корейский, Русский и другие.',
+    feat_coll: 'Отслеживание коллекции', feat_coll_desc: 'Импортируйте CSV из Manabox, DragonShield или Moxfield чтобы видеть уже имеющиеся карты.',
     recent: 'Последние деки', clear_all: 'Очистить всё', cards: 'карт', owned: 'есть',
     today: 'Сегодня', yesterday: 'Вчера', days_ago: n => `${n} дн. назад`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Вставить список',
@@ -374,6 +380,18 @@ const CATEGORY_FR = {
   Sorcery: 'Rituel', Artifact: 'Artefact', Enchantment: 'Enchantement',
   Planeswalker: 'Planeswalker', Land: 'Terrain', Other: 'Autre', Maybeboard: 'Maybeboard',
 }
+
+// --- Hero art ---
+const heroArtUrl = ref(null)
+onMounted(async () => {
+  try {
+    const r = await fetch('https://api.scryfall.com/cards/random?q=is:commander+order:edhrec+rarity:m')
+    if (r.ok) {
+      const d = await r.json()
+      heroArtUrl.value = d.image_uris?.art_crop ?? d.card_faces?.[0]?.image_uris?.art_crop ?? null
+    }
+  } catch {}
+})
 
 // --- State ---
 const showHistory = ref(false)
@@ -504,6 +522,14 @@ function formatDate(iso) {
   return d.toLocaleDateString(localeMap[language.value] || 'en-US', { day: 'numeric', month: 'short' })
 }
 
+function getCoverForEntry(entry) {
+  if (entry.coverImageUrl) return entry.coverImageUrl
+  const cached = getCachedCards(entry.deckId)
+  if (!cached?.length) return null
+  const commander = cached.find(c => c.category === 'Commander')
+  return (commander || cached[0])?.imageUrl || null
+}
+
 function applyCollection() {
   const map = getCollectionMap()
   if (!map) return
@@ -522,90 +548,137 @@ watch(deckId, () => { activeFilter.value = 'all' })
   min-height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 64px 24px 80px;
-  gap: 36px;
+  align-items: stretch;
 }
 
-/* Hero */
-.lp-hero {
-  text-align: center;
-  max-width: 560px;
+/* ── Hero section — sombre, pleine largeur ────────────── */
+.lp-hero-section {
+  position: relative;
+  width: 100%;
+  min-height: 62vh;
+  background: linear-gradient(160deg, #0c1628 0%, #182a44 55%, #0e2038 100%);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lp-hero-art {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.3;
+  filter: saturate(0.45) brightness(0.55);
+}
+
+/* gradient en bas pour fondre l'art dans le reste de la page */
+.lp-hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  z-index: 1;
+}
+
+.lp-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  width: 100%;
+  padding: 80px 24px 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+  text-align: center;
 }
 
 .lp-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
-  background: var(--accent-subtle);
-  color: var(--accent);
+  padding: 4px 14px;
+  background: rgba(79, 127, 255, 0.18);
+  border: 1px solid rgba(79, 127, 255, 0.3);
+  color: rgba(180, 210, 255, 0.92);
   border-radius: 9999px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .lp-title {
-  font-size: clamp(28px, 5vw, 42px);
+  font-size: clamp(30px, 5vw, 48px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.12;
-  color: var(--text-1);
+  line-height: 1.1;
+  color: #fff;
 }
 
-.lp-accent { color: var(--accent); }
+.lp-accent { color: #7aadff; }
 
 .lp-sub {
   font-size: 15px;
-  color: var(--text-2);
-  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
   max-width: 480px;
 }
 
-/* Input */
+/* Input wrap — sur fond sombre */
 .input-wrap {
   width: 100%;
-  max-width: 580px;
+  max-width: 620px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 8px;
 }
 
-/* Features */
-.lp-features {
+/* ── Contenu sous le hero ─────────────────────────────── */
+.lp-content {
+  width: 100%;
+  max-width: 800px;
+  align-self: center;
+  padding: 52px 24px 80px;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 680px;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ── Feature cards ────────────────────────────────────── */
+.lp-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 
 .lp-feat {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 16px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  min-width: 200px;
-  flex: 1;
-  max-width: 240px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lp-feat:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(79, 127, 255, 0.1);
 }
 
 .lf-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background: var(--accent-subtle);
   color: var(--accent);
   flex-shrink: 0;
 }
@@ -613,32 +686,27 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .lf-body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 0;
+  gap: 6px;
 }
 
 .lf-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-1);
+  letter-spacing: -0.01em;
 }
 
 .lf-desc {
-  font-size: 11px;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.55;
 }
 
-/* Recent history */
+/* ── Recent history ───────────────────────────────────── */
 .lp-recent {
-  width: 100%;
-  max-width: 680px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .lp-recent-hd {
@@ -648,7 +716,7 @@ watch(deckId, () => { activeFilter.value = 'all' })
 }
 
 .lp-recent-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-1);
   letter-spacing: -0.01em;
