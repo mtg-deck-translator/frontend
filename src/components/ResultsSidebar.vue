@@ -56,20 +56,22 @@
       <span class="ownership-label tabular">{{ ownedCount }}/{{ totalCount }} possédées</span>
     </div>
 
-    <div class="divider" />
+    <template v-if="layout === 'list'">
+      <div class="divider" />
 
-    <!-- Category TOC -->
-    <nav class="cat-nav" aria-label="Aller à la catégorie">
-      <button
-        v-for="group in categoryGroups"
-        :key="group.category"
-        class="cat-link"
-        @click="scrollToCategory(group.category)"
-      >
-        <span class="cat-name">{{ group.label }}</span>
-        <span class="cat-progress tabular">{{ group.owned }}/{{ group.total }}</span>
-      </button>
-    </nav>
+      <!-- Category TOC -->
+      <nav class="cat-nav" aria-label="Aller à la catégorie">
+        <button
+          v-for="group in categoryGroups"
+          :key="group.category"
+          class="cat-link"
+          @click="scrollToCategory(group.category)"
+        >
+          <span class="cat-name">{{ group.label }}</span>
+          <span class="cat-progress tabular">{{ group.owned }}/{{ group.total }}</span>
+        </button>
+      </nav>
+    </template>
 
   </aside>
 </template>
@@ -85,6 +87,7 @@ const props = defineProps({
   ownedCount: Number,
   totalCount: Number,
   categoryGroups: Array,
+  layout: { type: String, default: 'list' },
 })
 
 defineEmits(['update:search', 'update:sort', 'update:filter'])

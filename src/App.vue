@@ -50,6 +50,29 @@
           <span class="translate-bar-count tabular">{{ cards.length }} cartes</span>
           <span v-if="totalPrice > 0" class="translate-bar-price tabular">· {{ formatPrice(totalPrice) }}</span>
         </div>
+        <div class="layout-toggle">
+          <button :class="['lt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Vue liste">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button :class="['lt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Vue colonnes">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+              <rect x="5.5" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+              <rect x="10" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+          </button>
+          <button :class="['lt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Vue images">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+              <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+              <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+              <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+          </button>
+        </div>
+
         <button class="translate-bar-btn" @click="resetDeck">
           Nouveau deck
         </button>
@@ -68,6 +91,7 @@
             :owned-count="ownedCount"
             :total-count="cards.length"
             :category-groups="categoryGroups"
+            :layout="layout"
             @update:search="search = $event"
             @update:sort="sort = $event"
             @update:filter="activeFilter = $event"
@@ -83,6 +107,7 @@
               @buy-cardmarket="exportBuyCardmarket"
             />
             <ResultsPanel
+              v-if="layout === 'list'"
               :cards="cards"
               :checked-map="checkedMap"
               :filter="activeFilter"
@@ -90,6 +115,24 @@
               :sort="sort"
               @toggle="toggleCard"
               @set-all="setAllCards"
+            />
+            <ColumnsPanel
+              v-else-if="layout === 'columns'"
+              :cards="cards"
+              :checked-map="checkedMap"
+              :filter="activeFilter"
+              :search="search"
+              :sort="sort"
+              @toggle="toggleCard"
+            />
+            <VisualPanel
+              v-else
+              :cards="cards"
+              :checked-map="checkedMap"
+              :filter="activeFilter"
+              :search="search"
+              :sort="sort"
+              @toggle="toggleCard"
             />
           </div>
         </div>
@@ -120,6 +163,9 @@ import ResultsSidebar from './components/ResultsSidebar.vue'
 import HistoryPanel from './components/HistoryPanel.vue'
 import ToastNotification from './components/ToastNotification.vue'
 
+import ColumnsPanel from './components/ColumnsPanel.vue'
+import VisualPanel from './components/VisualPanel.vue'
+
 import { useDeck } from './composables/useDeck.js'
 import { useLanguage } from './composables/useLanguage.js'
 import { useChecklist } from './composables/useChecklist.js'
@@ -143,6 +189,9 @@ const search = ref('')
 const sort = ref('category')
 
 // --- Composables ---
+const layout = ref(localStorage.getItem('deck-layout') || 'list')
+watch(layout, v => localStorage.setItem('deck-layout', v))
+
 const { theme, toggle: toggleTheme } = useTheme()
 const { language, setLanguage } = useLanguage()
 
@@ -303,6 +352,33 @@ watch(deckId, () => { activeFilter.value = 'all' })
   color: var(--text-3);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.layout-toggle {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 1px;
+}
+
+.lt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  border-radius: calc(var(--radius-md) - 2px);
+  color: var(--text-3);
+  transition: all var(--transition-fast);
+}
+
+.lt-btn:hover { color: var(--text-1); }
+
+.lt-btn.active {
+  background: var(--surface);
+  color: var(--text-1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
 .translate-bar-btn {
