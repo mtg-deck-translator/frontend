@@ -113,16 +113,9 @@ function scrollToCategory(category) {
 
 <style scoped>
 .results-sidebar {
-  position: sticky;
-  top: calc(var(--header-height) + 16px);
-  max-height: calc(100vh - var(--header-height) - 32px);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-right: 20px;
-  padding-bottom: 24px;
-  border-right: 1px solid var(--border);
 }
 
 /* Search */

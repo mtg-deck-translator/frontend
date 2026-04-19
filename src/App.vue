@@ -19,10 +19,9 @@
       />
     </Transition>
 
-    <main class="container main-content">
-
-      <!-- Input panel — masqué quand le deck est chargé -->
-      <template v-if="status !== 'done'">
+    <!-- Pre-translation: input centré, spacieux -->
+    <div v-if="status !== 'done'" class="input-page">
+      <div class="input-wrap">
         <InputPanel
           v-model:mode="inputMode"
           v-model:url="urlInput"
@@ -30,114 +29,117 @@
           :status="status"
           @translate="onTranslate"
         />
-        <div v-if="status === 'translating'" class="section">
-          <ProgressBar :progress="progress" variant="translation" />
-        </div>
+        <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
         <div v-if="unparseableLines.length && status !== 'idle'" class="warning-banner">
           {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '...' : '' }}
         </div>
         <div v-if="status === 'error'" class="error-banner">{{ error }}</div>
-      </template>
-
-      <!-- Barre compacte après traduction -->
-      <div v-else class="translate-bar">
-        <div class="translate-bar-info">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
-            <path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          <span class="translate-bar-name">{{ deckName }}</span>
-          <span class="translate-bar-count tabular">{{ cards.length }} cartes</span>
-          <span v-if="totalPrice > 0" class="translate-bar-price tabular">· {{ formatPrice(totalPrice) }}</span>
-        </div>
-        <div class="layout-toggle">
-          <button :class="['lt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Vue liste">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <button :class="['lt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Vue colonnes">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <rect x="1" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-              <rect x="5.5" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-              <rect x="10" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-            </svg>
-          </button>
-          <button :class="['lt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Vue images">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-              <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-              <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-              <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-            </svg>
-          </button>
-        </div>
-
-        <button class="translate-bar-btn" @click="resetDeck">
-          Nouveau deck
-        </button>
       </div>
+    </div>
 
-      <!-- Layout résultats en 2 colonnes -->
-      <template v-if="status === 'done'">
-        <div class="results-layout">
+    <!-- Post-translation: app shell full-width -->
+    <div v-else class="deck-layout">
 
-          <!-- Sidebar navigation -->
-          <ResultsSidebar
-            :search="search"
-            :sort="sort"
-            :filter="activeFilter"
-            :counts="filterCounts"
-            :owned-count="ownedCount"
-            :total-count="cards.length"
-            :category-groups="categoryGroups"
-            :layout="layout"
-            @update:search="search = $event"
-            @update:sort="sort = $event"
-            @update:filter="activeFilter = $event"
-          />
+      <!-- Sidebar gauche -->
+      <aside class="deck-sidebar">
 
-          <!-- Contenu principal -->
-          <div class="results-main">
-            <ExportPanel
-              @copy-all="exportAll"
-              @copy-missing="exportMissing"
-              @download="exportDownload"
-              @print="exportPrint"
-              @buy-cardmarket="exportBuyCardmarket"
-            />
-            <ResultsPanel
-              v-if="layout === 'list'"
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-              @set-all="setAllCards"
-            />
-            <ColumnsPanel
-              v-else-if="layout === 'columns'"
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-            />
-            <VisualPanel
-              v-else
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-            />
+        <!-- En-tête deck -->
+        <div class="sidebar-header">
+          <div class="sh-title-row">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <span class="sh-name">{{ deckName }}</span>
+          </div>
+          <div class="sh-meta">
+            <span class="sh-stat tabular">{{ cards.length }} cartes</span>
+            <span v-if="totalPrice > 0" class="sh-stat tabular">· {{ formatPrice(totalPrice) }}</span>
+          </div>
+          <div class="sh-controls">
+            <div class="layout-toggle">
+              <button :class="['lt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Vue liste">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <button :class="['lt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Vue colonnes">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <rect x="1" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <rect x="5.5" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <rect x="10" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+              </button>
+              <button :class="['lt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Vue images">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+              </button>
+            </div>
+            <button class="new-deck-btn" @click="resetDeck">Nouveau deck</button>
           </div>
         </div>
-      </template>
-    </main>
+
+        <div class="sidebar-sep" />
+
+        <!-- Contrôles (search / filter / sort / ownership / TOC) -->
+        <ResultsSidebar
+          :search="search"
+          :sort="sort"
+          :filter="activeFilter"
+          :counts="filterCounts"
+          :owned-count="ownedCount"
+          :total-count="cards.length"
+          :category-groups="categoryGroups"
+          :layout="layout"
+          @update:search="search = $event"
+          @update:sort="sort = $event"
+          @update:filter="activeFilter = $event"
+        />
+      </aside>
+
+      <!-- Contenu principal -->
+      <main class="deck-main">
+        <ExportPanel
+          @copy-all="exportAll"
+          @copy-missing="exportMissing"
+          @download="exportDownload"
+          @print="exportPrint"
+          @buy-cardmarket="exportBuyCardmarket"
+        />
+        <ResultsPanel
+          v-if="layout === 'list'"
+          :cards="cards"
+          :checked-map="checkedMap"
+          :filter="activeFilter"
+          :search="search"
+          :sort="sort"
+          @toggle="toggleCard"
+          @set-all="setAllCards"
+        />
+        <ColumnsPanel
+          v-else-if="layout === 'columns'"
+          :cards="cards"
+          :checked-map="checkedMap"
+          :filter="activeFilter"
+          :search="search"
+          :sort="sort"
+          @toggle="toggleCard"
+        />
+        <VisualPanel
+          v-else
+          :cards="cards"
+          :checked-map="checkedMap"
+          :filter="activeFilter"
+          :search="search"
+          :sort="sort"
+          @toggle="toggleCard"
+        />
+      </main>
+    </div>
 
     <CardmarketPanel
       :show="showCardmarket"
@@ -155,16 +157,15 @@ import { ref, computed, watch } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
 import CardmarketPanel from './components/CardmarketPanel.vue'
+import ColumnsPanel from './components/ColumnsPanel.vue'
 import InputPanel from './components/InputPanel.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import ExportPanel from './components/ExportPanel.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
 import ResultsSidebar from './components/ResultsSidebar.vue'
+import VisualPanel from './components/VisualPanel.vue'
 import HistoryPanel from './components/HistoryPanel.vue'
 import ToastNotification from './components/ToastNotification.vue'
-
-import ColumnsPanel from './components/ColumnsPanel.vue'
-import VisualPanel from './components/VisualPanel.vue'
 
 import { useDeck } from './composables/useDeck.js'
 import { useLanguage } from './composables/useLanguage.js'
@@ -187,11 +188,10 @@ const showCardmarket = ref(false)
 const activeFilter = ref('all')
 const search = ref('')
 const sort = ref('category')
-
-// --- Composables ---
 const layout = ref(localStorage.getItem('deck-layout') || 'list')
 watch(layout, v => localStorage.setItem('deck-layout', v))
 
+// --- Composables ---
 const { theme, toggle: toggleTheme } = useTheme()
 const { language, setLanguage } = useLanguage()
 
@@ -208,10 +208,6 @@ const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 // --- Computed ---
 const totalPrice = computed(() =>
   cards.value.reduce((sum, c) => sum + (c.price ?? 0) * c.qty, 0)
-)
-const missingPrice = computed(() =>
-  cards.value.filter(c => !checkedMap.value[c.queryName])
-    .reduce((sum, c) => sum + (c.price ?? 0) * c.qty, 0)
 )
 function formatPrice(val) { return val.toFixed(2) + ' €' }
 
@@ -307,53 +303,90 @@ watch(deckId, () => { activeFilter.value = 'all' })
 <style scoped>
 .app { min-height: 100vh; }
 
-.main-content {
-  padding-top: 0;
-  padding-bottom: 40px;
+/* ── Page input ────────────────────────────────────────── */
+.input-page {
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 72px 24px 60px;
 }
 
-.section { margin: 0 0 16px; }
-
-/* Barre compacte post-traduction */
-.translate-bar {
+.input-wrap {
+  width: 100%;
+  max-width: 580px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Deck layout: sidebar + main ────────────────────── */
+.deck-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* ── Sidebar ──────────────────────────────────────────── */
+.deck-sidebar {
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  margin-bottom: 20px;
+  border-right: 1px solid var(--border);
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
-.translate-bar-info {
+.sidebar-header {
+  padding-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.sh-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: var(--text-2);
-  min-width: 0;
-  overflow: hidden;
+  gap: 7px;
+  color: var(--text-3);
+  margin-bottom: 4px;
 }
 
-.translate-bar-name {
+.sh-name {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
-.translate-bar-count,
-.translate-bar-price {
+.sh-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.sh-stat {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-3);
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
+.sh-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Layout toggle */
 .layout-toggle {
   display: flex;
   background: var(--surface-2);
@@ -381,41 +414,38 @@ watch(deckId, () => { activeFilter.value = 'all' })
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
-.translate-bar-btn {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+/* Nouveau deck */
+.new-deck-btn {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-2);
-  background: var(--surface);
-  transition: background var(--transition-fast), color var(--transition-fast);
+  color: var(--text-3);
+  padding: 5px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: transparent;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
 }
 
-.translate-bar-btn:hover {
-  background: var(--surface-2);
+.new-deck-btn:hover {
   color: var(--text-1);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
 }
 
-/* Layout 2 colonnes */
-.results-layout {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 0;
-  align-items: start;
+.sidebar-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 0 0 20px;
+  flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
-  .results-layout { grid-template-columns: 1fr; }
-}
-
-.results-main {
+/* ── Main content ────────────────────────────────────── */
+.deck-main {
+  padding: 24px 32px 64px;
   min-width: 0;
-  padding-left: 24px;
 }
 
-/* Banners */
+/* ── Banners ─────────────────────────────────────────── */
 .warning-banner {
   padding: 10px 14px;
   border-radius: var(--radius-md);
@@ -423,7 +453,6 @@ watch(deckId, () => { activeFilter.value = 'all' })
   border: 1px solid rgba(245, 158, 11, 0.2);
   color: var(--warning);
   font-size: 13px;
-  margin-bottom: 16px;
 }
 
 .error-banner {
@@ -434,11 +463,27 @@ watch(deckId, () => { activeFilter.value = 'all' })
   color: var(--error);
   font-size: 13px;
   line-height: 1.7;
-  margin-bottom: 16px;
 }
 
+/* ── Transitions ─────────────────────────────────────── */
 .history-fade-enter-active,
 .history-fade-leave-active { transition: opacity 200ms ease; }
 .history-fade-enter-from,
 .history-fade-leave-to { opacity: 0; }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .deck-layout { grid-template-columns: 220px 1fr; }
+}
+
+@media (max-width: 700px) {
+  .deck-layout { grid-template-columns: 1fr; }
+  .deck-sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .deck-main { padding: 16px; }
+}
 </style>
