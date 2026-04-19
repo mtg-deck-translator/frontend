@@ -18,10 +18,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { toRef } from 'vue'
 import CategoryGroup from './CategoryGroup.vue'
-
-const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other', 'Maybeboard']
+import { useFilteredGroups } from '../composables/useFilteredGroups.js'
 
 const props = defineProps({
   cards: Array,
@@ -33,42 +32,12 @@ const props = defineProps({
 
 defineEmits(['toggle', 'set-all'])
 
-const filteredCards = computed(() => {
-  let list = props.cards
-
-  if (props.filter === 'missing') list = list.filter(c => !props.checkedMap[c.queryName])
-  else if (props.filter === 'owned') list = list.filter(c => !!props.checkedMap[c.queryName])
-
-  if (props.search) {
-    const q = props.search.toLowerCase()
-    list = list.filter(c =>
-      c.frName?.toLowerCase().includes(q) ||
-      c.displayName?.toLowerCase().includes(q)
-    )
-  }
-
-  return list
-})
-
-const visibleGroups = computed(() => {
-  const groups = {}
-  for (const card of filteredCards.value) {
-    const cat = card.category || 'Other'
-    if (!groups[cat]) groups[cat] = []
-    groups[cat].push(card)
-  }
-
-  return CATEGORY_ORDER
-    .filter(cat => groups[cat]?.length)
-    .map(cat => {
-      const cards = groups[cat].slice()
-      if (props.sort === 'price') {
-        cards.sort((a, b) => (b.price ?? -1) - (a.price ?? -1))
-      } else {
-        cards.sort((a, b) => a.frName.localeCompare(b.frName, 'fr'))
-      }
-      return { category: cat, cards }
-    })
+const visibleGroups = useFilteredGroups({
+  cards: toRef(props, 'cards'),
+  checkedMap: toRef(props, 'checkedMap'),
+  filter: toRef(props, 'filter'),
+  search: toRef(props, 'search'),
+  sort: toRef(props, 'sort'),
 })
 </script>
 
