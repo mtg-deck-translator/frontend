@@ -46,6 +46,7 @@
       </div>
 
       <button
+        v-if="!hideButton"
         class="glass-btn"
         :disabled="isLoading || isEmpty"
         @click="$emit('translate')"
@@ -83,6 +84,7 @@ const props = defineProps({
   paste: String,
   status: String,
   labels: { type: Object, default: () => ({}) },
+  hideButton: { type: Boolean, default: false },
 })
 
 defineEmits(['update:mode', 'update:url', 'update:paste', 'translate'])
@@ -129,26 +131,13 @@ watch(() => props.mode, (mode) => {
 </script>
 
 <style scoped>
-/* ── Glassmorphism container ─────────────────────────── */
+/* ── Glassmorphism container — always dark ────────────── */
 .glass-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 18px;
-  box-shadow:
-    0 2px 16px rgba(0, 0, 0, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   overflow: hidden;
-}
-
-[data-theme="dark"] .glass-input {
-  background: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ── Barre principale ────────────────────────────────── */
@@ -169,34 +158,22 @@ watch(() => props.mode, (mode) => {
   flex-shrink: 0;
 }
 
-[data-theme="dark"] .glass-toggle { background: rgba(0, 0, 0, 0.3); }
-
 .gt-btn {
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.38);
+  color: rgba(255, 255, 255, 0.3);
   transition: background 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
-[data-theme="dark"] .gt-btn { color: rgba(255, 255, 255, 0.35); }
-
 .gt-btn.active {
-  background: rgba(255, 255, 255, 0.9);
-  color: #111;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .gt-btn.active {
-  background: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  box-shadow: none;
 }
 
-.gt-btn:hover:not(.active) { color: rgba(0, 0, 0, 0.65); }
-[data-theme="dark"] .gt-btn:hover:not(.active) { color: rgba(255, 255, 255, 0.6); }
+.gt-btn:hover:not(.active) { color: rgba(255, 255, 255, 0.6); }
 
 /* Champ input */
 .glass-field {
@@ -215,33 +192,26 @@ watch(() => props.mode, (mode) => {
   flex-shrink: 0;
 }
 
-[data-theme="dark"] .glass-icon { color: rgba(255, 255, 255, 0.3); }
-
 .glass-url {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  font-size: 15px;
-  color: #171717;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
   min-width: 0;
 }
 
-[data-theme="dark"] .glass-url { color: #fff; }
-
-.glass-url::placeholder { color: rgba(0, 0, 0, 0.28); }
-[data-theme="dark"] .glass-url::placeholder { color: rgba(255, 255, 255, 0.25); }
+.glass-url::placeholder { color: rgba(255, 255, 255, 0.22); }
 .glass-url:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .glass-paste-hint {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.3);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.25);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-[data-theme="dark"] .glass-paste-hint { color: rgba(255, 255, 255, 0.3); }
 
 /* Bouton Traduire */
 .glass-btn {
@@ -266,8 +236,6 @@ watch(() => props.mode, (mode) => {
   transform: translateY(-1px);
 }
 
-[data-theme="dark"] .glass-btn { box-shadow: 0 4px 18px rgba(79, 70, 229, 0.45); }
-[data-theme="dark"] .glass-btn:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(79, 70, 229, 0.6); }
 
 .glass-btn:active:not(:disabled) { transform: scale(0.98); }
 
@@ -298,10 +266,10 @@ watch(() => props.mode, (mode) => {
 .glass-textarea {
   width: 100%;
   min-height: 160px;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  color: #171717;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.65;
@@ -311,16 +279,7 @@ watch(() => props.mode, (mode) => {
   transition: border-color 0.15s;
 }
 
-[data-theme="dark"] .glass-textarea {
-  background: rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.glass-textarea:focus { border-color: rgba(79, 70, 229, 0.38); }
-[data-theme="dark"] .glass-textarea:focus { border-color: rgba(79, 70, 229, 0.45); }
-
-.glass-textarea::placeholder { color: rgba(0, 0, 0, 0.22); }
-[data-theme="dark"] .glass-textarea::placeholder { color: rgba(255, 255, 255, 0.18); }
+.glass-textarea:focus { border-color: rgba(255, 255, 255, 0.18); }
+.glass-textarea::placeholder { color: rgba(255, 255, 255, 0.18); }
 .glass-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

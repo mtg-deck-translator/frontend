@@ -1,62 +1,54 @@
 <template>
   <div
-    class="card-row"
+    class="cr-row"
     :class="{ checked: isChecked, commander: isCommander }"
     @mouseenter="showPreview = true"
     @mouseleave="showPreview = false"
   >
     <button
-      class="checkbox"
+      class="cr-check"
       role="checkbox"
       :aria-checked="isChecked"
-      :aria-label="`${isChecked ? 'Retirer' : 'Marquer'} ${card.frName} comme possédée`"
+      :aria-label="`${isChecked ? 'Retirer' : 'Marquer'} ${card.frName}`"
       @click="$emit('toggle', card.queryName)"
     >
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path
-          class="check-path"
-          d="M2 6l3 3 5-5"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          :class="{ visible: isChecked }"
-        />
+      <svg v-if="isChecked" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path d="M2 5l2.5 2.5 3.5-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
 
-    <span class="qty tabular">{{ card.qty }}</span>
+    <span class="cr-qty">{{ card.qty }}x</span>
 
-    <span class="fr-name">{{ card.frName }}</span>
+    <div class="cr-names">
+      <span class="cr-fr">{{ card.frName }}</span>
+      <span class="cr-sep">•</span>
+      <span class="cr-en">{{ card.displayName }}</span>
+    </div>
 
-    <span class="en-name" :class="{ strikethrough: isChecked }">{{ card.displayName }}</span>
+    <div class="cr-right">
+      <span v-if="card.price != null" class="cr-price">{{ formatPrice(card.price) }}</span>
+      <a
+        v-if="!card.error"
+        :href="cardmarketUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="cr-cm"
+        title="Cardmarket"
+        @click.stop
+      >
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <path d="M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M8 1h3v3M11 1L6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
 
-    <span v-if="card.price != null" class="price-tag tabular">{{ formatPrice(card.price) }}</span>
-    <a
-      v-if="!card.error"
-      :href="cardmarketUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="cm-link"
-      title="Voir sur Cardmarket"
-      @click.stop
-    >
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path d="M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-        <path d="M8 1h3v3M11 1L6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-    <span v-if="card.noFr" class="no-fr-badge">EN only</span>
-    <span v-if="card.error" class="error-badge" title="Erreur Scryfall">!</span>
+    <span v-if="card.noFr" class="cr-badge-en">EN</span>
+    <span v-if="card.error" class="cr-badge-err">!</span>
 
-    <!-- Image preview on hover -->
     <Teleport to="body">
       <Transition name="preview-fade">
-        <div
-          v-if="showPreview && card.imageUrl"
-          class="card-preview"
-          :style="previewStyle"
-        >
+        <div v-if="showPreview && card.imageUrl" class="card-preview" :style="previewStyle">
           <img :src="card.imageUrl" :alt="card.frName" />
         </div>
       </Transition>
@@ -67,11 +59,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 
-const props = defineProps({
-  card: Object,
-  isChecked: Boolean,
-})
-
+const props = defineProps({ card: Object, isChecked: Boolean })
 defineEmits(['toggle'])
 
 function formatPrice(price) {
@@ -85,182 +73,169 @@ const cardmarketUrl = computed(() => {
 })
 
 const isCommander = computed(() => props.card.category === 'Commander')
-
 const showPreview = ref(false)
 const mousePos = ref({ x: 0, y: 0 })
 
-function onMouseMove(e) {
-  mousePos.value = { x: e.clientX, y: e.clientY }
-}
-
+function onMouseMove(e) { mousePos.value = { x: e.clientX, y: e.clientY } }
 onMounted(() => document.addEventListener('mousemove', onMouseMove))
 onUnmounted(() => document.removeEventListener('mousemove', onMouseMove))
 
 const PREVIEW_W = 220
-
 const previewStyle = computed(() => {
-  const x = mousePos.value.x
-  const y = mousePos.value.y
+  const { x, y } = mousePos.value
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const PREVIEW_H = 308 // approx card height at 220px wide
-
+  const PREVIEW_H = 308
   let left = x + 16
   let top = y - PREVIEW_H / 2
-
-  // Flip left if too close to right edge
-  if (left + PREVIEW_W > vw - 16) {
-    left = x - PREVIEW_W - 16
-  }
-  // Clamp vertically
+  if (left + PREVIEW_W > vw - 16) left = x - PREVIEW_W - 16
   if (top < 8) top = 8
   if (top + PREVIEW_H > vh - 8) top = vh - PREVIEW_H - 8
-
   return { left: left + 'px', top: top + 'px' }
 })
 </script>
 
 <style scoped>
-.card-row {
+.cr-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 5px 0;
-  border-radius: var(--radius-sm);
-  transition: opacity var(--transition-fast);
-  min-height: 36px;
-  position: relative;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid transparent;
+  transition: background 150ms, border-left-color 150ms;
+  cursor: default;
 }
 
-.card-row.checked {
-  opacity: 0.45;
+.cr-row:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-left-color: var(--cat-color, rgba(255, 255, 255, 0.2));
 }
 
-.checkbox {
+.cr-row.checked {
+  opacity: 0.38;
+}
+
+/* Circular checkbox */
+.cr-check {
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border-strong);
-  background: var(--surface);
-  color: white;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
-  padding: 4px;
+  color: #fff;
+  transition: background 150ms, border-color 150ms;
+  cursor: pointer;
 }
 
-.card-row.checked .checkbox {
-  background: var(--accent);
-  border-color: var(--accent);
+.cr-row.checked .cr-check {
+  background: var(--cat-color, #10b981);
+  border-color: var(--cat-color, #10b981);
 }
 
-.check-path {
-  stroke-dasharray: 14;
-  stroke-dashoffset: 14;
-  transition: stroke-dashoffset 200ms ease;
-}
-
-.check-path.visible {
-  stroke-dashoffset: 0;
-}
-
-.qty {
+/* Qty badge */
+.cr-qty {
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-3);
-  width: 18px;
-  text-align: right;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 5px;
+  padding: 2px 7px;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.fr-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-  flex-shrink: 1;
-}
-
-.commander .fr-name {
-  color: var(--accent);
-}
-
-.en-name {
+/* Names */
+.cr-names {
   flex: 1;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-3);
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cr-fr {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.commander .cr-fr { color: #fbbf24; }
+
+.cr-sep {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.cr-en {
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
 }
 
-.en-name.strikethrough {
-  text-decoration: line-through;
-}
-
-.price-tag {
+/* Right zone */
+.cr-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-3);
   margin-left: auto;
 }
 
-.cm-link {
-  flex-shrink: 0;
+.cr-price {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+}
+
+.cr-cm {
+  color: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
-  color: var(--text-3);
   opacity: 0;
-  transition: opacity var(--transition-fast), color var(--transition-fast);
+  transition: opacity 150ms, color 150ms;
 }
 
-.card-row:hover .cm-link {
-  opacity: 1;
-}
+.cr-row:hover .cr-cm { opacity: 1; }
+.cr-cm:hover { color: rgba(255, 255, 255, 0.6); }
 
-.cm-link:hover {
-  color: var(--accent);
-}
-
-.no-fr-badge,
-.error-badge {
+/* Badges */
+.cr-badge-en,
+.cr-badge-err {
   flex-shrink: 0;
   font-family: var(--font-mono);
   font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 1px 5px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
+  border-radius: 4px;
 }
 
-.no-fr-badge {
-  background: var(--surface-2);
-  color: var(--text-3);
-  border: 1px solid var(--border);
+.cr-badge-en {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.error-badge {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
+.cr-badge-err {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
-
-@media (max-width: 640px) {
-  .checkbox { padding: 7px; }
-}
-
-/* Preview — teleported to body, so not scoped */
 </style>
 
 <style>
@@ -271,7 +246,7 @@ const previewStyle = computed(() => {
   width: 220px;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
 }
 
 .card-preview img {
