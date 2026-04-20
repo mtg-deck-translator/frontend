@@ -117,6 +117,12 @@
                 />
               </div>
 
+              <!-- Language target -->
+              <div class="lpl-lang-row">
+                <span class="lpl-lang-label">Traduire en</span>
+                <LanguageSelector :model-value="language" @update:model-value="setLanguage" />
+              </div>
+
               <!-- Translate button -->
               <button
                 class="lpl-translate-btn"
@@ -142,7 +148,6 @@
 
             <!-- Bottom bar -->
             <div class="lpl-bottom">
-              <LanguageSelector :model-value="language" @update:model-value="setLanguage" />
               <div class="lpl-platforms">
                 <span>Archidekt</span>
                 <span class="lpl-dot">·</span>
@@ -900,6 +905,52 @@ watch(deckId, () => { activeFilter.value = 'all' })
   flex-direction: column;
   gap: 10px;
   flex: 1;
+}
+
+/* Language row */
+.lpl-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lpl-lang-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+}
+
+/* Force dark styles on LanguageSelector when inside dark left panel */
+.lpl-input-section :deep(.lang-btn) {
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+
+.lpl-input-section :deep(.lang-btn:hover) {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.lpl-input-section :deep(.lang-dropdown) {
+  background: #18181b;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.lpl-input-section :deep(.lang-option) {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lpl-input-section :deep(.lang-option:hover) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.lpl-input-section :deep(.lang-option.active) {
+  color: #f59e0b;
 }
 
 /* Translate button */
