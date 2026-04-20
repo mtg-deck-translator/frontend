@@ -339,6 +339,14 @@
                       <span class="lpr-card-badge">{{ formatDate(entry.date) }}</span>
                     </div>
                     <div class="lpr-card-bottom">
+                      <div v-if="(entry.deckColors || []).length" class="lpr-card-colors">
+                        <span
+                          v-for="color in (entry.deckColors || [])"
+                          :key="color"
+                          class="lpr-color-pip"
+                          :style="MTG_COLOR_STYLES[color]"
+                        />
+                      </div>
                       <span class="lpr-card-count">{{ entry.totalCount }} cartes</span>
                       <span class="lpr-card-name">{{ entry.deckName }}</span>
                     </div>
@@ -356,40 +364,36 @@
                 <h2 class="lpr-section-title">Capacités</h2>
               </div>
               <div class="lpr-feat-grid">
-                <div class="lpr-feat">
+                <div class="lpr-feat lpr-feat--amber">
                   <div class="lpr-feat-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                      <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M8 5H5a3 3 0 0 0 0 6h3M12 5h3a3 3 0 0 1 0 6h-3M7 10h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </div>
-                  <div>
-                    <div class="lpr-feat-title">{{ i18n.feat_url }}</div>
-                    <div class="lpr-feat-desc">{{ i18n.feat_url_desc }}</div>
-                  </div>
+                  <div class="lpr-feat-title">{{ i18n.feat_url }}</div>
+                  <div class="lpr-feat-desc">{{ i18n.feat_url_desc }}</div>
                 </div>
-                <div class="lpr-feat">
+                <div class="lpr-feat lpr-feat--blue">
                   <div class="lpr-feat-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                      <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
-                      <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/>
+                      <path d="M2.5 10h15M10 2.5c-2.5 2.5-3.5 4.5-3.5 7.5s1 5 3.5 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                     </svg>
                   </div>
-                  <div>
-                    <div class="lpr-feat-title">{{ i18n.feat_lang }}</div>
-                    <div class="lpr-feat-desc">{{ i18n.feat_lang_desc }}</div>
-                  </div>
+                  <div class="lpr-feat-title">{{ i18n.feat_lang }}</div>
+                  <div class="lpr-feat-desc">{{ i18n.feat_lang_desc }}</div>
                 </div>
-                <div class="lpr-feat">
+                <div class="lpr-feat lpr-feat--green">
                   <div class="lpr-feat-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                      <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
-                      <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <rect x="2" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+                      <rect x="11" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+                      <path d="M5.5 6.5l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 14h16M2 17h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                     </svg>
                   </div>
-                  <div>
-                    <div class="lpr-feat-title">{{ i18n.feat_coll }}</div>
-                    <div class="lpr-feat-desc">{{ i18n.feat_coll_desc }}</div>
-                  </div>
+                  <div class="lpr-feat-title">{{ i18n.feat_coll }}</div>
+                  <div class="lpr-feat-desc">{{ i18n.feat_coll_desc }}</div>
                 </div>
               </div>
             </div>
@@ -560,6 +564,14 @@ import { matchDeckToCollection } from './services/collectionParser.js'
 import { getCachedCards, setCachedCards } from './services/storage.js'
 
 const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other', 'Maybeboard']
+const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G']
+const MTG_COLOR_STYLES = {
+  W: { background: '#f1f5f9', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)' },
+  U: { background: '#3b82f6', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.25)' },
+  B: { background: '#3f3f46', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)' },
+  R: { background: '#ef4444', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.2)' },
+  G: { background: '#22c55e', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)' },
+}
 const CATEGORY_FR = {
   Commander: 'Commandant', Creature: 'Créature', Instant: 'Éphémère',
   Sorcery: 'Rituel', Artifact: 'Artefact', Enchantment: 'Enchantement',
@@ -649,6 +661,9 @@ async function onTranslate() {
   if (status.value === 'done') {
     setCachedCards(deckId.value, cards.value)
     const coverCard = cards.value.find(c => c.category === 'Commander') || cards.value[0]
+    const deckColors = COLOR_ORDER.filter(c =>
+      cards.value.some(card => (card.colorIdentity || []).includes(c))
+    )
     addToHistory({
       deckId: deckId.value,
       deckName: deckName.value,
@@ -659,6 +674,7 @@ async function onTranslate() {
       url: inputMode.value === 'url' ? urlInput.value : undefined,
       pasteText: inputMode.value === 'paste' ? extra?.pasteText : undefined,
       coverImageUrl: coverCard?.imageUrl || null,
+      deckColors,
     })
   }
 }
@@ -720,11 +736,14 @@ function formatDate(iso) {
 }
 
 function getCoverForEntry(entry) {
-  if (entry.coverImageUrl) return entry.coverImageUrl
-  const cached = getCachedCards(entry.deckId)
-  if (!cached?.length) return null
-  const commander = cached.find(c => c.category === 'Commander')
-  return (commander || cached[0])?.imageUrl || null
+  let url = entry.coverImageUrl
+  if (!url) {
+    const cached = getCachedCards(entry.deckId)
+    if (!cached?.length) return null
+    const commander = cached.find(c => c.category === 'Commander')
+    url = (commander || cached[0])?.imageUrl || null
+  }
+  return url ? url.replace('/normal/', '/art_crop/') : null
 }
 
 function applyCollection() {
@@ -1083,7 +1102,8 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .lpr-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 14px;
+  max-width: 560px;
 }
 
 .lpr-card {
@@ -1111,8 +1131,8 @@ watch(deckId, () => { activeFilter.value = 'all' })
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center 20%;
-  opacity: 0.7;
+  background-position: center center;
+  opacity: 0.75;
   transition: opacity 400ms, transform 700ms;
 }
 
@@ -1151,6 +1171,20 @@ watch(deckId, () => { activeFilter.value = 'all' })
   gap: 3px;
 }
 
+.lpr-card-colors {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.lpr-color-pip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
+
 .lpr-card-count {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1171,51 +1205,81 @@ watch(deckId, () => { activeFilter.value = 'all' })
 /* Feature cards */
 .lpr-feat-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .lpr-feat {
   display: flex;
   flex-direction: column;
-  padding: 28px;
-  background: rgba(24, 24, 27, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(20px);
-  transition: background 150ms, border-color 150ms;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 200ms, transform 200ms;
 }
 
-.lpr-feat:hover {
-  background: rgba(39, 39, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.14);
+.lpr-feat:hover { transform: translateY(-2px); }
+
+.lpr-feat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
 }
+
+/* Amber variant */
+.lpr-feat--amber {
+  background: linear-gradient(150deg, rgba(245,158,11,0.08) 0%, rgba(24,24,27,0.5) 55%);
+}
+.lpr-feat--amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.lpr-feat--amber .lpr-feat-icon { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.lpr-feat--amber:hover { border-color: rgba(245,158,11,0.3); }
+
+/* Blue variant */
+.lpr-feat--blue {
+  background: linear-gradient(150deg, rgba(59,130,246,0.08) 0%, rgba(24,24,27,0.5) 55%);
+}
+.lpr-feat--blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.lpr-feat--blue .lpr-feat-icon { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.lpr-feat--blue:hover { border-color: rgba(59,130,246,0.3); }
+
+/* Green variant */
+.lpr-feat--green {
+  background: linear-gradient(150deg, rgba(34,197,94,0.07) 0%, rgba(24,24,27,0.5) 55%);
+}
+.lpr-feat--green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.lpr-feat--green .lpr-feat-icon { background: rgba(34,197,94,0.13); color: #4ade80; }
+.lpr-feat--green:hover { border-color: rgba(34,197,94,0.25); }
 
 .lpr-feat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   flex-shrink: 0;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+  transition: transform 200ms;
 }
 
+.lpr-feat:hover .lpr-feat-icon { transform: scale(1.08); }
+
 .lpr-feat-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: #fff;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
 .lpr-feat-desc {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(161, 161, 170, 1);
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 /* ══ DECK LEFT ═══════════════════════════════════════════ */

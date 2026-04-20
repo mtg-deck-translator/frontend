@@ -213,7 +213,8 @@ export async function translateBatch(cards, onProgress, lang = 'fr') {
     }
 
     const price = enCard?.prices?.eur ? parseFloat(enCard.prices.eur) : null
-    return { ...card, frName, noFr, error, category, imageUrl, price }
+    const colorIdentity = enCard?.color_identity || []
+    return { ...card, frName, noFr, error, category, imageUrl, price, colorIdentity }
   })
 
   onProgress(total, total)
