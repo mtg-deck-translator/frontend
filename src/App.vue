@@ -312,6 +312,13 @@
 
       <!-- ══ RIGHT PANEL ═════════════════════════════════ -->
       <div ref="cmdRight" class="cmd-right">
+        <Transition name="bg-fade">
+          <div
+            v-if="status === 'done' && deckBgUrl"
+            class="cmd-right-bg"
+            :style="{ backgroundImage: `url(${deckBgUrl})` }"
+          />
+        </Transition>
 
         <!-- LANDING RIGHT -->
         <template v-if="status !== 'done'">
@@ -628,6 +635,13 @@ const ownedPct = computed(() =>
 )
 
 const isLoading = computed(() => status.value === 'fetching' || status.value === 'translating')
+
+const deckBgUrl = computed(() => {
+  if (status.value !== 'done') return null
+  const commander = cards.value.find(c => c.category === 'Commander')
+  const card = commander || cards.value[0]
+  return card?.imageUrl ? card.imageUrl.replace('/normal/', '/art_crop/') : null
+})
 const isInputEmpty = computed(() =>
   inputMode.value === 'url' ? !urlInput.value?.trim() : !pasteInput.value?.trim()
 )
@@ -1621,8 +1635,30 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 /* ══ DECK RIGHT ═════════════════════════════════════════ */
 .dk-right {
-  padding: 20px 28px 64px;
+  padding: 24px 32px 64px;
+  position: relative;
+  z-index: 1;
 }
+
+/* Background art */
+.cmd-right-bg {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 400px;
+  bottom: 0;
+  background-size: cover;
+  background-position: center center;
+  opacity: 0.1;
+  filter: blur(60px) saturate(0.6);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-fade-enter-active,
+.bg-fade-leave-active { transition: opacity 600ms ease; }
+.bg-fade-enter-from,
+.bg-fade-leave-to { opacity: 0; }
 
 /* ── Transitions ─────────────────────────────────────── */
 .history-fade-enter-active,
