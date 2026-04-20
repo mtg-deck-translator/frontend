@@ -335,11 +335,12 @@
                     :style="{ backgroundImage: `url(${getCoverForEntry(entry)})` }"
                   />
                   <div class="lpr-card-body">
-                    <span class="lpr-card-date">{{ formatDate(entry.date) }}</span>
-                    <span class="lpr-card-name">{{ entry.deckName }}</span>
-                    <div class="lpr-card-foot">
+                    <div class="lpr-card-top">
+                      <span class="lpr-card-badge">{{ formatDate(entry.date) }}</span>
+                    </div>
+                    <div class="lpr-card-bottom">
                       <span class="lpr-card-count">{{ entry.totalCount }} cartes</span>
-                      <span v-if="entry.ownedCount > 0" class="lpr-card-owned">{{ entry.ownedCount }} poss.</span>
+                      <span class="lpr-card-name">{{ entry.deckName }}</span>
                     </div>
                   </div>
                 </button>
@@ -940,15 +941,19 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 /* Inlined input card */
 .lpl-input-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  overflow: hidden;
+  background: rgba(24, 24, 27, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 8px;
+  backdrop-filter: blur(24px);
 }
 
 .lpl-mode-tabs {
   display: flex;
-  padding: 6px 6px 0;
+  padding: 4px;
+  background: rgba(9, 9, 11, 0.6);
+  border-radius: 16px;
+  margin-bottom: 6px;
   gap: 2px;
 }
 
@@ -958,32 +963,33 @@ watch(deckId, () => { activeFilter.value = 'all' })
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 9px 12px;
-  border-radius: 9px 9px 0 0;
-  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.28);
-  transition: background 150ms, color 150ms;
+  color: rgba(113, 113, 122, 1);
+  transition: background 150ms, color 150ms, box-shadow 150ms;
 }
 
 .lpl-mode-tab.active {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(39, 39, 42, 1);
   color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-.lpl-mode-tab:hover:not(.active) { color: rgba(255, 255, 255, 0.55); }
+.lpl-mode-tab:hover:not(.active) { color: rgba(212, 212, 216, 1); }
 
 .lpl-url-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 18px 16px 16px;
 }
 
 .lpl-url-icon {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(113, 113, 122, 1);
   flex-shrink: 0;
+  transition: color 150ms;
 }
 
 .lpl-url-input {
@@ -991,32 +997,34 @@ watch(deckId, () => { activeFilter.value = 'all' })
   background: transparent;
   border: none;
   outline: none;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
   min-width: 0;
 }
 
-.lpl-url-input::placeholder { color: rgba(255, 255, 255, 0.22); }
+.lpl-url-input:not(:placeholder-shown) ~ .lpl-url-icon,
+.lpl-url-row:focus-within .lpl-url-icon { color: #f59e0b; }
+
+.lpl-url-input::placeholder { color: rgba(82, 82, 91, 1); }
 .lpl-url-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .lpl-paste-input {
   display: block;
   width: 100%;
-  min-height: 140px;
+  min-height: 130px;
   background: transparent;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.65;
-  padding: 13px 16px;
+  padding: 12px 16px 14px;
   outline: none;
   resize: vertical;
   box-sizing: border-box;
 }
 
-.lpl-paste-input::placeholder { color: rgba(255, 255, 255, 0.18); }
+.lpl-paste-input::placeholder { color: rgba(82, 82, 91, 1); }
 .lpl-paste-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Bottom bar */
@@ -1074,28 +1082,29 @@ watch(deckId, () => { activeFilter.value = 'all' })
 /* Recent deck cards */
 .lpr-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .lpr-card {
   position: relative;
-  min-height: 240px;
-  border-radius: 14px;
+  aspect-ratio: 5 / 7;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
   text-align: left;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: transform 200ms, border-color 200ms, box-shadow 200ms;
+  background: rgba(24, 24, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 500ms, border-color 300ms, box-shadow 300ms;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .lpr-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(245, 158, 11, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(-12px);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 24px 48px rgba(245, 158, 11, 0.15), 0 8px 24px rgba(0,0,0,0.6);
 }
 
 .lpr-card-art {
@@ -1103,12 +1112,11 @@ watch(deckId, () => { activeFilter.value = 'all' })
   inset: 0;
   background-size: cover;
   background-position: center 20%;
-  opacity: 0.5;
-  filter: saturate(0.7);
-  transition: opacity 200ms, transform 200ms;
+  opacity: 0.7;
+  transition: opacity 400ms, transform 700ms;
 }
 
-.lpr-card:hover .lpr-card-art { opacity: 0.4; transform: scale(1.05); }
+.lpr-card:hover .lpr-card-art { opacity: 0.85; transform: scale(1.07); }
 
 .lpr-card-body {
   position: relative;
@@ -1116,48 +1124,49 @@ watch(deckId, () => { activeFilter.value = 'all' })
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 14px 14px;
-  background: linear-gradient(to bottom, rgba(6,6,15,0.2) 0%, rgba(6,6,15,0.82) 100%);
-  gap: 4px;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.88) 100%);
 }
 
-.lpr-card-date {
-  font-family: var(--font-mono);
+.lpr-card-top {}
+
+.lpr-card-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 9px;
-  color: rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.lpr-card-name {
-  font-size: 14px;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #fff;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: auto;
 }
 
-.lpr-card-foot {
+.lpr-card-bottom {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .lpr-card-count {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.lpr-card-owned {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: #34d399;
+.lpr-card-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  transition: color 200ms;
 }
+
+.lpr-card:hover .lpr-card-name { color: #fbbf24; }
 
 /* Feature cards */
 .lpr-feat-grid {
@@ -1168,44 +1177,45 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 .lpr-feat {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  flex-direction: column;
+  padding: 28px;
+  background: rgba(24, 24, 27, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
   transition: background 150ms, border-color 150ms;
 }
 
 .lpr-feat:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(39, 39, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .lpr-feat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 9px;
-  color: rgba(255, 255, 255, 0.5);
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.7);
   flex-shrink: 0;
+  margin-bottom: 20px;
 }
 
 .lpr-feat-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   color: #fff;
-  letter-spacing: -0.02em;
-  margin-bottom: 4px;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
 }
 
 .lpr-feat-desc {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.35);
-  line-height: 1.55;
+  font-size: 13px;
+  color: rgba(161, 161, 170, 1);
+  line-height: 1.65;
 }
 
 /* ══ DECK LEFT ═══════════════════════════════════════════ */
