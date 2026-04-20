@@ -1,5 +1,6 @@
 <template>
   <div class="cat-group" :style="{ '--cat-color': catColor }" :id="`cat-${category}`">
+
     <div class="cat-head">
       <div class="cat-head-left">
         <svg class="cat-spark" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
@@ -8,25 +9,24 @@
         <span class="cat-label">{{ categoryFr }}</span>
       </div>
       <div class="cat-head-right">
-        <span class="cat-count">{{ ownedCount }}/{{ totalCount }} possédées</span>
+        <span class="cat-count">{{ ownedCount }}/{{ totalCount }}</span>
         <button class="cat-toggle" @click="handleToggleAll">
-          {{ allOwned ? 'Tout décocher' : 'Tout cocher' }}
+          {{ allOwned ? 'Décocher' : 'Tout cocher' }}
         </button>
       </div>
-    </div>
-    <div class="cat-progress-track">
-      <div class="cat-progress-fill" :style="{ width: pct + '%' }" />
     </div>
 
     <div class="cat-cards">
       <CardRow
-        v-for="card in cards"
+        v-for="(card, idx) in cards"
         :key="card.queryName"
         :card="card"
         :is-checked="!!checkedMap[card.queryName]"
+        :is-last="idx === cards.length - 1"
         @toggle="$emit('toggle', $event)"
       />
     </div>
+
   </div>
 </template>
 
@@ -60,7 +60,6 @@ const catColor = computed(() => CATEGORY_COLORS[props.category] || '#6b7280')
 const cardKeys = computed(() => props.cards.map(c => c.queryName))
 const ownedCount = computed(() => props.cards.filter(c => props.checkedMap[c.queryName]).length)
 const totalCount = computed(() => props.cards.length)
-const pct = computed(() => totalCount.value ? Math.round(ownedCount.value / totalCount.value * 100) : 0)
 const allOwned = computed(() => ownedCount.value === totalCount.value && totalCount.value > 0)
 
 function handleToggleAll() {
@@ -70,7 +69,7 @@ function handleToggleAll() {
 
 <style scoped>
 .cat-group {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   animation: fadeUp 280ms ease both;
   animation-delay: calc(var(--index, 0) * 35ms);
 }
@@ -80,16 +79,14 @@ function handleToggleAll() {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Section header */
 .cat-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #060611;
-  padding: 12px 0 8px;
-  margin-bottom: 2px;
+  padding-bottom: 12px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .cat-head-left {
@@ -104,9 +101,9 @@ function handleToggleAll() {
 }
 
 .cat-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--cat-color);
 }
@@ -114,42 +111,32 @@ function handleToggleAll() {
 .cat-head-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .cat-count {
   font-family: var(--font-mono);
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .cat-toggle {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.02em;
   transition: color 150ms;
 }
 
-.cat-toggle:hover { color: rgba(255, 255, 255, 0.65); }
+.cat-toggle:hover { color: rgba(255, 255, 255, 0.55); }
 
-.cat-progress-track {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.cat-progress-fill {
-  height: 100%;
-  background: var(--cat-color);
-  border-radius: 9999px;
-  opacity: 0.6;
-  transition: width 400ms ease;
-}
-
+/* Cards container — glassmorphism card */
 .cat-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  background: rgba(24, 24, 27, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 </style>
