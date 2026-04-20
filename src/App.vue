@@ -65,15 +65,57 @@
 
             <!-- Input section -->
             <div class="lpl-input-section">
-              <InputPanel
-                v-model:mode="inputMode"
-                v-model:url="urlInput"
-                v-model:paste="pasteInput"
-                :status="status"
-                :labels="i18n"
-                hide-button
-                @translate="onTranslate"
-              />
+              <div class="lpl-input-card">
+                <div class="lpl-mode-tabs">
+                  <button
+                    class="lpl-mode-tab"
+                    :class="{ active: inputMode === 'url' }"
+                    @click="inputMode = 'url'"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Lien Web
+                  </button>
+                  <button
+                    class="lpl-mode-tab"
+                    :class="{ active: inputMode === 'paste' }"
+                    @click="inputMode = 'paste'"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M2 5h12M2 8.5h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Liste Brute
+                  </button>
+                </div>
+                <div v-if="inputMode === 'url'" class="lpl-url-row">
+                  <svg class="lpl-url-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/>
+                    <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
+                  <input
+                    class="lpl-url-input"
+                    type="url"
+                    placeholder="https://archidekt.com/decks/…"
+                    :value="urlInput"
+                    :disabled="isLoading"
+                    @input="urlInput = $event.target.value"
+                    @keydown.enter="onTranslate"
+                  />
+                </div>
+                <textarea
+                  v-else
+                  class="lpl-paste-input"
+                  :value="pasteInput"
+                  :disabled="isLoading"
+                  spellcheck="false"
+                  autocomplete="off"
+                  :placeholder="pasteTextareaPlaceholder"
+                  @input="pasteInput = $event.target.value"
+                  @keydown.ctrl.enter.prevent="onTranslate"
+                  @keydown.meta.enter.prevent="onTranslate"
+                />
+              </div>
 
               <!-- Translate button -->
               <button
@@ -406,7 +448,7 @@ import { ref, computed, watch } from 'vue'
 
 const LANDING_I18N = {
   fr: {
-    hero_title_1: 'Traduisez vos decks', hero_title_2: 'dans votre langue',
+    hero_title_1: 'Forgez vos listes', hero_title_2: 'dans votre langue',
     hero_sub: 'Importez un deck depuis Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou collez votre liste. Noms traduits en quelques secondes via Scryfall.',
     feat_url: 'Import URL', feat_url_desc: 'Collez une URL Archidekt, Moxfield, MTGTOP8 ou Tappedout et obtenez la liste traduite instantanément.',
     feat_lang: '8 langues', feat_lang_desc: 'Français, Allemand, Espagnol, Italien, Portugais, Japonais, Coréen, Russe et plus encore.',
@@ -499,7 +541,6 @@ const LANDING_I18N = {
 import CardmarketPanel from './components/CardmarketPanel.vue'
 import CollectionImport from './components/CollectionImport.vue'
 import ColumnsPanel from './components/ColumnsPanel.vue'
-import InputPanel from './components/InputPanel.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
@@ -544,6 +585,8 @@ watch(layout, v => localStorage.setItem('deck-layout', v))
 const { theme, toggle: toggleTheme } = useTheme()
 const { language, setLanguage } = useLanguage()
 const i18n = computed(() => LANDING_I18N[language.value] || LANDING_I18N.fr)
+
+const pasteTextareaPlaceholder = `4 Island\n1x Lightning Bolt\n1x Frolicking Familiar // Blow Off Steam\n// Les commentaires sont ignorés\n1 Sol Ring`
 
 const {
   inputMode, urlInput, pasteInput,
@@ -727,7 +770,7 @@ watch(deckId, () => { activeFilter.value = 'all' })
   flex: 1;
   height: 100%;
   overflow-y: auto;
-  background: #06060f;
+  background: radial-gradient(ellipse 65% 55% at 75% 8%, rgba(88, 28, 220, 0.14) 0%, transparent 70%), #06060f;
   position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.08) transparent;
@@ -822,10 +865,7 @@ watch(deckId, () => { activeFilter.value = 'all' })
 }
 
 .lpl-grad {
-  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .lpl-sub {
@@ -898,6 +938,87 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .lpl-banner-warn { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.22); color: #fbbf24; }
 .lpl-banner-err  { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.22);  color: #fca5a5; }
 
+/* Inlined input card */
+.lpl-input-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.lpl-mode-tabs {
+  display: flex;
+  padding: 6px 6px 0;
+  gap: 2px;
+}
+
+.lpl-mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 9px 9px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.28);
+  transition: background 150ms, color 150ms;
+}
+
+.lpl-mode-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.lpl-mode-tab:hover:not(.active) { color: rgba(255, 255, 255, 0.55); }
+
+.lpl-url-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lpl-url-icon {
+  color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.lpl-url-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  min-width: 0;
+}
+
+.lpl-url-input::placeholder { color: rgba(255, 255, 255, 0.22); }
+.lpl-url-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.lpl-paste-input {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  padding: 13px 16px;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.lpl-paste-input::placeholder { color: rgba(255, 255, 255, 0.18); }
+.lpl-paste-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* Bottom bar */
 .lpl-bottom {
   display: flex;
@@ -959,7 +1080,7 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 .lpr-card {
   position: relative;
-  min-height: 160px;
+  min-height: 240px;
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
@@ -982,8 +1103,8 @@ watch(deckId, () => { activeFilter.value = 'all' })
   inset: 0;
   background-size: cover;
   background-position: center 20%;
-  opacity: 0.25;
-  filter: saturate(0.6);
+  opacity: 0.5;
+  filter: saturate(0.7);
   transition: opacity 200ms, transform 200ms;
 }
 
@@ -1040,9 +1161,9 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 /* Feature cards */
 .lpr-feat-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .lpr-feat {
