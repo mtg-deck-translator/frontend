@@ -1,14 +1,7 @@
 <template>
-  <div class="app">
-    <AppHeader
-      :theme="theme"
-      :history-open="showHistory"
-      v-model:language="language"
-      @toggle-theme="toggleTheme"
-      @toggle-history="showHistory = !showHistory"
-      @update:language="setLanguage"
-    />
+  <div class="cmd-app">
 
+    <!-- History overlay -->
     <Transition name="history-fade">
       <HistoryPanel
         v-if="showHistory"
@@ -19,168 +12,143 @@
       />
     </Transition>
 
-    <!-- Pre-translation: landing page — toujours sombre -->
-    <div v-if="status !== 'done'" class="input-page">
+    <div class="cmd-layout">
 
-      <!-- Orbes de fond (CSS uniquement, position: fixed → pas de resize) -->
-      <div class="lp-orb lp-orb-1" aria-hidden="true"/>
-      <div class="lp-orb lp-orb-2" aria-hidden="true"/>
+      <!-- ══ LEFT PANEL ══════════════════════════════════ -->
+      <div class="cmd-left">
 
-      <!-- Colonne centrale -->
-      <div class="lp-center">
+        <!-- LANDING LEFT -->
+        <template v-if="status !== 'done'">
+          <div class="lp-left">
 
-        <!-- Hero -->
-        <div class="lp-hero">
-          <div class="lp-badge">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M5 1l1 3h3l-2.5 1.8.9 3L5 7.1 2.6 8.8l.9-3L1 4h3z" fill="currentColor"/>
-            </svg>
-            Magic: The Gathering
-          </div>
-          <h1 class="lp-title">
-            {{ i18n.hero_title_1 }}<br>
-            <span class="lp-gradient">{{ i18n.hero_title_2 }}</span>
-          </h1>
-          <p class="lp-sub">{{ i18n.hero_sub }}</p>
-        </div>
-
-        <!-- Input glassmorphism -->
-        <div class="input-wrap">
-          <InputPanel
-            v-model:mode="inputMode"
-            v-model:url="urlInput"
-            v-model:paste="pasteInput"
-            :status="status"
-            :labels="i18n"
-            @translate="onTranslate"
-          />
-          <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation" />
-          <div v-if="unparseableLines.length && status !== 'idle'" class="lp-banner lp-banner-warn">
-            {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 3).join(', ') }}{{ unparseableLines.length > 3 ? '…' : '' }}
-          </div>
-          <div v-if="status === 'error'" class="lp-banner lp-banner-err">{{ error }}</div>
-        </div>
-
-        <!-- Feature cards -->
-        <div class="lp-features">
-          <div class="lp-feat lp-feat-blue">
-            <div class="lf-icon">
-              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="lf-body">
-              <span class="lf-title">{{ i18n.feat_url }}</span>
-              <span class="lf-desc">{{ i18n.feat_url_desc }}</span>
-            </div>
-          </div>
-          <div class="lp-feat lp-feat-purple">
-            <div class="lf-icon">
-              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6M8 2c2 2 3 4 3 6s-1 4-3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="lf-body">
-              <span class="lf-title">{{ i18n.feat_lang }}</span>
-              <span class="lf-desc">{{ i18n.feat_lang_desc }}</span>
-            </div>
-          </div>
-          <div class="lp-feat lp-feat-green">
-            <div class="lf-icon">
-              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="lf-body">
-              <span class="lf-title">{{ i18n.feat_coll }}</span>
-              <span class="lf-desc">{{ i18n.feat_coll_desc }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Decks récents -->
-        <div v-if="history.length" class="lp-recent">
-          <div class="lp-recent-hd">
-            <span class="lp-recent-title">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              {{ i18n.recent }}
-            </span>
-            <button class="lp-recent-clear" @click="clearHistory">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M2 3h8M4.5 3V2h3v1M5 5.5v3M7 5.5v3M3 3l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ i18n.clear_all }}
-            </button>
-          </div>
-          <div class="lp-recent-grid">
-            <button
-              v-for="entry in history.slice(0, 6)"
-              :key="entry.deckId"
-              class="lp-deck-card"
-              @click="onLoadFromHistory(entry)"
-            >
-              <div
-                v-if="getCoverForEntry(entry)"
-                class="ldc-art"
-                :style="{ backgroundImage: `url(${getCoverForEntry(entry)})` }"
-              />
-              <div class="ldc-body">
-                <div class="ldc-top">
-                  <span class="ldc-date">{{ formatDate(entry.date) }}</span>
+            <!-- Top bar: brand + controls -->
+            <div class="lpl-topbar">
+              <div class="lpl-brand">
+                <div class="lpl-logo">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="14" height="14" rx="3" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="1.2"/>
+                    <path d="M4 6h8M4 9h5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
                 </div>
-                <span class="ldc-name">{{ entry.deckName }}</span>
-                <div class="ldc-footer">
-                  <span class="ldc-count tabular">{{ entry.totalCount }} {{ i18n.cards }}</span>
-                  <span v-if="entry.ownedCount > 0" class="ldc-owned tabular">{{ entry.ownedCount }} {{ i18n.owned }}</span>
+                <div>
+                  <div class="lpl-name">MTG Translator</div>
+                  <div class="lpl-edition">ÉDITION PREMIUM</div>
                 </div>
               </div>
+              <div class="lpl-top-actions">
+                <button class="lpl-icon-btn" :title="showHistory ? 'Fermer l\'historique' : 'Historique'" @click="showHistory = !showHistory">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="lpl-icon-btn" :title="theme === 'dark' ? 'Mode clair' : 'Mode sombre'" @click="toggleTheme">
+                  <svg v-if="theme === 'dark'" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/>
+                    <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.1 3.1l1.1 1.1M11.8 11.8l1.1 1.1M3.1 12.9l1.1-1.1M11.8 4.2l1.1-1.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                  <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M13.5 9A6.5 6.5 0 0 1 7 2.5a6.5 6.5 0 1 0 6.5 6.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Hero text -->
+            <div class="lpl-hero">
+              <h1 class="lpl-title">
+                {{ i18n.hero_title_1 }}<br>
+                <span class="lpl-grad">{{ i18n.hero_title_2 }}</span>
+              </h1>
+              <p class="lpl-sub">{{ i18n.hero_sub }}</p>
+            </div>
+
+            <!-- Input section -->
+            <div class="lpl-input-section">
+              <InputPanel
+                v-model:mode="inputMode"
+                v-model:url="urlInput"
+                v-model:paste="pasteInput"
+                :status="status"
+                :labels="i18n"
+                hide-button
+                @translate="onTranslate"
+              />
+
+              <!-- Translate button -->
+              <button
+                class="lpl-translate-btn"
+                :disabled="isInputEmpty || isLoading"
+                @click="onTranslate"
+              >
+                <span v-if="isLoading" class="lpl-spinner"/>
+                {{ isLoading ? i18n.btn_fetching : i18n.btn_translate }}
+                <svg v-if="!isLoading" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <!-- Progress -->
+              <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation"/>
+
+              <!-- Banners -->
+              <div v-if="unparseableLines.length && status !== 'idle'" class="lpl-banner lpl-banner-warn">
+                {{ unparseableLines.length }} ligne(s) ignorée(s) : {{ unparseableLines.slice(0, 2).join(', ') }}{{ unparseableLines.length > 2 ? '…' : '' }}
+              </div>
+              <div v-if="status === 'error'" class="lpl-banner lpl-banner-err">{{ error }}</div>
+            </div>
+
+            <!-- Bottom bar -->
+            <div class="lpl-bottom">
+              <LanguageSelector :model-value="language" @update:model-value="setLanguage" />
+              <div class="lpl-platforms">
+                <span>Archidekt</span>
+                <span class="lpl-dot">·</span>
+                <span>Moxfield</span>
+                <span class="lpl-dot">·</span>
+                <span>MTGTOP8</span>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- DECK LEFT -->
+        <template v-else>
+          <div class="dk-left">
+
+            <!-- Back -->
+            <button class="dk-back" @click="resetDeck">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M9 2L3 7l6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Retour aux decks
             </button>
-          </div>
-        </div>
 
-      </div>
-    </div>
+            <!-- Deck info -->
+            <div class="dk-info">
+              <h2 class="dk-name">{{ deckName }}</h2>
+              <div class="dk-stats">
+                <span class="dk-stat">{{ cards.length }} cartes</span>
+                <span v-if="totalPrice > 0" class="dk-stat dk-stat-price">{{ formatPrice(totalPrice) }}</span>
+              </div>
+            </div>
 
-    <!-- Post-translation: app shell full-width -->
-    <div v-else class="deck-layout">
-
-      <!-- Sidebar gauche -->
-      <aside class="deck-sidebar">
-
-        <!-- En-tête deck -->
-        <div class="sidebar-header">
-          <div class="sh-title-row">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
-              <path d="M4 5h6M4 7.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-            <span class="sh-name">{{ deckName }}</span>
-          </div>
-          <div class="sh-meta">
-            <span class="sh-stat tabular">{{ cards.length }} cartes</span>
-            <span v-if="totalPrice > 0" class="sh-stat tabular">· {{ formatPrice(totalPrice) }}</span>
-          </div>
-          <div class="sh-controls">
-            <div class="layout-toggle">
-              <button :class="['lt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Vue liste">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <!-- Layout toggle -->
+            <div class="dk-layout-toggle">
+              <button :class="['dlt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Liste">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                   <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
                 </svg>
               </button>
-              <button :class="['lt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Vue colonnes">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <button :class="['dlt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Colonnes">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                   <rect x="1" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
                   <rect x="5.5" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
                   <rect x="10" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
                 </svg>
               </button>
-              <button :class="['lt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Vue images">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <button :class="['dlt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Images">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                   <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
                   <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
                   <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
@@ -188,71 +156,239 @@
                 </svg>
               </button>
             </div>
-            <button class="new-deck-btn" @click="resetDeck">Nouveau deck</button>
+
+            <!-- Action buttons 2×2 -->
+            <div class="dk-actions">
+              <button class="dk-action-btn" @click="exportAll">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M2 10V3a1 1 0 0 1 1-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                Copier tout
+              </button>
+              <button class="dk-action-btn" @click="exportDownload">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 2v7M4 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 11h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                Exporter .txt
+              </button>
+              <button class="dk-action-btn" @click="exportPrint">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <rect x="2" y="5" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4 5V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V5" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+                Imprimer
+              </button>
+              <button class="dk-action-btn dk-action-btn--accent" @click="exportBuyCardmarket">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <circle cx="5.5" cy="11.5" r="1" fill="currentColor"/>
+                  <circle cx="10.5" cy="11.5" r="1" fill="currentColor"/>
+                  <path d="M1 1h2l1.5 6h6L12 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Manquantes
+              </button>
+            </div>
+
+            <div class="dk-sep"/>
+
+            <!-- Search -->
+            <div class="dk-search">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <input
+                class="dk-search-input"
+                :value="search"
+                placeholder="Chercher une carte..."
+                @input="search = $event.target.value"
+              />
+              <button v-if="search" class="dk-search-clear" @click="search = ''">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="dk-filters">
+              <button
+                v-for="tab in DK_TABS"
+                :key="tab.value"
+                class="dk-filter-btn"
+                :class="{ active: activeFilter === tab.value }"
+                @click="activeFilter = tab.value"
+              >
+                <span class="dkf-label">{{ tab.label }}</span>
+                <span class="dkf-count">{{ filterCounts[tab.value] }}</span>
+              </button>
+            </div>
+
+            <div class="dk-sep"/>
+
+            <!-- Collection -->
+            <div class="dk-collection">
+              <div class="dk-coll-header">
+                <span class="dk-coll-label">COLLECTION</span>
+                <span class="dk-coll-pct">{{ ownedPct }}%</span>
+              </div>
+              <div class="dk-coll-stats">{{ ownedCount }} / {{ cards.length }} poss.</div>
+              <div class="dk-coll-track">
+                <div class="dk-coll-fill" :style="{ width: ownedPct + '%' }"/>
+              </div>
+              <CollectionImport @apply="applyCollection"/>
+            </div>
+
+            <div class="dk-sep"/>
+
+            <!-- TOC -->
+            <div class="dk-toc">
+              <div class="dk-toc-label">ANALYSE DU DECK</div>
+              <button
+                v-for="group in categoryGroups"
+                :key="group.category"
+                class="dk-toc-item"
+                @click="scrollToCategory(group.category)"
+              >
+                <span class="dk-toc-name">{{ group.label }}</span>
+                <span class="dk-toc-count">{{ group.owned }}/{{ group.total }}</span>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
           </div>
-        </div>
+        </template>
+      </div>
 
-        <div class="sidebar-sep" />
+      <!-- ══ RIGHT PANEL ═════════════════════════════════ -->
+      <div ref="cmdRight" class="cmd-right">
 
-        <!-- Contrôles (search / filter / sort / ownership / TOC) -->
-        <ResultsSidebar
-          :search="search"
-          :sort="sort"
-          :filter="activeFilter"
-          :counts="filterCounts"
-          :owned-count="ownedCount"
-          :total-count="cards.length"
-          :category-groups="categoryGroups"
-          :layout="layout"
-          @update:search="search = $event"
-          @update:sort="sort = $event"
-          @update:filter="activeFilter = $event"
-        />
+        <!-- LANDING RIGHT -->
+        <template v-if="status !== 'done'">
+          <div class="lp-right">
 
-        <div class="sidebar-sep" />
+            <!-- Recent decks -->
+            <div v-if="history.length" class="lpr-section">
+              <div class="lpr-section-head">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h2 class="lpr-section-title">{{ i18n.recent }}</h2>
+                <button class="lpr-clear" @click="clearHistory">{{ i18n.clear_all }}</button>
+              </div>
+              <div class="lpr-grid">
+                <button
+                  v-for="entry in history.slice(0, 6)"
+                  :key="entry.deckId"
+                  class="lpr-card"
+                  @click="onLoadFromHistory(entry)"
+                >
+                  <div
+                    v-if="getCoverForEntry(entry)"
+                    class="lpr-card-art"
+                    :style="{ backgroundImage: `url(${getCoverForEntry(entry)})` }"
+                  />
+                  <div class="lpr-card-body">
+                    <span class="lpr-card-date">{{ formatDate(entry.date) }}</span>
+                    <span class="lpr-card-name">{{ entry.deckName }}</span>
+                    <div class="lpr-card-foot">
+                      <span class="lpr-card-count">{{ entry.totalCount }} cartes</span>
+                      <span v-if="entry.ownedCount > 0" class="lpr-card-owned">{{ entry.ownedCount }} poss.</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
 
-        <!-- Import collection -->
-        <CollectionImport @apply="applyCollection" />
-      </aside>
+            <!-- Capacités -->
+            <div class="lpr-section">
+              <div class="lpr-section-head">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                  <path d="M7 1l1.5 4h4l-3.2 2.3 1.2 4L7 9 3.5 11.3l1.2-4L1.5 5h4z"/>
+                </svg>
+                <h2 class="lpr-section-title">Capacités</h2>
+              </div>
+              <div class="lpr-feat-grid">
+                <div class="lpr-feat">
+                  <div class="lpr-feat-icon">
+                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                      <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="lpr-feat-title">{{ i18n.feat_url }}</div>
+                    <div class="lpr-feat-desc">{{ i18n.feat_url_desc }}</div>
+                  </div>
+                </div>
+                <div class="lpr-feat">
+                  <div class="lpr-feat-icon">
+                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M2 8h12M8 2c-2 2-3 4-3 6s1 4 3 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="lpr-feat-title">{{ i18n.feat_lang }}</div>
+                    <div class="lpr-feat-desc">{{ i18n.feat_lang_desc }}</div>
+                  </div>
+                </div>
+                <div class="lpr-feat">
+                  <div class="lpr-feat-icon">
+                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                      <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="lpr-feat-title">{{ i18n.feat_coll }}</div>
+                    <div class="lpr-feat-desc">{{ i18n.feat_coll_desc }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      <!-- Contenu principal -->
-      <main class="deck-main">
-        <ExportPanel
-          @copy-all="exportAll"
-          @copy-missing="exportMissing"
-          @download="exportDownload"
-          @print="exportPrint"
-          @buy-cardmarket="exportBuyCardmarket"
-        />
-        <ResultsPanel
-          v-if="layout === 'list'"
-          :cards="cards"
-          :checked-map="checkedMap"
-          :filter="activeFilter"
-          :search="search"
-          :sort="sort"
-          @toggle="toggleCard"
-          @set-all="setAllCards"
-        />
-        <ColumnsPanel
-          v-else-if="layout === 'columns'"
-          :cards="cards"
-          :checked-map="checkedMap"
-          :filter="activeFilter"
-          :search="search"
-          :sort="sort"
-          @toggle="toggleCard"
-        />
-        <VisualPanel
-          v-else
-          :cards="cards"
-          :checked-map="checkedMap"
-          :filter="activeFilter"
-          :search="search"
-          :sort="sort"
-          @toggle="toggleCard"
-        />
-      </main>
+          </div>
+        </template>
+
+        <!-- DECK RIGHT -->
+        <template v-else>
+          <div class="dk-right">
+            <ResultsPanel
+              v-if="layout === 'list'"
+              :cards="cards"
+              :checked-map="checkedMap"
+              :filter="activeFilter"
+              :search="search"
+              :sort="sort"
+              @toggle="toggleCard"
+              @set-all="setAllCards"
+            />
+            <ColumnsPanel
+              v-else-if="layout === 'columns'"
+              :cards="cards"
+              :checked-map="checkedMap"
+              :filter="activeFilter"
+              :search="search"
+              :sort="sort"
+              @toggle="toggleCard"
+            />
+            <VisualPanel
+              v-else
+              :cards="cards"
+              :checked-map="checkedMap"
+              :filter="activeFilter"
+              :search="search"
+              :sort="sort"
+              @toggle="toggleCard"
+            />
+          </div>
+        </template>
+
+      </div>
     </div>
 
     <CardmarketPanel
@@ -261,7 +397,6 @@
       :lang="language"
       @close="showCardmarket = false"
     />
-
     <ToastNotification />
   </div>
 </template>
@@ -361,15 +496,13 @@ const LANDING_I18N = {
   },
 }
 
-import AppHeader from './components/AppHeader.vue'
 import CardmarketPanel from './components/CardmarketPanel.vue'
 import CollectionImport from './components/CollectionImport.vue'
 import ColumnsPanel from './components/ColumnsPanel.vue'
 import InputPanel from './components/InputPanel.vue'
+import LanguageSelector from './components/LanguageSelector.vue'
 import ProgressBar from './components/ProgressBar.vue'
-import ExportPanel from './components/ExportPanel.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
-import ResultsSidebar from './components/ResultsSidebar.vue'
 import VisualPanel from './components/VisualPanel.vue'
 import HistoryPanel from './components/HistoryPanel.vue'
 import ToastNotification from './components/ToastNotification.vue'
@@ -391,6 +524,12 @@ const CATEGORY_FR = {
   Planeswalker: 'Planeswalker', Land: 'Terrain', Other: 'Autre', Maybeboard: 'Maybeboard',
 }
 
+const DK_TABS = [
+  { value: 'all', label: 'Tout' },
+  { value: 'missing', label: 'À trouver' },
+  { value: 'owned', label: 'Possédées' },
+]
+
 // --- State ---
 const showHistory = ref(false)
 const showCardmarket = ref(false)
@@ -398,6 +537,7 @@ const activeFilter = ref('all')
 const search = ref('')
 const sort = ref('category')
 const layout = ref(localStorage.getItem('deck-layout') || 'list')
+const cmdRight = ref(null)
 watch(layout, v => localStorage.setItem('deck-layout', v))
 
 // --- Composables ---
@@ -421,6 +561,15 @@ const totalPrice = computed(() =>
   cards.value.reduce((sum, c) => sum + (c.price ?? 0) * c.qty, 0)
 )
 function formatPrice(val) { return val.toFixed(2) + ' €' }
+
+const ownedPct = computed(() =>
+  cards.value.length ? Math.round(ownedCount.value / cards.value.length * 100) : 0
+)
+
+const isLoading = computed(() => status.value === 'fetching' || status.value === 'translating')
+const isInputEmpty = computed(() =>
+  inputMode.value === 'url' ? !urlInput.value?.trim() : !pasteInput.value?.trim()
+)
 
 const missingCards = computed(() =>
   cards.value.filter(c => !checkedMap.value[c.queryName])
@@ -499,6 +648,12 @@ function onLoadFromHistory(entry) {
   onTranslate()
 }
 
+function scrollToCategory(category) {
+  const el = document.getElementById(`cat-${category}`)
+  if (!el || !cmdRight.value) return
+  cmdRight.value.scrollTo({ top: el.offsetTop - 16, behavior: 'smooth' })
+}
+
 function exportAll() { copyAll() }
 function exportMissing() { copyMissing() }
 function exportDownload() { downloadTxt(deckName.value) }
@@ -539,538 +694,688 @@ watch(deckId, () => { activeFilter.value = 'all' })
 </script>
 
 <style scoped>
-.app { min-height: 100vh; }
-
-/* ══════════════════════════════════════════════════════════
-   LANDING PAGE — suit le thème clair/sombre
-   ══════════════════════════════════════════════════════════ */
-
-.input-page {
-  min-height: calc(100vh - var(--header-height));
-  position: relative;
-  background: #FAFAF9;
+/* ══ App shell ══════════════════════════════════════════ */
+.cmd-app {
+  height: 100vh;
+  overflow: hidden;
+  background: #09090b;
+  color: #fafafa;
   display: flex;
+  flex-direction: column;
+}
+
+.cmd-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ══ Left panel ═════════════════════════════════════════ */
+.cmd-left {
+  width: 400px;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: #09090b;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+/* ══ Right panel ════════════════════════════════════════ */
+.cmd-right {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background: #06060f;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+/* ══ LANDING LEFT ════════════════════════════════════════ */
+.lp-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 24px 20px;
+  gap: 0;
+}
+
+/* Top bar */
+.lpl-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+  flex-shrink: 0;
+}
+
+.lpl-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lpl-logo {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  overflow-x: hidden;
+  width: 36px;
+  height: 36px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 10px;
 }
 
-[data-theme="dark"] .input-page { background: #030712; }
-
-/* Orbes lumineux — position: fixed → ne bougent pas au resize */
-.lp-orb {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-}
-.lp-orb-1 {
-  top: -20%;
-  left: -20%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(67, 56, 202, 0.07) 0%, transparent 65%);
-  filter: blur(1px);
-}
-.lp-orb-2 {
-  bottom: 0;
-  right: -15%;
-  width: 45%;
-  height: 55%;
-  background: radial-gradient(circle, rgba(109, 40, 217, 0.05) 0%, transparent 65%);
-  filter: blur(1px);
-}
-
-[data-theme="dark"] .lp-orb-1 {
-  background: radial-gradient(circle, rgba(67, 56, 202, 0.22) 0%, transparent 65%);
-}
-[data-theme="dark"] .lp-orb-2 {
-  background: radial-gradient(circle, rgba(109, 40, 217, 0.14) 0%, transparent 65%);
-}
-
-/* Colonne centrale */
-.lp-center {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 800px;
-  padding: 80px 24px 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 60px;
-}
-
-/* ── Hero ─────────────────────────────────────────────── */
-.lp-hero {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  max-width: 640px;
-}
-
-.lp-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 16px;
-  background: rgba(79, 70, 229, 0.08);
-  border: 1px solid rgba(79, 70, 229, 0.18);
-  color: rgba(79, 70, 229, 0.85);
-  border-radius: 9999px;
-  font-size: 10px;
+.lpl-name {
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.lpl-edition {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #f59e0b;
   text-transform: uppercase;
+  margin-top: 1px;
 }
 
-[data-theme="dark"] .lp-badge {
-  background: rgba(79, 70, 229, 0.14);
-  border-color: rgba(79, 70, 229, 0.28);
-  color: rgba(165, 180, 252, 0.9);
+.lpl-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.lp-title {
-  font-size: clamp(32px, 5vw, 54px);
+.lpl-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  transition: background 150ms, color 150ms;
+}
+
+.lpl-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Hero */
+.lpl-hero {
+  margin-bottom: 28px;
+  flex-shrink: 0;
+}
+
+.lpl-title {
+  font-size: clamp(26px, 3.5vw, 36px);
   font-weight: 800;
+  line-height: 1.1;
   letter-spacing: -0.04em;
-  line-height: 1.08;
-  color: #171717;
-  margin: 0;
+  color: #fff;
+  margin: 0 0 12px;
 }
 
-[data-theme="dark"] .lp-title { color: #f8fafc; }
-
-.lp-gradient {
-  background: linear-gradient(135deg, #6366f1 0%, #a78bfa 50%, #6366f1 100%);
-  background-size: 200% auto;
+.lpl-grad {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-[data-theme="dark"] .lp-gradient {
-  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #818cf8 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.lp-sub {
-  font-size: 16px;
-  color: rgba(82, 82, 82, 0.85);
-  line-height: 1.7;
-  max-width: 460px;
-}
-
-[data-theme="dark"] .lp-sub { color: rgba(148, 163, 184, 0.82); }
-
-/* ── Input wrap ───────────────────────────────────────── */
-.input-wrap {
-  width: 100%;
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.lp-banner {
-  padding: 10px 16px;
-  border-radius: 10px;
+.lpl-sub {
   font-size: 13px;
-  line-height: 1.5;
-  border: 1px solid;
-}
-.lp-banner-warn {
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.22);
-  color: #b45309;
-}
-.lp-banner-err {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.22);
-  color: #dc2626;
-}
-[data-theme="dark"] .lp-banner-warn { color: #fbbf24; }
-[data-theme="dark"] .lp-banner-err  { color: #fca5a5; }
-
-/* ── Feature cards ────────────────────────────────────── */
-.lp-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  width: 100%;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.65;
 }
 
-.lp-feat {
+/* Input section */
+.lpl-input-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px 22px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
+  gap: 10px;
+  flex: 1;
 }
-.lp-feat:hover { transform: translateY(-3px); }
-.lp-feat-blue:hover   { border-color: rgba(59,130,246,0.4);  box-shadow: 0 8px 28px rgba(59,130,246,0.1); }
-.lp-feat-purple:hover { border-color: rgba(168,85,247,0.4);  box-shadow: 0 8px 28px rgba(168,85,247,0.1); }
-.lp-feat-green:hover  { border-color: rgba(16,185,129,0.4);  box-shadow: 0 8px 28px rgba(16,185,129,0.1); }
 
-[data-theme="dark"] .lp-feat {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.07);
-  box-shadow: none;
-}
-[data-theme="dark"] .lp-feat-blue:hover   { box-shadow: 0 0 32px rgba(59,130,246,0.12);  background: rgba(59,130,246,0.03); }
-[data-theme="dark"] .lp-feat-purple:hover { box-shadow: 0 0 32px rgba(168,85,247,0.12); background: rgba(168,85,247,0.03); }
-[data-theme="dark"] .lp-feat-green:hover  { box-shadow: 0 0 32px rgba(16,185,129,0.12); background: rgba(16,185,129,0.03); }
-
-.lf-icon {
+/* Translate button */
+.lpl-translate-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 14px 24px;
+  background: #fff;
+  color: #09090b;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: background 150ms, box-shadow 150ms, transform 100ms;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.12);
+}
+
+.lpl-translate-btn:hover:not(:disabled) {
+  background: #f8f8f8;
+  box-shadow: 0 6px 28px rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.lpl-translate-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.lpl-translate-btn:disabled {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.lpl-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  border-top-color: #09090b;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
   flex-shrink: 0;
 }
-.lp-feat-blue  .lf-icon { background: rgba(59,130,246,0.1);  color: #2563eb; }
-.lp-feat-purple .lf-icon { background: rgba(168,85,247,0.1); color: #9333ea; }
-.lp-feat-green  .lf-icon { background: rgba(16,185,129,0.1); color: #059669; }
 
-[data-theme="dark"] .lp-feat-blue  .lf-icon { background: rgba(59,130,246,0.12);  color: #60a5fa; }
-[data-theme="dark"] .lp-feat-purple .lf-icon { background: rgba(168,85,247,0.12); color: #c084fc; }
-[data-theme="dark"] .lp-feat-green  .lf-icon { background: rgba(16,185,129,0.12); color: #34d399; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.lf-body { display: flex; flex-direction: column; gap: 8px; }
-
-.lf-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #171717;
-  letter-spacing: -0.02em;
+/* Banners */
+.lpl-banner {
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border: 1px solid;
 }
+.lpl-banner-warn { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.22); color: #fbbf24; }
+.lpl-banner-err  { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.22);  color: #fca5a5; }
 
-[data-theme="dark"] .lf-title { color: #f1f5f9; }
-
-.lf-desc {
-  font-size: 13px;
-  color: rgba(82, 82, 82, 0.75);
-  line-height: 1.6;
-}
-
-[data-theme="dark"] .lf-desc { color: rgba(148, 163, 184, 0.78); }
-
-/* ── Recent history ───────────────────────────────────── */
-.lp-recent {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.lp-recent-hd {
+/* Bottom bar */
+.lpl-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 20px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
-[data-theme="dark"] .lp-recent-hd { border-bottom-color: rgba(255, 255, 255, 0.06); }
-
-.lp-recent-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #171717;
-  letter-spacing: -0.02em;
-}
-
-[data-theme="dark"] .lp-recent-title { color: #f1f5f9; }
-
-.lp-recent-clear {
+.lpl-platforms {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.28);
-  transition: color 0.15s;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.2);
 }
-.lp-recent-clear:hover { color: #ef4444; }
 
-[data-theme="dark"] .lp-recent-clear { color: rgba(148, 163, 184, 0.45); }
-[data-theme="dark"] .lp-recent-clear:hover { color: #f87171; }
+.lpl-dot { color: rgba(255, 255, 255, 0.1); }
 
-.lp-recent-grid {
+/* ══ LANDING RIGHT ═══════════════════════════════════════ */
+.lp-right {
+  padding: 28px 32px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.lpr-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lpr-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  flex: 1;
+}
+
+.lpr-clear {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 150ms;
+}
+.lpr-clear:hover { color: #f87171; }
+
+/* Recent deck cards */
+.lpr-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
 }
 
-/* Deck card */
-.lp-deck-card {
+.lpr-card {
   position: relative;
-  min-height: 140px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  min-height: 160px;
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 200ms, border-color 200ms, box-shadow 200ms;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-.lp-deck-card:hover {
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.12);
-  transform: translateY(-3px);
 }
 
-[data-theme="dark"] .lp-deck-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.07);
-  box-shadow: none;
-}
-[data-theme="dark"] .lp-deck-card:hover {
-  border-color: rgba(99, 102, 241, 0.45);
-  box-shadow: 0 4px 28px rgba(99, 102, 241, 0.18);
+.lpr-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Art */
-.ldc-art {
+.lpr-card-art {
   position: absolute;
   inset: 0;
-  z-index: 0;
   background-size: cover;
   background-position: center 20%;
-  opacity: 0.15;
+  opacity: 0.25;
   filter: saturate(0.6);
-  transition: opacity 0.3s;
+  transition: opacity 200ms, transform 200ms;
 }
-.lp-deck-card:hover .ldc-art { opacity: 0.28; }
 
-[data-theme="dark"] .ldc-art { opacity: 0.28; filter: saturate(0.65); }
-[data-theme="dark"] .lp-deck-card:hover .ldc-art { opacity: 0.45; }
+.lpr-card:hover .lpr-card-art { opacity: 0.4; transform: scale(1.05); }
 
-/* Body avec gradient pour lisibilité */
-.ldc-body {
+.lpr-card-body {
   position: relative;
   z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.88) 100%);
+  padding: 14px 14px;
+  background: linear-gradient(to bottom, rgba(6,6,15,0.2) 0%, rgba(6,6,15,0.82) 100%);
+  gap: 4px;
 }
 
-[data-theme="dark"] .ldc-body {
-  background: linear-gradient(to bottom, rgba(3, 7, 18, 0.3) 0%, rgba(3, 7, 18, 0.72) 100%);
-}
-
-.ldc-top { display: flex; align-items: center; gap: 5px; }
-
-.ldc-date {
+.lpr-card-date {
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: rgba(82, 82, 82, 0.65);
-  background: rgba(255, 255, 255, 0.65);
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-[data-theme="dark"] .ldc-date {
-  color: rgba(148, 163, 184, 0.65);
-  background: rgba(3, 7, 18, 0.5);
-}
-
-.ldc-name {
+.lpr-card-name {
   font-size: 14px;
   font-weight: 700;
-  color: #171717;
+  color: #fff;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.02em;
-  flex: 1;
-}
-
-[data-theme="dark"] .ldc-name { color: #f1f5f9; }
-
-.ldc-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin-top: auto;
 }
 
-.ldc-count {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: rgba(82, 82, 82, 0.5);
-}
-
-[data-theme="dark"] .ldc-count { color: rgba(148, 163, 184, 0.55); }
-
-.ldc-owned {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: #059669;
-}
-
-[data-theme="dark"] .ldc-owned { color: #34d399; }
-
-/* ── Deck layout: sidebar + main ────────────────────── */
-.deck-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: calc(100vh - var(--header-height));
-}
-
-/* ── Sidebar ──────────────────────────────────────────── */
-.deck-sidebar {
-  position: sticky;
-  top: var(--header-height);
-  height: calc(100vh - var(--header-height));
-  overflow-y: auto;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 16px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-.sidebar-header {
-  padding-bottom: 16px;
-  flex-shrink: 0;
-}
-
-.sh-title-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--text-3);
-  margin-bottom: 4px;
-}
-
-.sh-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.01em;
-}
-
-.sh-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-left: 20px;
-  margin-bottom: 12px;
-}
-
-.sh-stat {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-3);
-}
-
-.sh-controls {
+.lpr-card-foot {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 4px;
 }
 
-/* Layout toggle */
-.layout-toggle {
+.lpr-card-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.lpr-card-owned {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #34d399;
+}
+
+/* Feature cards */
+.lpr-feat-grid {
   display: flex;
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
-  padding: 2px;
-  gap: 1px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.lt-btn {
+.lpr-feat {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: background 150ms, border-color 150ms;
+}
+
+.lpr-feat:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.lpr-feat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 26px;
-  border-radius: calc(var(--radius-md) - 2px);
-  color: var(--text-3);
-  transition: all var(--transition-fast);
-}
-
-.lt-btn:hover { color: var(--text-1); }
-
-.lt-btn.active {
-  background: var(--surface);
-  color: var(--text-1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-}
-
-/* Nouveau deck */
-.new-deck-btn {
-  font-size: 12px;
-  color: var(--text-3);
-  padding: 5px 10px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: transparent;
-  white-space: nowrap;
-  transition: all var(--transition-fast);
-}
-
-.new-deck-btn:hover {
-  color: var(--text-1);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
-
-.sidebar-sep {
-  height: 1px;
-  background: var(--border);
-  margin: 0 0 20px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 }
 
-/* ── Main content ────────────────────────────────────── */
-.deck-main {
-  padding: 24px 32px 64px;
+.lpr-feat-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.lpr-feat-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.55;
+}
+
+/* ══ DECK LEFT ═══════════════════════════════════════════ */
+.dk-left {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 32px;
+  gap: 0;
+  min-height: 100%;
+}
+
+.dk-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
+  transition: color 150ms;
+}
+.dk-back:hover { color: rgba(255, 255, 255, 0.7); }
+
+.dk-info { margin-bottom: 16px; }
+
+.dk-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.dk-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dk-stat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dk-stat-price {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* Layout toggle */
+.dk-layout-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.dlt-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.25);
+  transition: background 150ms, color 150ms;
+}
+
+.dlt-btn:hover { color: rgba(255, 255, 255, 0.55); }
+.dlt-btn.active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+/* Action buttons 2×2 */
+.dk-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.dk-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  transition: background 150ms, color 150ms, border-color 150ms;
+}
+
+.dk-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dk-action-btn--accent {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.dk-action-btn--accent:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+/* Separator */
+.dk-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 16px 0;
+  flex-shrink: 0;
+}
+
+/* Search */
+.dk-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 36px;
+  color: rgba(255, 255, 255, 0.25);
+  transition: border-color 150ms;
+  margin-bottom: 10px;
+}
+.dk-search:focus-within { border-color: rgba(255, 255, 255, 0.18); }
+
+.dk-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
   min-width: 0;
 }
 
-/* ── Banners ─────────────────────────────────────────── */
-.warning-banner {
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  color: var(--warning);
-  font-size: 13px;
+.dk-search-input::placeholder { color: rgba(255, 255, 255, 0.22); }
+
+.dk-search-clear {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 150ms;
+}
+.dk-search-clear:hover { color: rgba(255, 255, 255, 0.5); }
+
+/* Filter tabs */
+.dk-filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
 }
 
-.error-banner {
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: var(--error);
-  font-size: 13px;
-  line-height: 1.7;
+.dk-filter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 150ms, border-color 150ms;
+}
+
+.dk-filter-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dkf-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.dkf-count {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.dk-filter-btn.active .dkf-label { color: rgba(255, 255, 255, 0.75); }
+.dk-filter-btn.active .dkf-count { color: #f59e0b; }
+
+/* Collection */
+.dk-collection { display: flex; flex-direction: column; gap: 8px; }
+
+.dk-coll-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dk-coll-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.dk-coll-pct {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.dk-coll-stats {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.dk-coll-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.dk-coll-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 9999px;
+  transition: width 400ms ease;
+}
+
+/* TOC */
+.dk-toc { display: flex; flex-direction: column; gap: 1px; }
+
+.dk-toc-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 8px;
+}
+
+.dk-toc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  transition: background 150ms, color 150ms;
+  cursor: pointer;
+}
+
+.dk-toc-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dk-toc-name { flex: 1; font-weight: 500; text-align: left; }
+
+.dk-toc-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ══ DECK RIGHT ═════════════════════════════════════════ */
+.dk-right {
+  padding: 20px 28px 64px;
 }
 
 /* ── Transitions ─────────────────────────────────────── */
@@ -1081,17 +1386,13 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
-  .deck-layout { grid-template-columns: 220px 1fr; }
+  .cmd-left { width: 320px; }
 }
 
-@media (max-width: 700px) {
-  .deck-layout { grid-template-columns: 1fr; }
-  .deck-sidebar {
-    position: static;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .deck-main { padding: 16px; }
+@media (max-width: 640px) {
+  .cmd-layout { flex-direction: column; }
+  .cmd-left { width: 100%; height: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .cmd-right { height: auto; }
+  .lp-left { height: auto; }
 }
 </style>
