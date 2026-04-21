@@ -115,26 +115,34 @@
                   @keydown.ctrl.enter.prevent="onTranslate"
                   @keydown.meta.enter.prevent="onTranslate"
                 />
+
+                <!-- Card footer: language + translate -->
+                <div class="lpl-card-footer">
+                  <div class="lpl-footer-lang">
+                    <span class="lpl-lang-label">Traduire en</span>
+                    <LanguageSelector :model-value="language" @update:model-value="setLanguage" />
+                  </div>
+                  <button
+                    class="lpl-translate-btn"
+                    :disabled="isInputEmpty || isLoading"
+                    @click="onTranslate"
+                  >
+                    <span v-if="isLoading" class="lpl-spinner"/>
+                    <template v-else>
+                      {{ i18n.btn_translate }}
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </template>
+                    <span v-if="isLoading" class="lpl-loading-text">{{ i18n.btn_fetching }}</span>
+                  </button>
+                </div>
               </div>
 
-              <!-- Language target -->
-              <div class="lpl-lang-row">
-                <span class="lpl-lang-label">Traduire en</span>
-                <LanguageSelector :model-value="language" @update:model-value="setLanguage" />
+              <!-- Keyboard hint -->
+              <div v-if="inputMode === 'paste' && !isLoading" class="lpl-kbd-hint">
+                <kbd>Ctrl</kbd><span>+</span><kbd>↵</kbd> pour traduire
               </div>
-
-              <!-- Translate button -->
-              <button
-                class="lpl-translate-btn"
-                :disabled="isInputEmpty || isLoading"
-                @click="onTranslate"
-              >
-                <span v-if="isLoading" class="lpl-spinner"/>
-                {{ isLoading ? i18n.btn_fetching : i18n.btn_translate }}
-                <svg v-if="!isLoading" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
 
               <!-- Progress -->
               <ProgressBar v-if="status === 'translating'" :progress="progress" variant="translation"/>
@@ -921,96 +929,125 @@ watch(deckId, () => { activeFilter.value = 'all' })
   flex: 1;
 }
 
-/* Language row */
-.lpl-lang-row {
+/* Card footer */
+.lpl-card-footer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  padding: 10px 12px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.lpl-footer-lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .lpl-lang-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.28);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Force dark styles on LanguageSelector when inside dark left panel */
-.lpl-input-section :deep(.lang-btn) {
-  color: rgba(255, 255, 255, 0.65);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 6px 12px;
+/* LanguageSelector overrides inside dark card footer */
+.lpl-card-footer :deep(.lang-btn) {
+  color: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  border-radius: 8px;
 }
 
-.lpl-input-section :deep(.lang-btn:hover) {
-  background: rgba(255, 255, 255, 0.09);
+.lpl-card-footer :deep(.lang-btn:hover) {
+  background: rgba(255, 255, 255, 0.07);
   color: #fff;
 }
 
-.lpl-input-section :deep(.lang-dropdown) {
+.lpl-card-footer :deep(.lang-dropdown) {
   background: #18181b;
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-.lpl-input-section :deep(.lang-option) {
-  color: rgba(255, 255, 255, 0.5);
-}
+.lpl-card-footer :deep(.lang-option) { color: rgba(255, 255, 255, 0.5); }
+.lpl-card-footer :deep(.lang-option:hover) { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.lpl-card-footer :deep(.lang-option.active) { color: #f59e0b; }
 
-.lpl-input-section :deep(.lang-option:hover) {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-}
-
-.lpl-input-section :deep(.lang-option.active) {
-  color: #f59e0b;
-}
-
-/* Translate button */
+/* Translate button — compact pill inside card footer */
 .lpl-translate-btn {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 24px;
+  gap: 7px;
+  padding: 10px 18px;
   background: #fff;
   color: #09090b;
-  border-radius: 14px;
-  font-size: 14px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  flex-shrink: 0;
+  white-space: nowrap;
   transition: background 150ms, box-shadow 150ms, transform 100ms;
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 16px rgba(255, 255, 255, 0.14);
 }
 
 .lpl-translate-btn:hover:not(:disabled) {
-  background: #f8f8f8;
-  box-shadow: 0 6px 28px rgba(255, 255, 255, 0.18);
+  background: #f4f4f5;
+  box-shadow: 0 4px 22px rgba(255, 255, 255, 0.22);
   transform: translateY(-1px);
 }
 
-.lpl-translate-btn:active:not(:disabled) { transform: scale(0.98); }
+.lpl-translate-btn:active:not(:disabled) { transform: scale(0.97); }
 
 .lpl-translate-btn:disabled {
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.2);
   box-shadow: none;
   cursor: not-allowed;
 }
 
 .lpl-spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.15);
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
   border-top-color: #09090b;
   border-radius: 50%;
   animation: spin 0.65s linear infinite;
   flex-shrink: 0;
 }
 
+.lpl-loading-text { font-size: 12px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Keyboard hint */
+.lpl-kbd-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.18);
+  padding: 0 4px;
+}
+
+.lpl-kbd-hint kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0;
+}
+
+.lpl-kbd-hint span { color: rgba(255, 255, 255, 0.1); }
 
 /* Banners */
 .lpl-banner {
