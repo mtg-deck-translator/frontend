@@ -1,7 +1,7 @@
-// Les fonctions serverless vivent dans le même déploiement Vercel que le front :
-// chemin relatif, donc pas de CORS ni d'URL à synchroniser entre deux hébergeurs.
-// VITE_BACKEND_URL reste une échappatoire pour pointer un backend externe en dev.
-const BACKEND = import.meta.env.VITE_BACKEND_URL || ''
+// Les fonctions serverless (api/) vivent dans le même déploiement Vercel que le front.
+// On appelle donc /api en chemin relatif, en dur : pas de CORS, pas d'URL à synchroniser,
+// et surtout aucune variable d'env qui puisse repointer le front vers un backend mort —
+// c'est exactement ce qui est arrivé avec VITE_BACKEND_URL et le service Railway éteint.
 
 export function isArchidektUrl(url)  { return /archidekt\.com\/decks\//i.test(url) }
 export function isMtgtop8Url(url)    { return /mtgtop8\.com\/event/i.test(url) }
@@ -15,7 +15,7 @@ export function isSupportedUrl(url) {
 export async function fetchDeckFromBackend(url) {
   let resp
   try {
-    resp = await fetch(`${BACKEND}/api/deck?url=${encodeURIComponent(url)}`)
+    resp = await fetch(`/api/deck?url=${encodeURIComponent(url)}`)
   } catch {
     throw new Error("Impossible de contacter le serveur. Vérifiez votre connexion.")
   }

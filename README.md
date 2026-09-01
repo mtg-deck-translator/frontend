@@ -57,9 +57,11 @@ prend un 403 Cloudflare.
 
 ### Variables d'environnement
 
-| Variable | Rôle |
-|---|---|
-| `VITE_BACKEND_URL` | Optionnelle. Vide en prod (chemin relatif). Ne sert qu'à pointer un proxy externe. |
+**Aucune.** Le front appelle `/api` en chemin relatif, en dur.
+
+`VITE_BACKEND_URL` n'existe plus : elle était encore définie dans Vercel avec l'URL du
+service Railway éteint, ce qui aurait laissé le front taper dans le vide malgré les
+fonctions `api/` déployées. Elle peut être supprimée des Environment Variables du projet.
 
 ### Limitation connue
 
