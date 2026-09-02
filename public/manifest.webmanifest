@@ -1,0 +1,16 @@
+{
+  "name": "MTG Translator",
+  "short_name": "MTG Translator",
+  "description": "Traduisez une decklist Magic, cochez ce que vous possédez, repartez avec votre liste de courses.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -189,12 +189,23 @@
               <div class="dk-stats">
                 <span class="dk-stat">{{ cards.length }} cartes</span>
                 <span v-if="totalPrice > 0" class="dk-stat dk-stat-price">{{ formatPrice(totalPrice) }}</span>
+                <span class="dk-stat dk-stat-owned">{{ ownedCount }} / {{ cards.length }} poss.</span>
               </div>
               <!-- Changer de langue imposait auparavant de quitter le deck. -->
               <div class="dk-lang">
                 <LanguageSelector :model-value="language" @update:model-value="onChangeLanguage" />
               </div>
             </div>
+
+            <!-- Sur téléphone, tout ceci s'empilait au-dessus de la liste :
+                 il fallait faire défiler cinq cents pixels d'outils avant de
+                 voir une carte. Replié par défaut, déplié d'un geste. -->
+            <button class="dk-more" :aria-expanded="panelOpen" @click="panelOpen = !panelOpen">
+              {{ panelOpen ? 'Masquer les options' : 'Ma collection, filtres, recherche' }}
+              <span class="dk-more-chevron" :class="{ open: panelOpen }" aria-hidden="true">⌄</span>
+            </button>
+
+            <div class="dk-left-body" :class="{ open: panelOpen }">
 
             <!-- Étape 2 du parcours, donc deuxième bloc du rail. Elle était
                  en septième position, sous la ligne de flottaison d'un 13". -->
@@ -263,6 +274,7 @@
               </button>
             </div>
 
+            </div>
           </div>
         </template>
       </div>
@@ -673,6 +685,7 @@ const showHistory = ref(false)
 const showCardmarket = ref(false)
 const showMenu = ref(false)
 const pointing = ref(false)
+const panelOpen = ref(false)
 
 // Le pointage écrit directement dans la checklist du deck et dans la
 // collection locale : c'est le même geste que cocher une ligne.
@@ -1743,6 +1756,57 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-scroll { flex: 1; min-height: 0; }
 
 .dk-lang { margin-top: 10px; }
+
+/* Le disclosure n'existe que sur téléphone : sur grand écran le rail a la
+   place d'afficher tout, et un pli en plus serait un clic pour rien. */
+.dk-more { display: none; }
+.dk-stat-owned { display: none; }
+
+@media (max-width: 640px) {
+  .cmd-left {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding-bottom: 12px;
+    background: var(--bg-app);
+  }
+
+  .dk-more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    background: var(--fill-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .dk-more-chevron { transition: transform 200ms; }
+  .dk-more-chevron.open { transform: rotate(180deg); }
+
+  .dk-left-body { display: none; }
+  .dk-left-body.open { display: block; }
+
+  /* Le taux de possession migre dans l'en-tête : replié, c'est la seule
+     information de progression encore visible. */
+  .dk-stat-owned { display: inline; }
+
+  .dk-name { font-size: 17px; }
+  .dk-sep { margin: 12px 0; }
+}
+
+/* Encoche et barre gestuelle : sans ça, la barre du bas passe dessous. */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .dk-bar { margin-bottom: env(safe-area-inset-bottom); }
+  .cmd-app { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+}
 
 .dk-point-btn {
   width: 100%;
