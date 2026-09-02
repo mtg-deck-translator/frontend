@@ -7,6 +7,7 @@ export function useFilteredGroups({ cards, checkedMap, filter, search, sort }) {
 
     if (filter.value === 'missing') list = list.filter(c => !checkedMap.value[c.queryName])
     else if (filter.value === 'owned') list = list.filter(c => !!checkedMap.value[c.queryName])
+    else if (filter.value === 'nofr') list = list.filter(c => c.noFr && !c.error)
 
     if (search.value) {
       const q = search.value.toLowerCase()

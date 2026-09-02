@@ -20,6 +20,7 @@
         >
           <span class="col-qty tabular">{{ card.qty }}</span>
           <span class="col-name">{{ card.frName }}</span>
+          <span v-if="card.noFr && !card.error" class="no-fr-tag" title="Pas d’impression dans cette langue">EN</span>
           <span v-if="card.price != null" class="col-price tabular">{{ formatPrice(card.price) }}</span>
         </div>
       </div>
@@ -166,5 +167,20 @@ function groupPrice(group) {
   color: var(--text-3);
   font-size: 14px;
   width: 100%;
+}
+
+/* Pas d'impression dans la langue cible : l'information n'était surfacée
+   qu'en vue Liste, alors que c'est elle qu'on vient chercher. */
+.no-fr-tag {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: var(--accent);
+  background: var(--accent-fill);
+  border: 1px solid var(--accent-border);
 }
 </style>

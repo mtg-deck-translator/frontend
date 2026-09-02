@@ -32,7 +32,6 @@
                 </div>
                 <div>
                   <div class="lpl-name">MTG Translator</div>
-                  <div class="lpl-edition">ÉDITION PREMIUM</div>
                 </div>
               </div>
               <div class="lpl-top-actions">
@@ -424,6 +423,25 @@
         <!-- DECK RIGHT -->
         <template v-else>
           <div class="dk-right">
+
+            <!-- Depuis mi-2022, une part croissante des cartes n'a aucune
+                 impression dans les langues autres que l'anglais. Le joueur ne
+                 le découvrait qu'au moment de commander : l'information était
+                 calculée (card.noFr) mais reléguée à un badge de 8px. -->
+            <div v-if="noFrCount > 0 && !noFrDismissed" class="dk-nofr">
+              <span class="dk-nofr-icon" aria-hidden="true">⚠</span>
+              <p class="dk-nofr-text">
+                <strong>{{ noFrCount }}</strong>
+                {{ noFrCount > 1 ? 'cartes de ce deck n’existent pas' : 'carte de ce deck n’existe pas' }}
+                en {{ currentLanguageLabel }}.
+                <span class="dk-nofr-sub">Leur nom anglais est conservé — c’est celui à donner au vendeur.</span>
+              </p>
+              <button class="dk-nofr-btn" @click="toggleNoFrFilter">
+                {{ activeFilter === 'nofr' ? 'Afficher tout' : 'Voir lesquelles' }}
+              </button>
+              <button class="dk-nofr-close" aria-label="Masquer cet avertissement" @click="noFrDismissed = true">×</button>
+            </div>
+
             <ResultsPanel
               v-if="layout === 'list'"
               :cards="cards"
@@ -603,6 +621,7 @@ const DK_TABS = [
 const showHistory = ref(false)
 const showCardmarket = ref(false)
 const activeFilter = ref('all')
+const noFrDismissed = ref(false)
 const search = ref('')
 const sort = ref('category')
 const layout = ref(localStorage.getItem('deck-layout') || 'list')
@@ -611,7 +630,7 @@ watch(layout, v => localStorage.setItem('deck-layout', v))
 
 // --- Composables ---
 const { theme, toggle: toggleTheme } = useTheme()
-const { language, setLanguage } = useLanguage()
+const { language, setLanguage, LANGUAGES } = useLanguage()
 const i18n = computed(() => LANDING_I18N[language.value] || LANDING_I18N.fr)
 
 const pasteTextareaPlaceholder = `4 Island\n1x Lightning Bolt\n1x Frolicking Familiar // Blow Off Steam\n// Les commentaires sont ignorés\n1 Sol Ring`
@@ -652,6 +671,18 @@ const isInputEmpty = computed(() =>
 const missingCards = computed(() =>
   cards.value.filter(c => !checkedMap.value[c.queryName])
 )
+
+// Cartes sans impression dans la langue cible. On exclut celles que Scryfall
+// n'a pas reconnues (error) : leur absence de traduction n'est pas une
+// information sur la carte, mais sur notre résolution.
+const noFrCount = computed(() => cards.value.filter(c => c.noFr && !c.error).length)
+const currentLanguageLabel = computed(
+  () => LANGUAGES.find(l => l.code === language.value)?.label || language.value
+)
+
+function toggleNoFrFilter() {
+  activeFilter.value = activeFilter.value === 'nofr' ? 'all' : 'nofr'
+}
 
 const filterCounts = computed(() => ({
   all: cards.value.length,
@@ -769,7 +800,7 @@ function applyCollection() {
   setAll([...owned], true)
 }
 
-watch(deckId, () => { activeFilter.value = 'all' })
+watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 </script>
 
 <style scoped>
@@ -871,14 +902,6 @@ watch(deckId, () => { activeFilter.value = 'all' })
   letter-spacing: -0.02em;
 }
 
-.lpl-edition {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-top: 1px;
-}
 
 .lpl-top-actions {
   display: flex;
@@ -1710,6 +1733,69 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .history-fade-leave-active { transition: opacity 200ms ease; }
 .history-fade-enter-from,
 .history-fade-leave-to { opacity: 0; }
+
+/* ── Bandeau « pas de version française » ─────────────── */
+.dk-nofr {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--warning-fill);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+}
+
+.dk-nofr-icon { color: var(--accent); font-size: 14px; line-height: 1.5; }
+
+.dk-nofr-text {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.dk-nofr-text strong { color: var(--accent); font-weight: 700; }
+.dk-nofr-sub { display: block; color: var(--text-3); font-size: 12px; }
+
+.dk-nofr-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-fill);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+}
+
+.dk-nofr-btn:hover {
+  background: var(--accent-fill-hover);
+  border-color: var(--accent-border-hov);
+}
+
+.dk-nofr-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-4);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dk-nofr-close:hover { color: var(--text-2); background: var(--fill-2); }
+
+@media (max-width: 640px) {
+  .dk-nofr { flex-wrap: wrap; }
+  .dk-nofr-btn { width: 100%; }
+}
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 1024px) {

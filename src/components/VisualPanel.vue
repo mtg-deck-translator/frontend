@@ -23,6 +23,7 @@
             @click="$emit('toggle', card.queryName)"
             @mouseenter="hoveredCard = card"
           >
+            <span v-if="card.noFr && !card.error" class="no-fr-tag tile-no-fr" title="Pas d’impression dans cette langue">EN</span>
             <div class="tile-img-wrap">
               <img
                 v-if="card.imageUrl"
@@ -249,6 +250,7 @@ function groupPrice(group) {
 }
 
 .card-tile {
+  position: relative; /* ancre le badge « EN » */
   cursor: pointer;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -349,4 +351,27 @@ function groupPrice(group) {
   font-size: 14px;
 }
 
+
+/* Pas d'impression dans la langue cible : l'information n'était surfacée
+   qu'en vue Liste, alors que c'est elle qu'on vient chercher. */
+.no-fr-tag {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: var(--accent);
+  background: var(--accent-fill);
+  border: 1px solid var(--accent-border);
+}
+
+.tile-no-fr {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  background: var(--surface-menu);
+}
 </style>
