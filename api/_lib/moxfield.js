@@ -1,4 +1,4 @@
-import { gotScraping } from 'got-scraping'
+import { scrape, describeStatus } from './_http.js'
 
 const MOXFIELD_API = 'https://api2.moxfield.com'
 
@@ -26,20 +26,13 @@ function extractBoard(board, category, isSideboard = false) {
 export async function fetchMoxfieldDeck(urlOrId) {
   const publicId = extractPublicId(urlOrId)
 
-  let resp
-  try {
-    resp = await gotScraping({
-      url: `${MOXFIELD_API}/v3/decks/all/${publicId}`,
-      headers: { 'Accept': 'application/json' },
-      responseType: 'json',
-    })
-  } catch (err) {
-    throw new Error(`Impossible de contacter Moxfield : ${err.message}`)
-  }
+  const resp = await scrape(`${MOXFIELD_API}/v3/decks/all/${publicId}`, {
+    headers: { 'Accept': 'application/json' },
+    responseType: 'json',
+    sourceName: 'Moxfield',
+  })
 
-  if (resp.statusCode === 404) throw new Error('Deck Moxfield introuvable.')
-  if (resp.statusCode === 401 || resp.statusCode === 403) throw new Error('Ce deck Moxfield est privé.')
-  if (resp.statusCode !== 200) throw new Error(`Erreur Moxfield (HTTP ${resp.statusCode}).`)
+  if (resp.statusCode !== 200) throw new Error(describeStatus(resp.statusCode, 'Moxfield'))
 
   const deck = resp.body
   const commanderNames = new Set()

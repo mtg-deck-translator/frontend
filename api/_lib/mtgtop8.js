@@ -1,4 +1,4 @@
-import { gotScraping } from 'got-scraping'
+import { scrape, describeStatus } from './_http.js'
 
 function extractParams(url) {
   const u = new URL(url)
@@ -11,14 +11,17 @@ function extractParams(url) {
 export async function fetchMtgtop8Deck(url) {
   const { d, e } = extractParams(url)
 
+  // La liste de cartes est indispensable ; la page HTML ne sert qu'aux métadonnées
+  // (nom du deck, commandant). Son échec ne doit pas faire échouer l'import.
   const [mtgoResp, htmlResp] = await Promise.all([
-    gotScraping({ url: `https://www.mtgtop8.com/mtgo?d=${d}&e=${e}`, responseType: 'text' }),
-    gotScraping({ url: `https://www.mtgtop8.com/event?e=${e}&d=${d}`, responseType: 'text' }).catch(() => ({ body: '' })),
+    scrape(`https://www.mtgtop8.com/mtgo?d=${d}&e=${e}`, { responseType: 'text', sourceName: 'MTGTOP8' }),
+    scrape(`https://www.mtgtop8.com/event?e=${e}&d=${d}`, { responseType: 'text', sourceName: 'MTGTOP8' })
+      .catch(() => ({ statusCode: 0, body: '' })),
   ])
 
-  if (!mtgoResp.ok) throw new Error(`Impossible de récupérer le deck MTGTOP8 (erreur ${mtgoResp.statusCode}).`)
+  if (mtgoResp.statusCode !== 200) throw new Error(describeStatus(mtgoResp.statusCode, 'MTGTOP8'))
 
-  const { deckName, commanderName } = parseHtmlMeta(htmlResp.body, d)
+  const { deckName, commanderName } = parseHtmlMeta(htmlResp.body || '', d)
   const cards = parseMtgoText(mtgoResp.body, commanderName)
 
   if (!cards.length) throw new Error("Aucune carte trouvée dans ce deck MTGTOP8.")
@@ -26,7 +29,7 @@ export async function fetchMtgtop8Deck(url) {
   return { deckId: `mtgtop8:${d}`, deckName, cards }
 }
 
-function parseHtmlMeta(html, deckId) {
+export function parseHtmlMeta(html, deckId) {
   let deckName = `Deck #${deckId}`
   let commanderName = null
   if (!html) return { deckName, commanderName }
@@ -46,7 +49,7 @@ function parseHtmlMeta(html, deckId) {
   return { deckName, commanderName }
 }
 
-function parseMtgoText(text, commanderName) {
+export function parseMtgoText(text, commanderName) {
   const cards = []
   const lines = text.split('\n')
   let isSideboard = false

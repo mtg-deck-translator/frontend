@@ -1,4 +1,4 @@
-import { gotScraping } from 'got-scraping'
+import { scrape, describeStatus } from './_http.js'
 
 export async function fetchTappedoutDeck(url) {
   const match = url.match(/tappedout\.net\/mtg-decks\/([^/?#]+)/)
@@ -7,14 +7,9 @@ export async function fetchTappedoutDeck(url) {
   const slug = match[1]
   const txtUrl = `https://tappedout.net/mtg-decks/${slug}/?fmt=txt`
 
-  let resp
-  try {
-    resp = await gotScraping({ url: txtUrl, responseType: 'text' })
-  } catch (e) {
-    throw new Error(`Impossible de contacter Tappedout : ${e.message}`)
-  }
+  const resp = await scrape(txtUrl, { responseType: 'text', sourceName: 'Tappedout' })
 
-  if (!resp.ok) throw new Error(`Tappedout a retourné une erreur (${resp.statusCode}).`)
+  if (resp.statusCode !== 200) throw new Error(describeStatus(resp.statusCode, 'Tappedout'))
 
   const cards = parseTappedoutText(resp.body)
   if (!cards.length) throw new Error('Aucune carte trouvée dans ce deck Tappedout.')
@@ -23,7 +18,7 @@ export async function fetchTappedoutDeck(url) {
   return { deckId: `tappedout:${slug}`, deckName, cards }
 }
 
-function parseTappedoutText(text) {
+export function parseTappedoutText(text) {
   const cards = []
   let isSideboard = false
 

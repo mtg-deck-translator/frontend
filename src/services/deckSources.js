@@ -20,7 +20,19 @@ export async function fetchDeckFromBackend(url) {
     throw new Error("Impossible de contacter le serveur. Vérifiez votre connexion.")
   }
 
-  const data = await resp.json()
+  // Une fonction Vercel qui dépasse son délai renvoie une page HTML, pas du JSON.
+  // Sans ce try, l'utilisateur lisait « Unexpected token '<' » dans la bannière.
+  let data
+  try {
+    data = await resp.json()
+  } catch {
+    throw new Error(
+      resp.status === 504
+        ? "La source met trop de temps à répondre. Réessayez dans un instant."
+        : `Réponse inattendue du serveur (HTTP ${resp.status}).`
+    )
+  }
+
   if (!resp.ok) throw new Error(data.error || `Erreur serveur (HTTP ${resp.status}).`)
   return data
 }

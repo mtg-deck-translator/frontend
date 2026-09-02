@@ -622,7 +622,7 @@ const {
   translate, reset, loadFromHistory,
 } = useDeck()
 
-const { checkedMap, toggle: toggleCard, setAll, reset: resetChecklist, ownedCount } = useChecklist(deckId)
+const { checkedMap, toggle: toggleCard, setAll, ownedCount } = useChecklist(deckId)
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 const { getMap: getCollectionMap } = useCollection()
@@ -676,11 +676,14 @@ async function onTranslate() {
   activeFilter.value = 'all'
   search.value = ''
   sort.value = 'category'
-  resetChecklist()
+  // Pas de resetChecklist() ici : deckId vaut encore l'ancien deck, on effaçait
+  // donc sa checklist en localStorage. useChecklist observe déjà deckId et
+  // recharge la bonne liste quand il change — et retraduire le même deck
+  // conserve désormais ce qui était coché.
   const extra = await translate(language.value)
 
   if (status.value === 'done') {
-    setCachedCards(deckId.value, cards.value)
+    setCachedCards(deckId.value, language.value, cards.value)
     const coverCard = cards.value.find(c => c.category === 'Commander') || cards.value[0]
     const deckColors = COLOR_ORDER.filter(c =>
       cards.value.some(card => (card.colorIdentity || []).includes(c))
@@ -711,7 +714,8 @@ function setAllCards(keys, value) { setAll(keys, value) }
 
 function onLoadFromHistory(entry) {
   showHistory.value = false
-  const cached = getCachedCards(entry.deckId)
+  // Le cache est indexé par langue : changer de langue force une retraduction.
+  const cached = getCachedCards(entry.deckId, language.value)
   if (cached) {
     deckId.value = entry.deckId
     deckName.value = entry.deckName
@@ -759,7 +763,7 @@ function formatDate(iso) {
 function getCoverForEntry(entry) {
   let url = entry.coverImageUrl
   if (!url) {
-    const cached = getCachedCards(entry.deckId)
+    const cached = getCachedCards(entry.deckId, language.value)
     if (!cached?.length) return null
     const commander = cached.find(c => c.category === 'Commander')
     url = (commander || cached[0])?.imageUrl || null

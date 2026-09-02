@@ -1,7 +1,7 @@
 import { useToast } from './useToast.js'
 import { categoryLabel, orderCategories } from '../constants/categories.js'
 
-function formatCards(cards) {
+export function formatCards(cards) {
   const groups = {}
   for (const card of cards) {
     const cat = card.category || 'Other'

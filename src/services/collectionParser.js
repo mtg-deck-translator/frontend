@@ -1,19 +1,31 @@
+// Découpage CSV minimal mais conforme sur le point qui compte : un guillemet
+// littéral s'écrit en le doublant ("" à l'intérieur d'un champ cité). L'ancienne
+// version se contentait de basculer un booléen à chaque guillemet, ce qui faisait
+// disparaître les guillemets des noms qui en contiennent.
 function parseCSVLine(line) {
   const result = []
   let current = ''
   let inQuotes = false
+
   for (let i = 0; i < line.length; i++) {
     const ch = line[i]
+
     if (ch === '"') {
-      inQuotes = !inQuotes
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"'
+        i++
+      } else {
+        inQuotes = !inQuotes
+      }
     } else if (ch === ',' && !inQuotes) {
-      result.push(current.trim().replace(/^"|"$/g, ''))
+      result.push(current.trim())
       current = ''
     } else {
       current += ch
     }
   }
-  result.push(current.trim().replace(/^"|"$/g, ''))
+
+  result.push(current.trim())
   return result
 }
 

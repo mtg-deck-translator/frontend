@@ -74,7 +74,11 @@ export function useDeck() {
       status.value = 'done'
     } catch (err) {
       status.value = 'error'
-      error.value = "Erreur lors de la traduction via Scryfall. Réessayez."
+      // ScryfallError porte un message utile (limite de débit, panne réseau…).
+      // Le générique ne sert que pour l'imprévu.
+      error.value = err?.name === 'ScryfallError'
+        ? err.message
+        : "Erreur lors de la traduction via Scryfall. Réessayez."
     }
 
     return { pasteText }
