@@ -1,11 +1,5 @@
 import { computed } from 'vue'
-
-const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other', 'Maybeboard']
-const CATEGORY_FR = {
-  Commander: 'Commandant', Creature: 'Créature', Instant: 'Éphémère',
-  Sorcery: 'Rituel', Artifact: 'Artefact', Enchantment: 'Enchantement',
-  Planeswalker: 'Planeswalker', Land: 'Terrain', Other: 'Autre', Maybeboard: 'Maybeboard',
-}
+import { categoryLabel, orderCategories } from '../constants/categories.js'
 
 export function useFilteredGroups({ cards, checkedMap, filter, search, sort }) {
   return computed(() => {
@@ -29,8 +23,9 @@ export function useFilteredGroups({ cards, checkedMap, filter, search, sort }) {
       groups[cat].push(card)
     }
 
-    return CATEGORY_ORDER
-      .filter(cat => groups[cat]?.length)
+    // orderCategories ne perd aucune catégorie : les personnalisées (Archidekt)
+    // sont réordonnées, jamais écartées.
+    return orderCategories(Object.keys(groups))
       .map(cat => {
         const sorted = groups[cat].slice()
         if (sort.value === 'price') {
@@ -38,7 +33,7 @@ export function useFilteredGroups({ cards, checkedMap, filter, search, sort }) {
         } else {
           sorted.sort((a, b) => a.frName.localeCompare(b.frName, 'fr'))
         }
-        return { category: cat, label: CATEGORY_FR[cat] || cat, cards: sorted }
+        return { category: cat, label: categoryLabel(cat, { plural: true }), cards: sorted }
       })
   })
 }

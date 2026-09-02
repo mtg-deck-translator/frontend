@@ -1,18 +1,5 @@
 import { useToast } from './useToast.js'
-
-const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other']
-
-const CATEGORY_FR = {
-  Commander: 'Commandant',
-  Creature: 'Créature',
-  Instant: 'Éphémère',
-  Sorcery: 'Rituel',
-  Artifact: 'Artefact',
-  Enchantment: 'Enchantement',
-  Planeswalker: 'Planeswalker',
-  Land: 'Terrain',
-  Other: 'Autre',
-}
+import { categoryLabel, orderCategories } from '../constants/categories.js'
 
 function formatCards(cards) {
   const groups = {}
@@ -23,9 +10,8 @@ function formatCards(cards) {
   }
 
   const lines = []
-  for (const cat of CATEGORY_ORDER) {
-    if (!groups[cat]?.length) continue
-    lines.push(`// ${CATEGORY_FR[cat] || cat}`)
+  for (const cat of orderCategories(Object.keys(groups))) {
+    lines.push(`// ${categoryLabel(cat)}`)
     for (const card of groups[cat]) {
       lines.push(`${card.qty} ${card.frName}`)
     }

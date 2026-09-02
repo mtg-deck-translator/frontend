@@ -2,7 +2,6 @@ const CARD_REGEX = /^(\d+)x?\s+(.+?)(?:\s+\([\w\d]+\)(?:\s+\d+)?(?:\s+\[.*?\])?)
 
 const SIDEBOARD_MARKERS = /^(sideboard|maybeboard|sb:|Sideboard:|Maybeboard:)/i
 
-const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other']
 
 export function parsePastedList(text) {
   const lines = text.split('\n')
@@ -55,5 +54,3 @@ export function parsePastedList(text) {
 
   return { cards, unparseableLines }
 }
-
-export { CATEGORY_ORDER }

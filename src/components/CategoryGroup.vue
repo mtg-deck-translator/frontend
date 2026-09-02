@@ -33,18 +33,8 @@
 <script setup>
 import { computed } from 'vue'
 import CardRow from './CardRow.vue'
+import { categoryColor, categoryLabel } from '../constants/categories.js'
 
-const CATEGORY_FR = {
-  Commander: 'Commandant', Creature: 'Créatures', Instant: 'Éphémères',
-  Sorcery: 'Rituels', Artifact: 'Artefacts', Enchantment: 'Enchantements',
-  Planeswalker: 'Planeswalkers', Land: 'Terrains', Other: 'Autre', Maybeboard: 'Maybeboard',
-}
-
-const CATEGORY_COLORS = {
-  Commander: '#f59e0b', Creature: '#10b981', Instant: '#3b82f6',
-  Sorcery: '#8b5cf6', Artifact: '#a1a1aa', Enchantment: '#f472b6',
-  Planeswalker: '#a855f7', Land: '#a16207', Other: '#6b7280', Maybeboard: '#64748b',
-}
 
 const props = defineProps({
   category: String,
@@ -55,8 +45,8 @@ const props = defineProps({
 
 const emit = defineEmits(['toggle', 'set-all'])
 
-const categoryFr = computed(() => CATEGORY_FR[props.category] || props.category)
-const catColor = computed(() => CATEGORY_COLORS[props.category] || '#6b7280')
+const categoryFr = computed(() => categoryLabel(props.category, { plural: true }))
+const catColor = computed(() => categoryColor(props.category))
 const cardKeys = computed(() => props.cards.map(c => c.queryName))
 const ownedCount = computed(() => props.cards.filter(c => props.checkedMap[c.queryName]).length)
 const totalCount = computed(() => props.cards.length)

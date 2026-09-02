@@ -582,8 +582,8 @@ import { useExport } from './composables/useExport.js'
 import { useCollection } from './composables/useCollection.js'
 import { matchDeckToCollection } from './services/collectionParser.js'
 import { getCachedCards, setCachedCards } from './services/storage.js'
+import { categoryLabel, orderCategories } from './constants/categories.js'
 
-const CATEGORY_ORDER = ['Commander', 'Creature', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Planeswalker', 'Land', 'Other', 'Maybeboard']
 const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G']
 const MTG_COLOR_STYLES = {
   W: { background: '#f1f5f9', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)' },
@@ -591,11 +591,6 @@ const MTG_COLOR_STYLES = {
   B: { background: '#3f3f46', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)' },
   R: { background: '#ef4444', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.2)' },
   G: { background: '#22c55e', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)' },
-}
-const CATEGORY_FR = {
-  Commander: 'Commandant', Creature: 'Créature', Instant: 'Éphémère',
-  Sorcery: 'Rituel', Artifact: 'Artefact', Enchantment: 'Enchantement',
-  Planeswalker: 'Planeswalker', Land: 'Terrain', Other: 'Autre', Maybeboard: 'Maybeboard',
 }
 
 const DK_TABS = [
@@ -672,9 +667,8 @@ const categoryGroups = computed(() => {
     groups[cat].total++
     groups[cat].owned += checkedMap.value[card.queryName] ? 1 : 0
   }
-  return CATEGORY_ORDER
-    .filter(cat => groups[cat])
-    .map(cat => ({ category: cat, label: CATEGORY_FR[cat] || cat, ...groups[cat] }))
+  return orderCategories(Object.keys(groups))
+    .map(cat => ({ category: cat, label: categoryLabel(cat), ...groups[cat] }))
 })
 
 // --- Actions ---
