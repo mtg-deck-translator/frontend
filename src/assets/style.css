@@ -375,6 +375,14 @@ a {
   --cat-other: #9ca3af;
   --cat-zone: #94a3b8;
   --cat-custom: #a3aec2;
+
+  /* Texte posé sur le voile sombre d'une illustration : blanc dans les deux
+     thèmes, puisque le voile, lui, reste sombre. */
+  --text-on-scrim: #ffffff;
+  --text-on-scrim-muted: rgba(255, 255, 255, 0.7);
+
+  /* Illustration du deck en fond de canvas. */
+  --deck-bg-opacity: 0.1;
 }
 
 [data-theme="light"] {
@@ -392,8 +400,8 @@ a {
   --fill-3: rgba(0, 0, 0, 0.095);
   --fill-4: rgba(0, 0, 0, 0.14);
 
-  --border-subtle: rgba(0, 0, 0, 0.07);
-  --border: rgba(0, 0, 0, 0.11);
+  --border-subtle: rgba(0, 0, 0, 0.10);
+  --border: rgba(0, 0, 0, 0.15);
   --border-strong: rgba(0, 0, 0, 0.18);
   --border-focus: rgba(0, 0, 0, 0.34);
 
@@ -454,6 +462,13 @@ a {
   --cat-other: #4b5563;
   --cat-zone: #475569;
   --cat-custom: #4b5563;
+
+  --text-on-scrim: #ffffff;
+  --text-on-scrim-muted: rgba(255, 255, 255, 0.7);
+
+  /* Sur fond clair, 10 % d'une illustration floutée teinte toute la page
+     (vert, rose selon le deck) et délave le contenu. */
+  --deck-bg-opacity: 0.035;
 }
 
 /* Aucun anneau de focus n'existait nulle part : `grep focus-visible` ne

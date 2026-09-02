@@ -142,12 +142,14 @@ const previewStyle = computed(() => {
   cursor: pointer;
 }
 
-.cr-row.checked .cr-check:hover {
+.cr-check:hover {
   border-color: var(--border-focus);
   background: var(--fill-2);
 }
 
-.cr-check {
+/* Pastille pleine = carte possédée. Le sélecteur doit rester scopé à .checked :
+   sans quoi toutes les lignes se remplissent et cocher ne se voit plus. */
+.cr-row.checked .cr-check {
   background: var(--cat-color, var(--accent));
   border-color: var(--cat-color, var(--accent));
 }

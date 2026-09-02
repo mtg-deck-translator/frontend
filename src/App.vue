@@ -1296,13 +1296,15 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .lpr-card-count {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--text-4);
+  color: var(--text-on-scrim-muted);
 }
 
+/* Posé sur le voile sombre de l'illustration : la couleur ne suit pas le
+   thème, sinon le texte devient noir sur noir en mode clair. */
 .lpr-card-name {
   font-size: 17px;
   font-weight: 700;
-  color: var(--text-1);
+  color: var(--text-on-scrim);
   letter-spacing: -0.03em;
   line-height: 1.2;
   transition: color 200ms;
@@ -1692,7 +1694,7 @@ watch(deckId, () => { activeFilter.value = 'all' })
   inset: 0;
   background-size: cover;
   background-position: center center;
-  opacity: 0.1;
+  opacity: var(--deck-bg-opacity);
   filter: blur(60px) saturate(0.6);
   pointer-events: none;
   z-index: 0;
