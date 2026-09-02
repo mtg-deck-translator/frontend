@@ -348,6 +348,33 @@ a {
   --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.55);
   --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.60);
   --shadow-lg: var(--shadow-4); /* référencé par CardmarketPanel, jamais défini */
+
+  /* Teintes d'ombre, extraites pour que le thème clair puisse les adoucir :
+     une ombre noire à 60 % sur fond blanc est une tache, pas une élévation. */
+  --shadow-tint-1: rgba(0, 0, 0, 0.25);
+  --shadow-tint-2: rgba(0, 0, 0, 0.40);
+  --shadow-tint-3: rgba(0, 0, 0, 0.60);
+
+  /* Bouton primaire : blanc sur fond sombre, il doit s'inverser en clair. */
+  --btn-primary-bg: #ffffff;
+  --btn-primary-bg-hover: #f4f4f5;
+  --btn-primary-glow: rgba(255, 255, 255, 0.14);
+  --btn-primary-glow-hover: rgba(255, 255, 255, 0.22);
+
+  /* Couleurs de catégorie. Land, Other et les zones sont remontées par rapport
+     aux valeurs d'origine (#a16207, #6b7280, #64748b), qui plafonnaient à
+     4,1-4,2:1 sur fond sombre, sous le seuil AA de 4,5:1. */
+  --cat-commander: #f59e0b;
+  --cat-creature: #10b981;
+  --cat-instant: #3b82f6;
+  --cat-sorcery: #8b5cf6;
+  --cat-artifact: #a1a1aa;
+  --cat-enchantment: #f472b6;
+  --cat-planeswalker: #a855f7;
+  --cat-land: #ca8a04;
+  --cat-other: #9ca3af;
+  --cat-zone: #94a3b8;
+  --cat-custom: #a3aec2;
 }
 
 [data-theme="light"] {
@@ -404,6 +431,29 @@ a {
   --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.12);
   --shadow-4: 0 20px 44px rgba(0, 0, 0, 0.16);
   --shadow-lg: var(--shadow-4);
+
+  --shadow-tint-1: rgba(0, 0, 0, 0.06);
+  --shadow-tint-2: rgba(0, 0, 0, 0.10);
+  --shadow-tint-3: rgba(0, 0, 0, 0.16);
+
+  --btn-primary-bg: #18181b;
+  --btn-primary-bg-hover: #27272a;
+  --btn-primary-glow: rgba(24, 24, 27, 0.16);
+  --btn-primary-glow-hover: rgba(24, 24, 27, 0.24);
+
+  /* Sur fond clair, les mêmes teintes doivent être assombries pour rester
+     lisibles : l'ambre #f59e0b ne fait que 2,15:1 sur blanc. */
+  --cat-commander: #b45309;
+  --cat-creature: #047857;
+  --cat-instant: #1d4ed8;
+  --cat-sorcery: #6d28d9;
+  --cat-artifact: #52525b;
+  --cat-enchantment: #be185d;
+  --cat-planeswalker: #7e22ce;
+  --cat-land: #854d0e;
+  --cat-other: #4b5563;
+  --cat-zone: #475569;
+  --cat-custom: #4b5563;
 }
 
 /* Aucun anneau de focus n'existait nulle part : `grep focus-visible` ne

@@ -105,7 +105,7 @@ const previewStyle = computed(() => {
   gap: 14px;
   padding: 13px 18px;
   border-left: 2px solid transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
   transition: background 150ms, border-left-color 150ms;
   cursor: default;
 }
@@ -117,8 +117,8 @@ const previewStyle = computed(() => {
 }
 
 .cr-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-left-color: var(--cat-color, rgba(255, 255, 255, 0.2));
+  background: var(--fill-1);
+  border-left-color: var(--cat-color, var(--border-focus));
 }
 
 /* Checkbox */
@@ -132,12 +132,12 @@ const previewStyle = computed(() => {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border: 1.5px solid var(--border-strong);
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-1);
   transition: background 150ms, border-color 150ms;
   cursor: pointer;
 }
@@ -148,8 +148,8 @@ const previewStyle = computed(() => {
 }
 
 .cr-check {
-  background: var(--cat-color, #10b981);
-  border-color: var(--cat-color, #10b981);
+  background: var(--cat-color, var(--accent));
+  border-color: var(--cat-color, var(--accent));
 }
 
 /* Qty badge */
@@ -163,9 +163,9 @@ const previewStyle = computed(() => {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.35);
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-4);
+  background: var(--surface-sunk);
+  border: 1px solid var(--border-subtle);
   border-radius: 9px;
 }
 
@@ -182,7 +182,7 @@ const previewStyle = computed(() => {
 .cr-fr {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -190,13 +190,13 @@ const previewStyle = computed(() => {
   transition: color 150ms;
 }
 
-.cr-row.checked .cr-fr { color: #fff; }
+.cr-row.checked .cr-fr { color: var(--text-1); }
 .commander .cr-fr { font-size: 16px; font-weight: 700; }
 
 .cr-en {
   font-size: 11px;
   font-style: italic;
-  color: rgba(255, 255, 255, 0.18);
+  color: var(--text-4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -214,12 +214,12 @@ const previewStyle = computed(() => {
 .cr-price {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.22);
+  color: var(--text-4);
   white-space: nowrap;
   transition: color 150ms;
 }
 
-.cr-row:hover .cr-price { color: var(--cat-color, rgba(255, 255, 255, 0.5)); }
+.cr-row:hover .cr-price { color: var(--cat-color, var(--text-3)); }
 
 .cr-badge-en {
   font-family: var(--font-mono);
@@ -229,9 +229,9 @@ const previewStyle = computed(() => {
   letter-spacing: 0.06em;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fill-2);
+  color: var(--text-4);
+  border: 1px solid var(--border);
 }
 </style>
 
@@ -243,7 +243,7 @@ const previewStyle = computed(() => {
   width: 220px;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 12px 40px var(--shadow-tint-3);
 }
 
 .card-preview img {

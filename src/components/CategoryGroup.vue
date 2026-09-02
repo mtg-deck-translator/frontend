@@ -76,7 +76,7 @@ function handleToggleAll() {
   justify-content: space-between;
   padding-bottom: 12px;
   margin-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .cat-head-left {
@@ -107,26 +107,26 @@ function handleToggleAll() {
 .cat-count {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-4);
 }
 
 .cat-toggle {
   font-size: 10px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.18);
+  color: var(--text-4);
   letter-spacing: 0.02em;
   transition: color 150ms;
 }
 
-.cat-toggle:hover { color: rgba(255, 255, 255, 0.55); }
+.cat-toggle:hover { color: var(--text-3); }
 
 /* Cards container — glassmorphism card */
 .cat-cards {
-  background: rgba(24, 24, 27, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
   overflow: hidden;
   backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 24px var(--shadow-tint-1);
 }
 </style>

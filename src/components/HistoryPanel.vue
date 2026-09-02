@@ -73,7 +73,7 @@ function formatDate(iso) {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: flex-start;

@@ -96,7 +96,7 @@ async function copyAgain() {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--scrim);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -113,7 +113,7 @@ async function copyAgain() {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg, 0 24px 64px rgba(0,0,0,0.4));
+  box-shadow: var(--shadow-lg, 0 24px 64px var(--shadow-tint-2));
   width: 100%;
   max-width: 480px;
   padding: 20px;

@@ -133,7 +133,7 @@ function groupPrice(group) {
 /* Zoom panel */
 .zoom-panel {
   position: sticky;
-  top: calc(var(--header-height) + 16px);
+  top: 16px;
 }
 
 .zoom-inner {
@@ -147,7 +147,7 @@ function groupPrice(group) {
   width: 100%;
   height: auto;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 20px var(--shadow-tint-1);
 }
 
 .zoom-placeholder {
@@ -217,9 +217,9 @@ function groupPrice(group) {
 
 .visual-header {
   position: sticky;
-  top: var(--header-height);
+  top: 0;
   z-index: 10;
-  background: var(--bg);
+  background: var(--bg-canvas);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -259,7 +259,7 @@ function groupPrice(group) {
 .card-tile:hover {
   border-color: var(--border-strong);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px var(--shadow-tint-1);
 }
 
 .card-tile.checked {
@@ -296,7 +296,7 @@ function groupPrice(group) {
 .tile-checked-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(79, 127, 255, 0.35);
+  background: var(--accent-fill-hover);
   display: flex;
   align-items: center;
   justify-content: center;

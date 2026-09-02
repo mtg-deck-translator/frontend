@@ -91,8 +91,8 @@ async function onFile(e) {
   justify-content: space-between;
   gap: 8px;
   padding: 7px 10px;
-  background: rgba(34, 197, 94, 0.06);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: var(--success-fill);
+  border: 1px solid var(--success-border);
   border-radius: var(--radius-md);
 }
 
@@ -133,12 +133,12 @@ async function onFile(e) {
   color: var(--success);
   padding: 3px 8px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border: 1px solid var(--success-border);
   transition: background var(--transition-fast);
 }
 
 .cl-apply:hover {
-  background: rgba(34, 197, 94, 0.1);
+  background: var(--success-fill);
 }
 
 .cl-clear {

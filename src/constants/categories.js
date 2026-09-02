@@ -58,34 +58,38 @@ export const CATEGORY_FR_PLURAL = {
   Land: 'Terrains',
 }
 
-export const CATEGORY_COLORS = {
-  Commander: '#f59e0b',
-  Creature: '#10b981',
-  Instant: '#3b82f6',
-  Sorcery: '#8b5cf6',
-  Artifact: '#a1a1aa',
-  Enchantment: '#f472b6',
-  Planeswalker: '#a855f7',
-  Land: '#a16207',
-  Other: '#6b7280',
-  Sideboard: '#64748b',
-  Maybeboard: '#64748b',
+/**
+ * Couleurs de catégorie, en variables CSS plutôt qu'en littéraux : elles
+ * doivent suivre le thème. Trois d'entre elles échouaient au seuil AA sur fond
+ * sombre (Land 4,10:1, Other 4,17:1, Sideboard 4,24:1) et l'ambre du
+ * commandant serait illisible sur fond clair. Les valeurs vivent dans
+ * assets/style.css, où les deux thèmes sont définis côte à côte.
+ */
+export const CATEGORY_COLOR_VARS = {
+  Commander: '--cat-commander',
+  Creature: '--cat-creature',
+  Instant: '--cat-instant',
+  Sorcery: '--cat-sorcery',
+  Artifact: '--cat-artifact',
+  Enchantment: '--cat-enchantment',
+  Planeswalker: '--cat-planeswalker',
+  Land: '--cat-land',
+  Other: '--cat-other',
+  Sideboard: '--cat-zone',
+  Maybeboard: '--cat-zone',
 }
 
 /** Couleur des catégories personnalisées, qu'on ne peut pas connaître à l'avance. */
-export const CATEGORY_COLOR_FALLBACK = '#7c8598'
+export const CATEGORY_COLOR_FALLBACK = 'var(--cat-custom)'
 
-/**
- * Libellé affichable d'une catégorie.
- * Une catégorie personnalisée n'est pas traduisible : on rend son nom d'origine.
- */
 export function categoryLabel(category, { plural = false } = {}) {
   const map = plural ? CATEGORY_FR_PLURAL : CATEGORY_FR
   return map[category] || category
 }
 
 export function categoryColor(category) {
-  return CATEGORY_COLORS[category] || CATEGORY_COLOR_FALLBACK
+  const v = CATEGORY_COLOR_VARS[category]
+  return v ? `var(${v})` : CATEGORY_COLOR_FALLBACK
 }
 
 export function isKnownCategory(category) {
