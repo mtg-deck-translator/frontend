@@ -82,3 +82,23 @@ Host github-mtg
 ```
 
 Les remotes sont donc en `git@github-mtg:mtg-deck-translator/*.git`, pas en `git@github.com:`.
+
+## Configuration Vercel
+
+`vercel.json` ne peut pas être commenté : le schéma Vercel rejette toute clé
+inconnue dans une entrée `headers`, y compris `comment` — une tentative de
+commentaire y a déjà fait échouer un build. Les raisons sont donc ici.
+
+- **`/assets/(.*)` en `max-age=31536000, immutable`** — Vite met un hash de
+  contenu dans le nom de chaque fichier : un changement produit un nouveau nom.
+  Ils sont donc cachables définitivement. Par défaut Vercel servait
+  `max-age=0, must-revalidate`, et le navigateur revalidait 53 fichiers à
+  chaque visite.
+- **`/` en `max-age=0`** — l'index doit rester frais, c'est lui qui pointe vers
+  les assets hashés.
+- **CSP** — `img-src` autorise `cards.scryfall.io` (les images de cartes) et
+  `connect-src` `api.scryfall.com`. Toute nouvelle source d'images ou d'API
+  devra être ajoutée ici, sinon elle sera bloquée silencieusement.
+- **`regions: ["cdg1"]`** — les fonctions tournaient par défaut à Washington
+  alors que le CDN sert depuis Paris, soit environ 250 ms de plancher sur
+  `/api/*` pour un public français.
