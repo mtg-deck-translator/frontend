@@ -208,8 +208,8 @@
                 <div class="dk-coll-fill" :style="{ width: ownedPct + '%' }"/>
               </div>
               <p v-if="ownedCount === 0" class="dk-coll-hint">
-                Cochez vos cartes pour ne pas les racheter — on s’en souviendra
-                pour vos prochains decks.
+                Dites-nous ce que vous avez déjà, pour ne pas le racheter.
+                On s’en souviendra pour vos prochains decks.
               </p>
               <p v-else-if="manualSize > 0" class="dk-coll-hint">
                 {{ totalKnown }} cartes connues, appliquées automatiquement à
@@ -220,7 +220,11 @@
                 v-if="missingCards.length"
                 class="dk-point-btn"
                 @click="pointing = true"
-              >Pointer ma collection</button>
+              >Vérifier mes cartes une par une</button>
+              <p v-if="missingCards.length" class="dk-point-hint">
+                L’app vous montre chaque carte en image, vous répondez
+                « je l’ai » ou « je ne l’ai pas ». Pratique devant vos boîtes.
+              </p>
               <CollectionImport @apply="applyCollection"/>
             </div>
 
@@ -1755,6 +1759,13 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 .dk-point-btn:hover { background: var(--accent-hover); }
+
+.dk-point-hint {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text-4);
+}
 
 .dk-coll-link {
   padding: 0;

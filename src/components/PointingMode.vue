@@ -1,11 +1,14 @@
 <template>
-  <div class="pt" role="dialog" aria-modal="true" aria-label="Pointer ma collection">
+  <div class="pt" role="dialog" aria-modal="true" aria-label="Vérifier vos cartes une par une">
     <div class="pt-head">
       <div>
-        <div class="pt-title">Pointer ma collection</div>
-        <div class="pt-sub">Les cartes les plus chères d’abord — c’est là que ne pas racheter rapporte.</div>
+        <div class="pt-title">Avez-vous déjà cette carte ?</div>
+        <div class="pt-sub">
+          Regardez dans vos boîtes et répondez. On commence par les plus chères,
+          c’est là que ne pas racheter rapporte le plus.
+        </div>
       </div>
-      <button class="pt-close" @click="$emit('close')">Terminer</button>
+      <button class="pt-close" @click="$emit('close')">Arrêter</button>
     </div>
 
     <div v-if="current" class="pt-body">
@@ -25,10 +28,10 @@
 
       <div class="pt-actions">
         <button class="pt-btn pt-btn--own" @click="own">
-          Je l’ai <kbd>J</kbd>
+          Oui, je l’ai <kbd>J</kbd>
         </button>
         <button class="pt-btn" @click="skip">
-          Passer <kbd>N</kbd>
+          Non <kbd>N</kbd>
         </button>
       </div>
 
@@ -38,7 +41,9 @@
     </div>
 
     <p v-else class="pt-done">
-      Tout est pointé. <strong>{{ ownedHere }}</strong> carte{{ ownedHere > 1 ? 's' : '' }} ajoutée{{ ownedHere > 1 ? 's' : '' }} à votre collection.
+      Vous avez passé tout le deck en revue.
+      <strong>{{ ownedHere }}</strong> carte{{ ownedHere > 1 ? 's' : '' }}
+      enregistrée{{ ownedHere > 1 ? 's' : '' }} — on s’en souviendra pour vos prochains decks.
     </p>
 
     <div class="pt-progress">
