@@ -597,6 +597,7 @@ import { useChecklist } from './composables/useChecklist.js'
 import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
 import { useExport } from './composables/useExport.js'
+import { useToast } from './composables/useToast.js'
 import { useCollection } from './composables/useCollection.js'
 import { matchDeckToCollection } from './services/collectionParser.js'
 import { getCachedCards, setCachedCards } from './services/storage.js'
@@ -644,6 +645,7 @@ const {
 const { checkedMap, toggle: toggleCard, setAll, ownedCount } = useChecklist(deckId)
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
+const { show } = useToast()
 const { getMap: getCollectionMap } = useCollection()
 
 // --- Computed ---
@@ -771,6 +773,25 @@ function scrollToCategory(category) {
 }
 
 function exportAll() { copyAll() }
+function exportDownload() { downloadTxt(deckName.value) }
+function exportPrint() { window.print() }
+
+async function exportBuyCardmarket() {
+  if (missingCards.value.length === 0) {
+    show('Rien à acheter : toutes les cartes sont cochées.', 'info')
+    return
+  }
+  // displayName porte le nom ANGLAIS de la source : c'est celui que Cardmarket
+  // indexe. Ne jamais envoyer frName ici.
+  const text = missingCards.value.map(c => `${c.qty} ${c.displayName}`).join('\n')
+  try {
+    await navigator.clipboard.writeText(text)
+    show(`${missingCards.value.length} cartes copiées`, 'success')
+  } catch {
+    show('Échec de la copie', 'error')
+  }
+  showCardmarket.value = true
+}
 
 function formatDate(iso) {
   const d = new Date(iso)
