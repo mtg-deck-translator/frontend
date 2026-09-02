@@ -740,15 +740,6 @@ function scrollToCategory(category) {
 }
 
 function exportAll() { copyAll() }
-function exportMissing() { copyMissing() }
-function exportDownload() { downloadTxt(deckName.value) }
-function exportPrint() { window.print() }
-async function exportBuyCardmarket() {
-  if (missingCards.value.length === 0) return
-  const text = missingCards.value.map(c => `${c.qty} ${c.displayName}`).join('\n')
-  try { await navigator.clipboard.writeText(text) } catch {}
-  showCardmarket.value = true
-}
 
 function formatDate(iso) {
   const d = new Date(iso)

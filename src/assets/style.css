@@ -273,3 +273,156 @@ a {
     color: #1a3fa0 !important;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Jeu de tokens unifié.
+   Ajouté en fin de fichier : à spécificité égale, la dernière déclaration
+   l'emporte, donc ce bloc redéfinit les :root plus haut sans les toucher.
+
+   Il règle d'abord un conflit d'accent : --accent valait #4F7FFF (bleu) alors
+   que toute l'interface visible est en ambre #f59e0b. Les composants
+   correctement tokenisés (ProgressBar, ColumnsPanel, VisualPanel,
+   HistoryPanel, CollectionImport) affichaient donc du bleu au milieu d'une
+   app ambre : passer de la vue Liste à la vue Colonnes donnait l'impression
+   de changer d'application.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Surfaces */
+  --bg-app: #09090b;
+  --bg-canvas: #06060f;
+  --canvas-glow: rgba(88, 28, 220, 0.14);
+  --surface-1: rgba(24, 24, 27, 0.5);
+  --surface-2: rgba(24, 24, 27, 0.6);
+  --surface-3: rgba(24, 24, 27, 0.8);
+  --surface-sunk: rgba(9, 9, 11, 0.6);
+  --surface-menu: #18181b;
+
+  /* Remplissages d'état */
+  --fill-1: rgba(255, 255, 255, 0.04);
+  --fill-2: rgba(255, 255, 255, 0.07);
+  --fill-3: rgba(255, 255, 255, 0.10);
+  --fill-4: rgba(255, 255, 255, 0.18);
+
+  /* Bordures */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-focus: rgba(255, 255, 255, 0.28);
+
+  /* Texte — --text-4 est fixé à .55 (5,9:1) et non .35 : le palier le plus
+     faible portait le nom des cartes, à 3,19:1, sous le seuil AA. */
+  --text-1: #ffffff;
+  --text-2: rgba(255, 255, 255, 0.78);
+  --text-3: rgba(255, 255, 255, 0.62);
+  --text-4: rgba(255, 255, 255, 0.55);
+  --text-on-accent: #09090b;
+  --text-inverse: #09090b;
+
+  /* Accent — ambre, la couleur réellement utilisée par l'interface */
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-fill: rgba(245, 158, 11, 0.08);
+  --accent-fill-hover: rgba(245, 158, 11, 0.14);
+  --accent-border: rgba(245, 158, 11, 0.22);
+  --accent-border-hov: rgba(245, 158, 11, 0.35);
+  --accent-glow: rgba(245, 158, 11, 0.15);
+
+  /* Sémantique */
+  --success: #4ade80;
+  --success-fill: rgba(34, 197, 94, 0.08);
+  --success-border: rgba(34, 197, 94, 0.24);
+  --danger: #fca5a5;
+  --danger-fill: rgba(239, 68, 68, 0.08);
+  --danger-border: rgba(239, 68, 68, 0.22);
+  --warning: #fbbf24;
+  --warning-fill: rgba(245, 158, 11, 0.08);
+  --info: #60a5fa;
+  --info-fill: rgba(59, 130, 246, 0.08);
+
+  /* Voiles et ombres */
+  --scrim: rgba(0, 0, 0, 0.55);
+  --scrim-strong: rgba(0, 0, 0, 0.72);
+  --shadow-1: 0 2px 10px rgba(0, 0, 0, 0.40);
+  --shadow-2: 0 4px 24px rgba(0, 0, 0, 0.30);
+  --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.60);
+  --shadow-lg: var(--shadow-4); /* référencé par CardmarketPanel, jamais défini */
+}
+
+[data-theme="light"] {
+  --bg-app: #fafaf9;
+  --bg-canvas: #f4f4f5;
+  --canvas-glow: rgba(88, 28, 220, 0.05);
+  --surface-1: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(255, 255, 255, 0.85);
+  --surface-3: #ffffff;
+  --surface-sunk: rgba(0, 0, 0, 0.045);
+  --surface-menu: #ffffff;
+
+  --fill-1: rgba(0, 0, 0, 0.035);
+  --fill-2: rgba(0, 0, 0, 0.065);
+  --fill-3: rgba(0, 0, 0, 0.095);
+  --fill-4: rgba(0, 0, 0, 0.14);
+
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border: rgba(0, 0, 0, 0.11);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --border-focus: rgba(0, 0, 0, 0.34);
+
+  --text-1: #18181b;
+  --text-2: rgba(24, 24, 27, 0.78);
+  --text-3: rgba(24, 24, 27, 0.62);
+  --text-4: rgba(24, 24, 27, 0.55);
+  --text-on-accent: #ffffff;
+  --text-inverse: #ffffff;
+
+  /* #f59e0b ne fait que 2,15:1 sur blanc : inutilisable en thème clair. */
+  --accent: #b45309;
+  --accent-hover: #92400e;
+  --accent-fill: rgba(180, 83, 9, 0.07);
+  --accent-fill-hover: rgba(180, 83, 9, 0.12);
+  --accent-border: rgba(180, 83, 9, 0.25);
+  --accent-border-hov: rgba(180, 83, 9, 0.40);
+  --accent-glow: rgba(180, 83, 9, 0.18);
+
+  --success: #15803d;
+  --success-fill: rgba(34, 197, 94, 0.10);
+  --success-border: rgba(21, 128, 61, 0.28);
+  --danger: #b91c1c;
+  --danger-fill: rgba(239, 68, 68, 0.09);
+  --danger-border: rgba(185, 28, 28, 0.25);
+  --warning: #b45309;
+  --warning-fill: rgba(245, 158, 11, 0.12);
+  --info: #1d4ed8;
+  --info-fill: rgba(59, 130, 246, 0.10);
+
+  --scrim: rgba(24, 24, 27, 0.35);
+  --scrim-strong: rgba(24, 24, 27, 0.55);
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --shadow-4: 0 20px 44px rgba(0, 0, 0, 0.16);
+  --shadow-lg: var(--shadow-4);
+}
+
+/* Aucun anneau de focus n'existait nulle part : `grep focus-visible` ne
+   renvoyait rien, et trois champs posaient `outline:none` sans remplacement.
+   La navigation clavier fonctionnait mais restait invisible. */
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* L'app anime au survol des levées de 12px et des cascades sur chaque groupe.
+   Le spinner garde son animation : c'est le seul signal de chargement. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .lpl-spinner { animation-duration: 0.65s !important; animation-iteration-count: infinite !important; }
+}
