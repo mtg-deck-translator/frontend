@@ -208,7 +208,13 @@
                 <div class="dk-coll-fill" :style="{ width: ownedPct + '%' }"/>
               </div>
               <p v-if="ownedCount === 0" class="dk-coll-hint">
-                Cochez vos cartes pour ne pas les racheter.
+                Cochez vos cartes pour ne pas les racheter — on s’en souviendra
+                pour vos prochains decks.
+              </p>
+              <p v-else-if="manualSize > 0" class="dk-coll-hint">
+                {{ totalKnown }} cartes connues, appliquées automatiquement à
+                chaque nouveau deck.
+                <button class="dk-coll-link" @click="onForgetCollection">Oublier</button>
               </p>
               <CollectionImport @apply="applyCollection"/>
             </div>
@@ -309,11 +315,31 @@
               </div>
             </div>
 
+            <!-- Pendant la traduction, la seule chose qui bouge à l'écran
+                 était une barre de 350px en bas à gauche, tandis que 60 % de
+                 la surface affichait encore le mode d'emploi. -->
+            <div v-if="isLoading" class="lpr-loading">
+              <div class="lpr-loading-head">
+                <span class="lpr-step-num" aria-hidden="true">1</span>
+                <div>
+                  <div class="lpr-step-title">{{ status === 'translating' ? i18n.btn_translating : i18n.btn_fetching }}</div>
+                  <div class="lpr-step-desc">
+                    {{ status === 'translating'
+                      ? `${progress.current} / ${progress.total} cartes`
+                      : 'Récupération du deck depuis la source…' }}
+                  </div>
+                </div>
+              </div>
+              <div class="lpr-skel-list">
+                <div v-for="i in 8" :key="i" class="lpr-skel" :style="{ animationDelay: i * 60 + 'ms' }"/>
+              </div>
+            </div>
+
             <!-- Comment ça marche — remplace l'ancien bloc « Capacités ».
                  Trois fonctions listées à poids égal ne disent pas dans quel
                  ordre s'en servir ; un chemin numéroté, si. C'est le fil rouge,
                  annoncé avant même d'entrer. -->
-            <div class="lpr-section">
+            <div v-if="!isLoading" class="lpr-section">
               <div class="lpr-section-head">
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -329,6 +355,18 @@
                   </div>
                 </li>
               </ol>
+
+              <!-- Collection persistante affichée dès l'accueil : c'est elle
+                   qui fait la différence entre un utilitaire à usage unique et
+                   un outil où l'on revient. -->
+              <div v-if="hasAnyCollection" class="lpr-coll">
+                <div class="lpr-coll-head">
+                  <span class="lpr-coll-dot" aria-hidden="true">✓</span>
+                  <strong>{{ totalKnown }} cartes</strong> dans votre collection
+                </div>
+                <p class="lpr-coll-sub">Elle sera appliquée automatiquement à votre prochain deck.</p>
+                <button class="lpr-coll-btn" @click="downloadCollection">Exporter en .csv</button>
+              </div>
 
               <!-- Le drapeau « pas de version française » est ce qu'aucun autre
                    outil n'affiche : il ne peut pas rester un badge découvert à
@@ -435,6 +473,7 @@
                     <button @click="runMenu(exportAll)">Copier la liste complète</button>
                     <button @click="runMenu(exportDownload)">Exporter en .txt</button>
                     <button @click="runMenu(exportPrint)">Imprimer</button>
+                    <button v-if="hasAnyCollection" @click="runMenu(downloadCollection)">Exporter ma collection (.csv)</button>
                   </div>
                 </div>
               </div>
@@ -668,11 +707,25 @@ const {
   translate, reset, loadFromHistory,
 } = useDeck()
 
-const { checkedMap, toggle: toggleCard, setAll, ownedCount } = useChecklist(deckId)
+const { checkedMap, toggle: toggleBase, setAll: setAllBase, ownedCount } = useChecklist(deckId)
+
+// Toute carte cochée, dans n'importe quel deck, alimente la collection locale.
+function toggleCard(queryName) {
+  toggleBase(queryName)
+  rememberOwned(queryName, !!checkedMap.value[queryName])
+}
+
+function setAll(keys, value) {
+  setAllBase(keys, value)
+  for (const k of keys) rememberOwned(k, value)
+}
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 const { show } = useToast()
-const { getMap: getCollectionMap } = useCollection()
+const {
+  getMap: getCollectionMap, rememberOwned, hasAnyCollection, totalKnown,
+  manualSize, csvSize, clearManual, exportCSV,
+} = useCollection()
 
 // --- Computed ---
 const totalPrice = computed(() =>
@@ -743,6 +796,7 @@ async function onTranslate() {
   const extra = await translate(language.value)
 
   if (status.value === 'done') {
+    autoApplyCollection()
     setCachedCards(deckId.value, language.value, cards.value)
     const coverCard = cards.value.find(c => c.category === 'Commander') || cards.value[0]
     const deckColors = COLOR_ORDER.filter(c =>
@@ -782,6 +836,7 @@ function onLoadFromHistory(entry) {
     cards.value = cached
     status.value = 'done'
     activeFilter.value = 'all'
+    autoApplyCollection()
     return
   }
   if (entry.inputMode === 'url') {
@@ -836,11 +891,41 @@ function getCoverForEntry(entry) {
   return url ? url.replace('/normal/', '/art_crop/') : null
 }
 
+// Format Manabox, lisible ailleurs : un outil communautaire ne retient pas
+// les données de ses utilisateurs en otage.
+function downloadCollection() {
+  const blob = new Blob([exportCSV()], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'ma-collection-mtg.csv'
+  a.click()
+  URL.revokeObjectURL(url)
+  show('Collection exportée', 'success')
+}
+
+function onForgetCollection() {
+  clearManual()
+  show('Cartes pointées oubliées', 'info')
+}
+
 function applyCollection() {
   const map = getCollectionMap()
-  if (!map) return
+  if (!map) return 0
   const owned = matchDeckToCollection(cards.value, map)
-  setAll([...owned], true)
+  // setAllBase, pas setAll : ces cartes viennent déjà de la collection, les
+  // y réinjecter ne ferait que dupliquer le travail.
+  setAllBase([...owned], true)
+  return owned.size
+}
+
+// Appliqué sans rien demander : l'utilisateur a déjà dit ce qu'il possède,
+// le lui redemander à chaque deck n'a aucun sens. C'est ce qui fait qu'au
+// deuxième deck la checklist est déjà en partie remplie.
+function autoApplyCollection() {
+  if (!hasAnyCollection.value) return
+  const n = applyCollection()
+  if (n > 0) show(`${n} carte${n > 1 ? 's' : ''} déjà dans votre collection`, 'success')
 }
 
 watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
@@ -1633,6 +1718,18 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 
 .dk-lang { margin-top: 10px; }
 
+.dk-coll-link {
+  padding: 0;
+  font-size: 12px;
+  color: var(--text-4);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.dk-coll-link:hover { color: var(--danger); }
+
 .dk-coll-hint {
   margin: 8px 0 0;
   font-size: 12px;
@@ -1838,6 +1935,48 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 
 .lpr-step-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
 .lpr-step-desc { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+
+.lpr-loading { padding: 8px 0 24px; }
+.lpr-loading-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
+.lpr-skel-list { display: flex; flex-direction: column; gap: 10px; }
+
+.lpr-skel {
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--fill-1) 25%, var(--fill-2) 50%, var(--fill-1) 75%);
+  background-size: 200% 100%;
+  animation: skel 1.4s ease-in-out infinite;
+}
+
+@keyframes skel {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.lpr-coll {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--success-fill);
+  border: 1px solid var(--success-border);
+  border-radius: 12px;
+}
+
+.lpr-coll-head { font-size: 13.5px; color: var(--text-2); }
+.lpr-coll-head strong { color: var(--text-1); font-weight: 600; }
+.lpr-coll-dot { color: var(--success); margin-right: 6px; }
+.lpr-coll-sub { margin: 4px 0 10px; font-size: 12.5px; color: var(--text-3); }
+
+.lpr-coll-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--fill-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.lpr-coll-btn:hover { color: var(--text-1); background: var(--fill-2); }
 
 .lpr-nofr-pitch {
   margin: 18px 0 0;

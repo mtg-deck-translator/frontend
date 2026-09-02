@@ -50,7 +50,7 @@
         </div>
       </div>
       <p v-if="visibleGroups.length === 0" class="empty-state">
-        {{ search ? 'Aucune carte ne correspond à la recherche.' : 'Aucune carte dans cette vue.' }}
+        {{ emptyMessage }}
       </p>
     </div>
 
@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, toRef } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { useFilteredGroups } from '../composables/useFilteredGroups.js'
 
 const props = defineProps({
@@ -105,6 +105,16 @@ const visibleGroups = useFilteredGroups({
   filter: toRef(props, 'filter'),
   search: toRef(props, 'search'),
   sort: toRef(props, 'sort'),
+})
+
+// « Aucune carte dans cette vue » est vrai et inutile : il faut dire pourquoi
+// c'est vide, et ce qu'on peut y faire.
+const emptyMessage = computed(() => {
+  if (props.search) return 'Aucune carte ne correspond à la recherche.'
+  if (props.filter === 'owned') return 'Vous n’avez encore coché aucune carte de ce deck.'
+  if (props.filter === 'missing') return 'Rien à acheter : vous avez le deck complet.'
+  if (props.filter === 'nofr') return 'Toutes les cartes de ce deck existent dans votre langue.'
+  return 'Aucune carte à afficher.'
 })
 
 function formatPrice(price) {
