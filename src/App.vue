@@ -216,6 +216,11 @@
                 chaque nouveau deck.
                 <button class="dk-coll-link" @click="onForgetCollection">Oublier</button>
               </p>
+              <button
+                v-if="missingCards.length"
+                class="dk-point-btn"
+                @click="pointing = true"
+              >Pointer ma collection</button>
               <CollectionImport @apply="applyCollection"/>
             </div>
 
@@ -403,7 +408,7 @@
             <!-- Un contrôle qui pilote la liste se pose sur la liste, pas dans
                  un rail à mille pixels de là. Et avec des libellés : trois
                  icônes muettes ne disent pas ce qu'elles font. -->
-            <div class="dk-toolbar">
+            <div v-if="!pointing" class="dk-toolbar">
               <div class="dk-views" role="group" aria-label="Affichage">
                 <button
                   v-for="v in LAYOUTS"
@@ -423,7 +428,15 @@
               </label>
             </div>
 
-            <div class="dk-scroll">
+            <div v-if="pointing" class="dk-scroll">
+              <PointingMode
+                :cards="missingCards"
+                @own="onPointOwned"
+                @close="pointing = false"
+              />
+            </div>
+
+            <div v-else class="dk-scroll">
               <ResultsPanel
                 v-if="layout === 'list'"
                 :cards="cards"
@@ -448,7 +461,7 @@
             <!-- Le fil rouge : une seule action suivante, qui change selon
                  l'état. On ne propose pas d'acheter un deck entier à quelqu'un
                  qui n'a pas encore dit ce qu'il possédait. -->
-            <div class="dk-bar">
+            <div v-if="!pointing" class="dk-bar">
               <p class="dk-bar-text">
                 <template v-if="missingCards.length === 0 && cards.length">
                   <strong>Vous avez déjà tout ce deck.</strong>
@@ -616,6 +629,7 @@ const LANDING_I18N = {
 
 import CardmarketPanel from './components/CardmarketPanel.vue'
 import CollectionImport from './components/CollectionImport.vue'
+import PointingMode from './components/PointingMode.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
@@ -654,6 +668,14 @@ const DK_TABS = [
 const showHistory = ref(false)
 const showCardmarket = ref(false)
 const showMenu = ref(false)
+const pointing = ref(false)
+
+// Le pointage écrit directement dans la checklist du deck et dans la
+// collection locale : c'est le même geste que cocher une ligne.
+function onPointOwned(queryName, owned = true) {
+  setAllBase([queryName], owned)
+  rememberOwned(queryName, owned)
+}
 
 // La vue « Colonnes » a été retirée : c'était la vue Liste amputée du nom
 // anglais et du badge « pas de VF », donc celle qui masquait le différenciateur,
@@ -928,7 +950,7 @@ function autoApplyCollection() {
   if (n > 0) show(`${n} carte${n > 1 ? 's' : ''} déjà dans votre collection`, 'success')
 }
 
-watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
+watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; pointing.value = false })
 </script>
 
 <style scoped>
@@ -1717,6 +1739,22 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 .dk-scroll { flex: 1; min-height: 0; }
 
 .dk-lang { margin-top: 10px; }
+
+.dk-point-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.dk-point-btn:hover { background: var(--accent-hover); }
 
 .dk-coll-link {
   padding: 0;
