@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Le proxy de decklists n'a rien à faire dans un index.
+Disallow: /api/
+
+Sitemap: https://frontend-eight-gamma-56.vercel.app/sitemap.xml
