@@ -2,7 +2,7 @@
   <div
     class="cr-row"
     :class="{ checked: isChecked, commander: isCommander, 'is-last': isLast }"
-    @mouseenter="showPreview = true"
+    @mouseenter="onMouseEnter"
     @mouseleave="showPreview = false"
   >
     <button
@@ -11,6 +11,7 @@
       :aria-checked="isChecked"
       :aria-label="`${isChecked ? 'Retirer' : 'Marquer'} ${card.frName}`"
       @click="$emit('toggle', card.queryName)"
+      @keydown.space.prevent="$emit('toggle', card.queryName)"
     >
       <svg v-if="isChecked" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M2.5 6l3 3 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -40,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   card: Object,
@@ -55,11 +56,31 @@ function formatPrice(price) {
 }
 
 const isCommander = computed(() => props.card.category === 'Commander')
+
+// L'aperçu suit le pointeur : il n'a de sens qu'avec une vraie souris.
+// Au tactile, le tap émule un mouseenter sans mouseleave, donc la vignette
+// s'affichait aux coordonnées initiales {0,0}, collée en haut à gauche, en
+// pointer-events:none — impossible à refermer jusqu'au tap suivant.
+const canHover = typeof window !== 'undefined'
+  && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
+
 const showPreview = ref(false)
 const mousePos = ref({ x: 0, y: 0 })
 
+function onMouseEnter() { if (canHover) showPreview.value = true }
+
+// Un seul écouteur mousemove partagé par toutes les lignes, attaché
+// uniquement pendant l'affichage d'un aperçu. Auparavant chaque CardRow
+// posait le sien au montage : un deck de 100 cartes, c'était 100 écouteurs
+// globaux qui écrivaient chacun dans un ref et invalidaient un computed à
+// chaque mouvement de souris, en permanence, même sans aperçu affiché.
 function onMouseMove(e) { mousePos.value = { x: e.clientX, y: e.clientY } }
-onMounted(() => document.addEventListener('mousemove', onMouseMove))
+
+watch(showPreview, visible => {
+  if (visible) document.addEventListener('mousemove', onMouseMove)
+  else document.removeEventListener('mousemove', onMouseMove)
+})
+
 onUnmounted(() => document.removeEventListener('mousemove', onMouseMove))
 
 const PREVIEW_W = 220
@@ -101,6 +122,11 @@ const previewStyle = computed(() => {
 }
 
 /* Checkbox */
+.cr-check:hover {
+  border-color: var(--border-focus);
+  background: var(--fill-2);
+}
+
 .cr-check {
   flex-shrink: 0;
   width: 22px;
@@ -116,7 +142,12 @@ const previewStyle = computed(() => {
   cursor: pointer;
 }
 
-.cr-row.checked .cr-check {
+.cr-row.checked .cr-check:hover {
+  border-color: var(--border-focus);
+  background: var(--fill-2);
+}
+
+.cr-check {
   background: var(--cat-color, #10b981);
   border-color: var(--cat-color, #10b981);
 }

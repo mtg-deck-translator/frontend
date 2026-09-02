@@ -774,19 +774,36 @@ watch(deckId, () => { activeFilter.value = 'all' })
 
 <style scoped>
 /* ══ App shell ══════════════════════════════════════════ */
+/* Mobile d'abord : la page scrolle normalement.
+   L'ancienne version posait height:100vh + overflow:hidden ici, et la media
+   query 640px passait les enfants en height:auto — le contenu débordait donc
+   d'un conteneur qui ne scrolle pas. Sur téléphone, le bouton « Traduire »
+   se retrouvait sous la ligne de flottaison, hors d'atteinte, et une fois un
+   deck chargé la liste de cartes était inaccessible : l'app était inutilisable.
+   100dvh et non 100vh : sur iOS, 100vh compte la barre d'URL rétractable. */
 .cmd-app {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;
   background: #09090b;
   color: #fafafa;
   display: flex;
   flex-direction: column;
 }
 
+@media (min-width: 641px) {
+  .cmd-app {
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+
 .cmd-layout {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  min-height: 0;
+}
+
+@media (min-width: 641px) {
+  .cmd-layout { overflow: hidden; }
 }
 
 /* ══ Left panel ═════════════════════════════════════════ */
@@ -1667,12 +1684,12 @@ watch(deckId, () => { activeFilter.value = 'all' })
 }
 
 /* Background art */
+/* left:400px reprenait la largeur de la sidebar : à 320px (tablette) il
+   restait une bande de 80px décalée, et sous 640px le fond partait hors écran.
+   En absolute dans .cmd-right, il suit son conteneur sans rien savoir de lui. */
 .cmd-right-bg {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 400px;
-  bottom: 0;
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center center;
   opacity: 0.1;
@@ -1693,14 +1710,50 @@ watch(deckId, () => { activeFilter.value = 'all' })
 .history-fade-leave-to { opacity: 0; }
 
 /* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .cmd-left { width: 360px; }
+  .lpr-feat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 900px) {
-  .cmd-left { width: 320px; }
+  .cmd-left { width: 300px; }
+  .lpr-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
   .cmd-layout { flex-direction: column; }
-  .cmd-left { width: 100%; height: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .cmd-right { height: auto; }
-  .lp-left { height: auto; }
+  .cmd-left {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .cmd-right { height: auto; overflow-y: visible; }
+  .lp-left, .dk-left { height: auto; }
+
+  /* Le pied de la carte d'input est un space-between avec un bouton en
+     flex-shrink:0 : sous 480px il poussait le sélecteur de langue hors cadre. */
+  .lpl-card-footer { flex-wrap: wrap; gap: 12px; }
+  .lpl-translate-btn { width: 100%; justify-content: center; }
+
+  /* Quatre actions de deck sur une seule colonne : à deux, les libellés
+     « Copier tout » et « Exporter .txt » étaient tronqués. */
+  .dk-actions { grid-template-columns: 1fr; }
+
+  /* Un nom de deck long débordait, faute de point de césure. */
+  .dk-name { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 480px) {
+  .lpr-grid, .lpr-feat-grid { grid-template-columns: 1fr; }
+}
+
+/* Les cibles tactiles descendaient jusqu'à 11px. Le minimum AA de WCAG 2.2
+   (2.5.8) est 24px ; 44px est la recommandation confortable. */
+@media (pointer: coarse) {
+  .dk-action-btn, .dk-filter-btn, .dlt-btn, .lpl-mode-tab, .dk-toc-item {
+    min-height: 44px;
+  }
+  .dk-search-clear, .lpl-icon-btn { min-width: 44px; min-height: 44px; }
 }
 </style>
