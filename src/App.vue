@@ -32,6 +32,7 @@
                 </div>
                 <div>
                   <div class="lpl-name">MTG Translator</div>
+                  <div class="lpl-free">{{ i18n.free_badge }}</div>
                 </div>
               </div>
               <div class="lpl-top-actions">
@@ -74,7 +75,7 @@
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M6 4H4a2 2 0 0 0 0 4h2M10 4h2a2 2 0 0 1 0 4h-2M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
-                    Lien Web
+                    {{ i18n.tab_url }}
                   </button>
                   <button
                     class="lpl-mode-tab"
@@ -84,7 +85,7 @@
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M2 5h12M2 8.5h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
-                    Liste Brute
+                    {{ i18n.tab_paste }}
                   </button>
                 </div>
                 <div v-if="inputMode === 'url'" class="lpl-url-row">
@@ -138,6 +139,11 @@
                 </div>
               </div>
 
+              <!-- Sans URL sous la main, le visiteur n'a rien à faire : cul-de-sac. -->
+              <button v-if="!isLoading" class="lpl-example" @click="loadExample">
+                {{ i18n.try_example }}
+              </button>
+
               <!-- Keyboard hint -->
               <div v-if="inputMode === 'paste' && !isLoading" class="lpl-kbd-hint">
                 <kbd>Ctrl</kbd><span>+</span><kbd>↵</kbd> pour traduire
@@ -170,102 +176,47 @@
         <template v-else>
           <div class="dk-left">
 
-            <!-- Back -->
+            <!-- Il n'y a pas de liste de decks : ce bouton ramène au formulaire. -->
             <button class="dk-back" @click="resetDeck">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M9 2L3 7l6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Retour aux decks
+              Nouveau deck
             </button>
 
-            <!-- Deck info -->
             <div class="dk-info">
               <h2 class="dk-name">{{ deckName }}</h2>
               <div class="dk-stats">
                 <span class="dk-stat">{{ cards.length }} cartes</span>
                 <span v-if="totalPrice > 0" class="dk-stat dk-stat-price">{{ formatPrice(totalPrice) }}</span>
               </div>
+              <!-- Changer de langue imposait auparavant de quitter le deck. -->
+              <div class="dk-lang">
+                <LanguageSelector :model-value="language" @update:model-value="onChangeLanguage" />
+              </div>
             </div>
 
-            <!-- Layout toggle -->
-            <div class="dk-layout-toggle">
-              <button :class="['dlt-btn', { active: layout === 'list' }]" @click="layout = 'list'" title="Liste">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-              </button>
-              <button :class="['dlt-btn', { active: layout === 'columns' }]" @click="layout = 'columns'" title="Colonnes">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <rect x="1" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <rect x="5.5" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <rect x="10" y="2" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                </svg>
-              </button>
-              <button :class="['dlt-btn', { active: layout === 'images' }]" @click="layout = 'images'" title="Images">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Action buttons 2×2 -->
-            <div class="dk-actions">
-              <button class="dk-action-btn" @click="exportAll">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                  <path d="M2 10V3a1 1 0 0 1 1-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-                Copier tout
-              </button>
-              <button class="dk-action-btn" @click="exportDownload">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 2v7M4 7l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 11h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-                Exporter .txt
-              </button>
-              <button class="dk-action-btn" @click="exportPrint">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <rect x="2" y="5" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/>
-                  <path d="M4 5V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5V5" stroke="currentColor" stroke-width="1.3"/>
-                </svg>
-                Imprimer
-              </button>
-              <button class="dk-action-btn dk-action-btn--accent" @click="exportBuyCardmarket">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <circle cx="5.5" cy="11.5" r="1" fill="currentColor"/>
-                  <circle cx="10.5" cy="11.5" r="1" fill="currentColor"/>
-                  <path d="M1 1h2l1.5 6h6L12 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Manquantes
-              </button>
+            <!-- Étape 2 du parcours, donc deuxième bloc du rail. Elle était
+                 en septième position, sous la ligne de flottaison d'un 13". -->
+            <div class="dk-collection">
+              <div class="dk-coll-header">
+                <span class="dk-coll-label">CE QUE VOUS AVEZ</span>
+                <span class="dk-coll-pct">{{ ownedPct }}%</span>
+              </div>
+              <div class="dk-coll-stats">{{ ownedCount }} / {{ cards.length }} poss.</div>
+              <div class="dk-coll-track">
+                <div class="dk-coll-fill" :style="{ width: ownedPct + '%' }"/>
+              </div>
+              <p v-if="ownedCount === 0" class="dk-coll-hint">
+                Cochez vos cartes pour ne pas les racheter.
+              </p>
+              <CollectionImport @apply="applyCollection"/>
             </div>
 
             <div class="dk-sep"/>
 
-            <!-- Search -->
-            <div class="dk-search">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/>
-                <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-              <input
-                class="dk-search-input"
-                :value="search"
-                placeholder="Chercher une carte..."
-                @input="search = $event.target.value"
-              />
-              <button v-if="search" class="dk-search-clear" @click="search = ''">
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Filter tabs -->
+            <!-- Les filtres passent devant la recherche : « À trouver » est
+                 l'information la plus consultée, la recherche est ponctuelle. -->
             <div class="dk-filters">
               <button
                 v-for="tab in DK_TABS"
@@ -279,36 +230,20 @@
               </button>
             </div>
 
-            <div class="dk-sep"/>
-
-            <!-- Collection -->
-            <div class="dk-collection">
-              <div class="dk-coll-header">
-                <span class="dk-coll-label">COLLECTION</span>
-                <span class="dk-coll-pct">{{ ownedPct }}%</span>
-              </div>
-              <div class="dk-coll-stats">{{ ownedCount }} / {{ cards.length }} poss.</div>
-              <div class="dk-coll-track">
-                <div class="dk-coll-fill" :style="{ width: ownedPct + '%' }"/>
-              </div>
-              <CollectionImport @apply="applyCollection"/>
-            </div>
-
-            <div class="dk-sep"/>
-
-            <!-- TOC -->
-            <div class="dk-toc">
-              <div class="dk-toc-label">ANALYSE DU DECK</div>
-              <button
-                v-for="group in categoryGroups"
-                :key="group.category"
-                class="dk-toc-item"
-                @click="scrollToCategory(group.category)"
-              >
-                <span class="dk-toc-name">{{ group.label }}</span>
-                <span class="dk-toc-count">{{ group.owned }}/{{ group.total }}</span>
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                  <path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="dk-search">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <input
+                class="dk-search-input"
+                :value="search"
+                placeholder="Chercher une carte..."
+                @input="search = $event.target.value"
+              />
+              <button v-if="search" class="dk-search-clear" aria-label="Effacer la recherche" @click="search = ''">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
                 </svg>
               </button>
             </div>
@@ -374,47 +309,33 @@
               </div>
             </div>
 
-            <!-- Capacités -->
+            <!-- Comment ça marche — remplace l'ancien bloc « Capacités ».
+                 Trois fonctions listées à poids égal ne disent pas dans quel
+                 ordre s'en servir ; un chemin numéroté, si. C'est le fil rouge,
+                 annoncé avant même d'entrer. -->
             <div class="lpr-section">
               <div class="lpr-section-head">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-                  <path d="M7 1l1.5 4h4l-3.2 2.3 1.2 4L7 9 3.5 11.3l1.2-4L1.5 5h4z"/>
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <h2 class="lpr-section-title">Capacités</h2>
+                <h2 class="lpr-section-title">{{ i18n.how_title }}</h2>
               </div>
-              <div class="lpr-feat-grid">
-                <div class="lpr-feat lpr-feat--amber">
-                  <div class="lpr-feat-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M8 5H5a3 3 0 0 0 0 6h3M12 5h3a3 3 0 0 1 0 6h-3M7 10h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+              <ol class="lpr-steps">
+                <li v-for="(step, i) in steps" :key="i" class="lpr-step">
+                  <span class="lpr-step-num" aria-hidden="true">{{ i + 1 }}</span>
+                  <div>
+                    <div class="lpr-step-title">{{ step.title }}</div>
+                    <div class="lpr-step-desc">{{ step.desc }}</div>
                   </div>
-                  <div class="lpr-feat-title">{{ i18n.feat_url }}</div>
-                  <div class="lpr-feat-desc">{{ i18n.feat_url_desc }}</div>
-                </div>
-                <div class="lpr-feat lpr-feat--blue">
-                  <div class="lpr-feat-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/>
-                      <path d="M2.5 10h15M10 2.5c-2.5 2.5-3.5 4.5-3.5 7.5s1 5 3.5 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-                  </div>
-                  <div class="lpr-feat-title">{{ i18n.feat_lang }}</div>
-                  <div class="lpr-feat-desc">{{ i18n.feat_lang_desc }}</div>
-                </div>
-                <div class="lpr-feat lpr-feat--green">
-                  <div class="lpr-feat-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <rect x="2" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
-                      <rect x="11" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
-                      <path d="M5.5 6.5l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M2 14h16M2 17h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-                  </div>
-                  <div class="lpr-feat-title">{{ i18n.feat_coll }}</div>
-                  <div class="lpr-feat-desc">{{ i18n.feat_coll_desc }}</div>
-                </div>
-              </div>
+                </li>
+              </ol>
+
+              <!-- Le drapeau « pas de version française » est ce qu'aucun autre
+                   outil n'affiche : il ne peut pas rester un badge découvert à
+                   la quarantième ligne d'un deck. -->
+              <p class="lpr-nofr-pitch">
+                <span aria-hidden="true">⚠</span> {{ i18n.nofr_pitch }}
+              </p>
             </div>
 
           </div>
@@ -426,8 +347,7 @@
 
             <!-- Depuis mi-2022, une part croissante des cartes n'a aucune
                  impression dans les langues autres que l'anglais. Le joueur ne
-                 le découvrait qu'au moment de commander : l'information était
-                 calculée (card.noFr) mais reléguée à un badge de 8px. -->
+                 le découvrait qu'au moment de commander. -->
             <div v-if="noFrCount > 0 && !noFrDismissed" class="dk-nofr">
               <span class="dk-nofr-icon" aria-hidden="true">⚠</span>
               <p class="dk-nofr-text">
@@ -442,34 +362,84 @@
               <button class="dk-nofr-close" aria-label="Masquer cet avertissement" @click="noFrDismissed = true">×</button>
             </div>
 
-            <ResultsPanel
-              v-if="layout === 'list'"
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-              @set-all="setAllCards"
-            />
-            <ColumnsPanel
-              v-else-if="layout === 'columns'"
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-            />
-            <VisualPanel
-              v-else
-              :cards="cards"
-              :checked-map="checkedMap"
-              :filter="activeFilter"
-              :search="search"
-              :sort="sort"
-              @toggle="toggleCard"
-            />
+            <!-- Un contrôle qui pilote la liste se pose sur la liste, pas dans
+                 un rail à mille pixels de là. Et avec des libellés : trois
+                 icônes muettes ne disent pas ce qu'elles font. -->
+            <div class="dk-toolbar">
+              <div class="dk-views" role="group" aria-label="Affichage">
+                <button
+                  v-for="v in LAYOUTS"
+                  :key="v.value"
+                  class="dk-view-btn"
+                  :class="{ active: layout === v.value }"
+                  :aria-pressed="layout === v.value"
+                  @click="layout = v.value"
+                >{{ v.label }}</button>
+              </div>
+              <label class="dk-sort">
+                <span class="dk-sort-label">Trier</span>
+                <select class="dk-sort-select" :value="sort" @change="sort = $event.target.value">
+                  <option value="category">Catégorie</option>
+                  <option value="price">Prix décroissant</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="dk-scroll">
+              <ResultsPanel
+                v-if="layout === 'list'"
+                :cards="cards"
+                :checked-map="checkedMap"
+                :filter="activeFilter"
+                :search="search"
+                :sort="sort"
+                @toggle="toggleCard"
+                @set-all="setAllCards"
+              />
+              <VisualPanel
+                v-else
+                :cards="cards"
+                :checked-map="checkedMap"
+                :filter="activeFilter"
+                :search="search"
+                :sort="sort"
+                @toggle="toggleCard"
+              />
+            </div>
+
+            <!-- Le fil rouge : une seule action suivante, qui change selon
+                 l'état. On ne propose pas d'acheter un deck entier à quelqu'un
+                 qui n'a pas encore dit ce qu'il possédait. -->
+            <div class="dk-bar">
+              <p class="dk-bar-text">
+                <template v-if="missingCards.length === 0 && cards.length">
+                  <strong>Vous avez déjà tout ce deck.</strong>
+                </template>
+                <template v-else-if="ownedCount === 0">
+                  <strong>Étape 2 sur 3</strong> — dites-nous ce que vous possédez déjà.
+                </template>
+                <template v-else>
+                  Il vous manque <strong>{{ missingCards.length }} cartes</strong>
+                  <span v-if="missingPrice > 0"> · {{ formatPrice(missingPrice) }}</span>
+                </template>
+              </p>
+              <div class="dk-bar-actions">
+                <button
+                  v-if="missingCards.length"
+                  class="dk-bar-primary"
+                  @click="exportBuyCardmarket"
+                >Préparer ma liste de courses →</button>
+                <div class="dk-menu">
+                  <button class="dk-menu-btn" aria-haspopup="true" :aria-expanded="showMenu" @click="showMenu = !showMenu">…</button>
+                  <div v-if="showMenu" class="dk-menu-list">
+                    <button @click="runMenu(exportAll)">Copier la liste complète</button>
+                    <button @click="runMenu(exportDownload)">Exporter en .txt</button>
+                    <button @click="runMenu(exportPrint)">Imprimer</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </template>
 
@@ -491,11 +461,14 @@ import { ref, computed, watch } from 'vue'
 
 const LANDING_I18N = {
   fr: {
-    hero_title_1: 'Forgez vos listes', hero_title_2: 'dans votre langue',
-    hero_sub: 'Importez un deck depuis Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou collez votre liste. Noms traduits en quelques secondes via Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Collez une URL Archidekt, Moxfield, MTGTOP8 ou Tappedout et obtenez la liste traduite instantanément.',
-    feat_lang: '8 langues', feat_lang_desc: 'Français, Allemand, Espagnol, Italien, Portugais, Japonais, Coréen, Russe et plus encore.',
-    feat_coll: 'Suivi de collection', feat_coll_desc: 'Importez votre CSV Manabox, DragonShield ou Moxfield pour voir quelles cartes vous possédez déjà.',
+    hero_title_1: 'Ne rachetez pas', hero_title_2: 'ce que vous avez déjà.',
+    hero_sub: 'Collez le lien de votre deck : on traduit les noms en français, vous cochez ce que vous possédez, et vous repartez avec la liste à acheter — prête pour Cardmarket.',
+    free_badge: 'GRATUIT · SANS COMPTE', how_title: 'COMMENT ÇA MARCHE',
+    step1: 'Collez le lien de votre deck', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — ou votre liste au format texte.',
+    step2: 'Cochez ce que vous possédez', step2_desc: 'Pointage rapide carte par carte, ou import de votre collection en CSV.',
+    step3: 'Récupérez votre liste de courses', step3_desc: 'Uniquement ce qu’il vous manque, prêt à coller dans une Wantlist Cardmarket.',
+    nofr_pitch: 'Certaines cartes n’existent pas dans votre langue. On vous le dit avant que vous les cherchiez pour rien.', try_example: 'Essayer avec un exemple',
+    tab_url: 'Lien de deck', tab_paste: 'Coller une liste',
     recent: 'Decks récents', clear_all: 'Effacer tout', cards: 'cartes', owned: 'possédées',
     today: "Aujourd'hui", yesterday: 'Hier', days_ago: n => `Il y a ${n}j`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Coller une liste', mode_paste_short: 'Liste',
@@ -503,77 +476,98 @@ const LANDING_I18N = {
     btn_translate: 'Traduire', btn_fetching: 'Récupération…', btn_translating: 'Traduction…',
   },
   de: {
-    hero_title_1: 'Übersetze deine Decks', hero_title_2: 'in deine Sprache',
-    hero_sub: 'Importiere ein Deck von Archidekt, Moxfield, MTGTOP8 oder Tappedout — oder füge deine Liste ein. Namen werden in Sekunden via Scryfall übersetzt.',
-    feat_url: 'URL-Import', feat_url_desc: 'Füge eine Archidekt-, Moxfield-, MTGTOP8- oder Tappedout-URL ein und erhalte sofort die übersetzte Liste.',
-    feat_lang: '8 Sprachen', feat_lang_desc: 'Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch, Japanisch, Koreanisch, Russisch und mehr.',
-    feat_coll: 'Sammlungs-Tracking', feat_coll_desc: 'Importiere dein Manabox-, DragonShield- oder Moxfield-CSV und sieh welche Karten du bereits besitzt.',
+    hero_title_1: 'Kauf nicht doppelt,', hero_title_2: 'was du schon hast.',
+    hero_sub: 'Füge den Link deines Decks ein: Wir übersetzen die Namen, du hakst ab, was du besitzt, und bekommst die Einkaufsliste — bereit für Cardmarket.',
+    free_badge: 'KOSTENLOS · OHNE KONTO', how_title: 'SO FUNKTIONIERT ES',
+    step1: 'Deck-Link einfügen', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — oder deine Liste als Text.',
+    step2: 'Abhaken, was du besitzt', step2_desc: 'Karte für Karte, oder Sammlung als CSV importieren.',
+    step3: 'Einkaufsliste erhalten', step3_desc: 'Nur was dir fehlt, bereit für eine Cardmarket-Wantlist.',
+    nofr_pitch: 'Manche Karten gibt es in deiner Sprache nicht. Wir sagen es dir vorher.', try_example: 'Mit einem Beispiel testen',
+    tab_url: 'Deck-Link', tab_paste: 'Liste einfügen',
     recent: 'Letzte Decks', clear_all: 'Alle löschen', cards: 'Karten', owned: 'besessen',
     today: 'Heute', yesterday: 'Gestern', days_ago: n => `Vor ${n} Tagen`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Liste einfügen', mode_paste_short: 'Liste',
     btn_translate: 'Übersetzen', btn_fetching: 'Laden...', btn_translating: 'Übersetzen...',
   },
   it: {
-    hero_title_1: 'Traduci i tuoi deck', hero_title_2: 'nella tua lingua',
-    hero_sub: 'Importa un deck da Archidekt, Moxfield, MTGTOP8 o Tappedout — oppure incolla la tua lista. Nomi tradotti in pochi secondi tramite Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Incolla un URL Archidekt, Moxfield, MTGTOP8 o Tappedout e ottieni istantaneamente la lista tradotta.',
-    feat_lang: '8 lingue', feat_lang_desc: 'Francese, Tedesco, Spagnolo, Italiano, Portoghese, Giapponese, Coreano, Russo e altro.',
-    feat_coll: 'Traccia collezione', feat_coll_desc: 'Importa il tuo CSV Manabox, DragonShield o Moxfield per vedere quali carte possiedi già.',
+    hero_title_1: 'Non ricomprare', hero_title_2: 'ciò che hai già.',
+    hero_sub: 'Incolla il link del tuo mazzo: traduciamo i nomi, tu spunti ciò che possiedi e ottieni la lista da comprare — pronta per Cardmarket.',
+    free_badge: 'GRATUITO · SENZA ACCOUNT', how_title: 'COME FUNZIONA',
+    step1: 'Incolla il link del mazzo', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — o la tua lista in testo.',
+    step2: 'Spunta ciò che possiedi', step2_desc: 'Carta per carta, o importa la collezione in CSV.',
+    step3: 'Ottieni la lista della spesa', step3_desc: 'Solo ciò che manca, pronto per una Wantlist Cardmarket.',
+    nofr_pitch: 'Alcune carte non esistono nella tua lingua. Te lo diciamo prima.', try_example: 'Prova con un esempio',
+    tab_url: 'Link del mazzo', tab_paste: 'Incolla una lista',
     recent: 'Deck recenti', clear_all: 'Cancella tutto', cards: 'carte', owned: 'possedute',
     today: 'Oggi', yesterday: 'Ieri', days_ago: n => `${n} giorni fa`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Incolla lista',
     btn_translate: 'Traduci', btn_fetching: 'Caricamento...', btn_translating: 'Traduzione...',
   },
   es: {
-    hero_title_1: 'Traduce tus mazos', hero_title_2: 'a tu idioma',
-    hero_sub: 'Importa un mazo desde Archidekt, Moxfield, MTGTOP8 o Tappedout — o pega tu lista. Nombres traducidos en segundos con Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Pega una URL de Archidekt, Moxfield, MTGTOP8 o Tappedout y obtén la lista traducida al instante.',
-    feat_lang: '8 idiomas', feat_lang_desc: 'Francés, Alemán, Español, Italiano, Portugués, Japonés, Coreano, Ruso y más.',
-    feat_coll: 'Seguimiento de colección', feat_coll_desc: 'Importa tu CSV de Manabox, DragonShield o Moxfield para ver qué cartas ya posees.',
+    hero_title_1: 'No vuelvas a comprar', hero_title_2: 'lo que ya tienes.',
+    hero_sub: 'Pega el enlace de tu mazo: traducimos los nombres, marcas lo que tienes y te llevas la lista de compra — lista para Cardmarket.',
+    free_badge: 'GRATIS · SIN CUENTA', how_title: 'CÓMO FUNCIONA',
+    step1: 'Pega el enlace de tu mazo', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — o tu lista en texto.',
+    step2: 'Marca lo que ya tienes', step2_desc: 'Carta por carta, o importa tu colección en CSV.',
+    step3: 'Obtén tu lista de compra', step3_desc: 'Solo lo que falta, listo para una Wantlist de Cardmarket.',
+    nofr_pitch: 'Algunas cartas no existen en tu idioma. Te lo decimos antes.', try_example: 'Probar con un ejemplo',
+    tab_url: 'Enlace del mazo', tab_paste: 'Pegar una lista',
     recent: 'Mazos recientes', clear_all: 'Borrar todo', cards: 'cartas', owned: 'poseídas',
     today: 'Hoy', yesterday: 'Ayer', days_ago: n => `Hace ${n} días`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Pegar lista',
     btn_translate: 'Traducir', btn_fetching: 'Cargando...', btn_translating: 'Traduciendo...',
   },
   pt: {
-    hero_title_1: 'Traduza seus decks', hero_title_2: 'no seu idioma',
-    hero_sub: 'Importe um deck do Archidekt, Moxfield, MTGTOP8 ou Tappedout — ou cole sua lista. Nomes traduzidos em segundos via Scryfall.',
-    feat_url: 'Import URL', feat_url_desc: 'Cole uma URL do Archidekt, Moxfield, MTGTOP8 ou Tappedout e obtenha a lista traduzida instantaneamente.',
-    feat_lang: '8 idiomas', feat_lang_desc: 'Francês, Alemão, Espanhol, Italiano, Português, Japonês, Coreano, Russo e mais.',
-    feat_coll: 'Rastrear coleção', feat_coll_desc: 'Importe seu CSV do Manabox, DragonShield ou Moxfield para ver quais cartas você já possui.',
+    hero_title_1: 'Não compre de novo', hero_title_2: 'o que você já tem.',
+    hero_sub: 'Cole o link do seu deck: traduzimos os nomes, você marca o que possui e leva a lista de compras — pronta para o Cardmarket.',
+    free_badge: 'GRÁTIS · SEM CONTA', how_title: 'COMO FUNCIONA',
+    step1: 'Cole o link do seu deck', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — ou sua lista em texto.',
+    step2: 'Marque o que você possui', step2_desc: 'Carta a carta, ou importe sua coleção em CSV.',
+    step3: 'Receba sua lista de compras', step3_desc: 'Só o que falta, pronto para uma Wantlist do Cardmarket.',
+    nofr_pitch: 'Algumas cartas não existem no seu idioma. Avisamos antes.', try_example: 'Testar com um exemplo',
+    tab_url: 'Link do deck', tab_paste: 'Colar uma lista',
     recent: 'Decks recentes', clear_all: 'Limpar tudo', cards: 'cartas', owned: 'possuídas',
     today: 'Hoje', yesterday: 'Ontem', days_ago: n => `Há ${n} dias`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Colar lista',
     btn_translate: 'Traduzir', btn_fetching: 'Carregando...', btn_translating: 'Traduzindo...',
   },
   ja: {
-    hero_title_1: 'デッキを翻訳する', hero_title_2: 'あなたの言語で',
-    hero_sub: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けるか、リストを直接入力。Scryfallで数秒で翻訳。',
-    feat_url: 'URLインポート', feat_url_desc: 'Archidekt、Moxfield、MTGTOP8、TappedoutのURLを貼り付けると即座に翻訳済みリストを取得。',
-    feat_lang: '8言語', feat_lang_desc: 'フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、日本語、韓国語、ロシア語など。',
-    feat_coll: 'コレクション管理', feat_coll_desc: 'Manabox、DragonShield、MoxfieldのCSVをインポートして所持カードを確認。',
+    hero_title_1: 'すでに持っているカードを', hero_title_2: '二度と買わない。',
+    hero_sub: 'デッキのURLを貼るだけ。カード名を翻訳し、所持済みにチェックを入れると、買うべきリストが手に入ります（Cardmarket対応）。',
+    free_badge: '無料・アカウント不要', how_title: '使いかた',
+    step1: 'デッキのURLを貼る', step1_desc: 'Archidekt・Moxfield・MTGTOP8・Tappedout、またはテキストのリスト。',
+    step2: '持っているカードにチェック', step2_desc: '一枚ずつ、またはコレクションのCSVを読み込み。',
+    step3: '買い物リストを受け取る', step3_desc: '足りないカードだけ。Cardmarketのウォントリストにそのまま貼れます。',
+    nofr_pitch: '一部のカードはあなたの言語では存在しません。探す前にお知らせします。', try_example: 'サンプルで試す',
+    tab_url: 'デッキのURL', tab_paste: 'リストを貼る',
     recent: '最近のデッキ', clear_all: 'すべて削除', cards: 'カード', owned: '所有',
     today: '今日', yesterday: '昨日', days_ago: n => `${n}日前`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'リストを貼り付け',
     btn_translate: '翻訳', btn_fetching: '取得中...', btn_translating: '翻訳中...',
   },
   ko: {
-    hero_title_1: '덱을 번역하세요', hero_title_2: '당신의 언어로',
-    hero_sub: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout에서 덱을 가져오거나 목록을 붙여넣으세요. Scryfall로 몇 초 만에 번역됩니다.',
-    feat_url: 'URL 가져오기', feat_url_desc: 'Archidekt, Moxfield, MTGTOP8 또는 Tappedout URL을 붙여넣으면 즉시 번역된 목록을 얻을 수 있습니다.',
-    feat_lang: '8개 언어', feat_lang_desc: '프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 일본어, 한국어, 러시아어 등.',
-    feat_coll: '컬렉션 추적', feat_coll_desc: 'Manabox, DragonShield 또는 Moxfield CSV를 가져와 이미 보유한 카드를 확인하세요.',
+    hero_title_1: '이미 가진 카드를', hero_title_2: '다시 사지 마세요.',
+    hero_sub: '덱 링크를 붙여넣으면 카드 이름을 번역하고, 보유 카드를 체크하면 살 목록이 나옵니다 — Cardmarket에 바로 사용 가능.',
+    free_badge: '무료 · 계정 불필요', how_title: '이용 방법',
+    step1: '덱 링크 붙여넣기', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout, 또는 텍스트 목록.',
+    step2: '보유한 카드 체크', step2_desc: '한 장씩, 또는 컬렉션 CSV 가져오기.',
+    step3: '구매 목록 받기', step3_desc: '부족한 카드만. Cardmarket 원트리스트에 바로 붙여넣기.',
+    nofr_pitch: '일부 카드는 해당 언어로 발매되지 않았습니다. 찾기 전에 알려드립니다.', try_example: '예시로 시험해보기',
+    tab_url: '덱 링크', tab_paste: '목록 붙여넣기',
     recent: '최근 덱', clear_all: '모두 지우기', cards: '카드', owned: '보유',
     today: '오늘', yesterday: '어제', days_ago: n => `${n}일 전`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: '목록 붙여넣기',
     btn_translate: '번역', btn_fetching: '불러오는 중...', btn_translating: '번역 중...',
   },
   ru: {
-    hero_title_1: 'Переводите свои деки', hero_title_2: 'на ваш язык',
-    hero_sub: 'Импортируйте дек с Archidekt, Moxfield, MTGTOP8 или Tappedout — или вставьте список. Названия переведены за секунды через Scryfall.',
-    feat_url: 'Импорт URL', feat_url_desc: 'Вставьте URL Archidekt, Moxfield, MTGTOP8 или Tappedout и мгновенно получите переведённый список.',
-    feat_lang: '8 языков', feat_lang_desc: 'Французский, Немецкий, Испанский, Итальянский, Португальский, Японский, Корейский, Русский и другие.',
-    feat_coll: 'Отслеживание коллекции', feat_coll_desc: 'Импортируйте CSV из Manabox, DragonShield или Moxfield чтобы видеть уже имеющиеся карты.',
+    hero_title_1: 'Не покупайте снова то,', hero_title_2: 'что у вас уже есть.',
+    hero_sub: 'Вставьте ссылку на колоду: мы переведём названия, вы отметите свои карты и получите список покупок — готовый для Cardmarket.',
+    free_badge: 'БЕСПЛАТНО · БЕЗ АККАУНТА', how_title: 'КАК ЭТО РАБОТАЕТ',
+    step1: 'Вставьте ссылку на колоду', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — или список текстом.',
+    step2: 'Отметьте свои карты', step2_desc: 'По одной карте или импортом коллекции в CSV.',
+    step3: 'Получите список покупок', step3_desc: 'Только недостающее, готовое для Wantlist на Cardmarket.',
+    nofr_pitch: 'Некоторых карт нет на вашем языке. Мы предупредим заранее.', try_example: 'Попробовать на примере',
+    tab_url: 'Ссылка на колоду', tab_paste: 'Вставить список',
     recent: 'Последние деки', clear_all: 'Очистить всё', cards: 'карт', owned: 'есть',
     today: 'Сегодня', yesterday: 'Вчера', days_ago: n => `${n} дн. назад`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Вставить список',
@@ -583,7 +577,6 @@ const LANDING_I18N = {
 
 import CardmarketPanel from './components/CardmarketPanel.vue'
 import CollectionImport from './components/CollectionImport.vue'
-import ColumnsPanel from './components/ColumnsPanel.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
@@ -621,11 +614,28 @@ const DK_TABS = [
 // --- State ---
 const showHistory = ref(false)
 const showCardmarket = ref(false)
+const showMenu = ref(false)
+
+// La vue « Colonnes » a été retirée : c'était la vue Liste amputée du nom
+// anglais et du badge « pas de VF », donc celle qui masquait le différenciateur,
+// et rien n'y signalait qu'une ligne était cliquable.
+const LAYOUTS = [
+  { value: 'list', label: 'Liste' },
+  { value: 'images', label: 'Visuel' },
+]
+
+function runMenu(action) {
+  showMenu.value = false
+  action()
+}
 const activeFilter = ref('all')
 const noFrDismissed = ref(false)
 const search = ref('')
 const sort = ref('category')
-const layout = ref(localStorage.getItem('deck-layout') || 'list')
+// « columns » a disparu : une préférence stockée sur cette vue doit retomber
+// sur la liste plutôt que sur un layout inconnu.
+const storedLayout = (() => { try { return localStorage.getItem('deck-layout') } catch { return null } })()
+const layout = ref(storedLayout === 'images' ? 'images' : 'list')
 const cmdRight = ref(null)
 watch(layout, v => localStorage.setItem('deck-layout', v))
 
@@ -633,6 +643,22 @@ watch(layout, v => localStorage.setItem('deck-layout', v))
 const { theme, toggle: toggleTheme } = useTheme()
 const { language, setLanguage, LANGUAGES } = useLanguage()
 const i18n = computed(() => LANDING_I18N[language.value] || LANDING_I18N.fr)
+
+const steps = computed(() => [
+  { title: i18n.value.step1, desc: i18n.value.step1_desc },
+  { title: i18n.value.step2, desc: i18n.value.step2_desc },
+  { title: i18n.value.step3, desc: i18n.value.step3_desc },
+])
+
+// Deck public et stable, choisi pour être petit et complet (commandant,
+// terrains, sorts) : il montre le parcours entier sans faire attendre.
+const EXAMPLE_DECK_URL = 'https://archidekt.com/decks/7031486/buffs_by_hans'
+
+function loadExample() {
+  inputMode.value = 'url'
+  urlInput.value = EXAMPLE_DECK_URL
+  onTranslate()
+}
 
 const pasteTextareaPlaceholder = `4 Island\n1x Lightning Bolt\n1x Frolicking Familiar // Blow Off Steam\n// Les commentaires sont ignorés\n1 Sol Ring`
 
@@ -677,6 +703,18 @@ const missingCards = computed(() =>
 // Cartes sans impression dans la langue cible. On exclut celles que Scryfall
 // n'a pas reconnues (error) : leur absence de traduction n'est pas une
 // information sur la carte, mais sur notre résolution.
+// La seule somme qui décide d'un achat : le prix de ce qui manque, et non
+// celui du deck entier — ce dernier était le seul affiché.
+const missingPrice = computed(
+  () => missingCards.value.reduce((sum, c) => sum + (c.price ?? 0) * (c.qty || 1), 0)
+)
+
+// Retraduire sur place, sans repasser par le formulaire.
+async function onChangeLanguage(code) {
+  setLanguage(code)
+  if (status.value === 'done') await onTranslate()
+}
+
 const noFrCount = computed(() => cards.value.filter(c => c.noFr && !c.error).length)
 const currentLanguageLabel = computed(
   () => LANGUAGES.find(l => l.code === language.value)?.label || language.value
@@ -692,17 +730,6 @@ const filterCounts = computed(() => ({
   owned: cards.value.filter(c => !!checkedMap.value[c.queryName]).length,
 }))
 
-const categoryGroups = computed(() => {
-  const groups = {}
-  for (const card of cards.value) {
-    const cat = card.category || 'Other'
-    if (!groups[cat]) groups[cat] = { total: 0, owned: 0 }
-    groups[cat].total++
-    groups[cat].owned += checkedMap.value[card.queryName] ? 1 : 0
-  }
-  return orderCategories(Object.keys(groups))
-    .map(cat => ({ category: cat, label: categoryLabel(cat), ...groups[cat] }))
-})
 
 // --- Actions ---
 async function onTranslate() {
@@ -766,11 +793,6 @@ function onLoadFromHistory(entry) {
   onTranslate()
 }
 
-function scrollToCategory(category) {
-  const el = document.getElementById(`cat-${category}`)
-  if (!el || !cmdRight.value) return
-  cmdRight.value.scrollTo({ top: el.offsetTop - 16, behavior: 'smooth' })
-}
 
 function exportAll() { copyAll() }
 function exportDownload() { downloadTxt(deckName.value) }
@@ -1357,84 +1379,20 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 .lpr-card:hover .lpr-card-name { color: var(--accent-hover); }
 
 /* Feature cards */
-.lpr-feat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
 
-.lpr-feat {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  backdrop-filter: blur(20px);
-  position: relative;
-  overflow: hidden;
-  transition: border-color 200ms, transform 200ms;
-}
 
-.lpr-feat:hover { transform: translateY(-2px); }
 
-.lpr-feat::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-}
 
 /* Amber variant */
-.lpr-feat--amber {
-  background: linear-gradient(150deg, var(--accent-fill) 0%, var(--surface-1) 55%);
-}
-.lpr-feat--amber::before { background: linear-gradient(90deg, var(--accent), var(--accent-hover)); }
-.lpr-feat--amber .lpr-feat-icon { background: var(--accent-fill-hover); color: var(--accent); }
-.lpr-feat--amber:hover { border-color: var(--accent-border-hov); }
 
 /* Blue variant */
-.lpr-feat--blue {
-  background: linear-gradient(150deg, var(--info-fill) 0%, var(--surface-1) 55%);
-}
-.lpr-feat--blue::before { background: linear-gradient(90deg, var(--info), var(--info)); }
-.lpr-feat--blue .lpr-feat-icon { background: var(--info-fill); color: var(--info); }
-.lpr-feat--blue:hover { border-color: var(--info); }
 
 /* Green variant */
-.lpr-feat--green {
-  background: linear-gradient(150deg, var(--success-fill) 0%, var(--surface-1) 55%);
-}
-.lpr-feat--green::before { background: linear-gradient(90deg, var(--success), var(--success)); }
-.lpr-feat--green .lpr-feat-icon { background: var(--success-fill); color: var(--success); }
-.lpr-feat--green:hover { border-color: var(--success-border); }
 
-.lpr-feat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  margin-bottom: 14px;
-  transition: transform 200ms;
-}
 
 .lpr-feat:hover .lpr-feat-icon { transform: scale(1.08); }
 
-.lpr-feat-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-1);
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
-}
 
-.lpr-feat-desc {
-  font-size: 12px;
-  color: var(--text-3);
-  line-height: 1.6;
-}
 
 /* ══ DECK LEFT ═══════════════════════════════════════════ */
 .dk-left {
@@ -1490,70 +1448,14 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 }
 
 /* Layout toggle */
-.dk-layout-toggle {
-  display: flex;
-  background: var(--fill-1);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 2px;
-  margin-bottom: 16px;
-}
 
-.dlt-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  border-radius: 7px;
-  color: var(--text-4);
-  transition: background 150ms, color 150ms;
-}
 
-.dlt-btn:hover { color: var(--text-3); }
-.dlt-btn.active { background: var(--fill-3); color: var(--text-1); }
 
 /* Action buttons 2×2 */
-.dk-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 16px;
-}
 
-.dk-action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 12px;
-  background: var(--fill-1);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-3);
-  transition: background 150ms, color 150ms, border-color 150ms;
-}
 
-.dk-action-btn:hover {
-  background: var(--fill-3);
-  color: var(--text-2);
-  border-color: var(--border-strong);
-}
 
-.dk-action-btn--accent {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-fill);
-}
 
-.dk-action-btn--accent:hover {
-  background: var(--accent-fill-hover);
-  border-color: var(--accent-border-hov);
-  color: var(--accent-hover);
-}
 
 /* Separator */
 .dk-sep {
@@ -1686,41 +1588,11 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 }
 
 /* TOC */
-.dk-toc { display: flex; flex-direction: column; gap: 1px; }
 
-.dk-toc-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-4);
-  margin-bottom: 8px;
-}
 
-.dk-toc-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: var(--text-4);
-  transition: background 150ms, color 150ms;
-  cursor: pointer;
-}
 
-.dk-toc-item:hover {
-  background: var(--fill-2);
-  color: var(--text-3);
-}
 
-.dk-toc-name { flex: 1; font-weight: 500; text-align: left; }
 
-.dk-toc-count {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-4);
-}
 
 /* ══ DECK RIGHT ═════════════════════════════════════════ */
 .dk-right {
@@ -1754,6 +1626,231 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 .history-fade-leave-active { transition: opacity 200ms ease; }
 .history-fade-enter-from,
 .history-fade-leave-to { opacity: 0; }
+
+/* ── Écran deck : barre d'outils, fil rouge ───────────── */
+.dk-right { display: flex; flex-direction: column; }
+.dk-scroll { flex: 1; min-height: 0; }
+
+.dk-lang { margin-top: 10px; }
+
+.dk-coll-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.dk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.dk-views {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--fill-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+
+.dk-view-btn {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+
+.dk-view-btn:hover { color: var(--text-2); background: var(--fill-2); }
+.dk-view-btn.active { color: var(--text-1); background: var(--fill-3); }
+
+.dk-sort { display: flex; align-items: center; gap: 8px; }
+
+.dk-sort-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.dk-sort-select {
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  background: var(--fill-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Barre du fil rouge : collée en bas du panneau, toujours visible. */
+.dk-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-2);
+}
+
+.dk-bar-text { margin: 0; font-size: 13.5px; color: var(--text-2); }
+.dk-bar-text strong { color: var(--text-1); font-weight: 600; }
+.dk-bar-actions { display: flex; align-items: center; gap: 8px; }
+
+.dk-bar-primary {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.dk-bar-primary:hover { background: var(--accent-hover); }
+
+.dk-menu { position: relative; }
+
+.dk-menu-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-3);
+  background: var(--fill-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.dk-menu-btn:hover { color: var(--text-1); background: var(--fill-2); }
+
+.dk-menu-list {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  min-width: 200px;
+  padding: 6px;
+  background: var(--surface-menu);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-3);
+  display: flex;
+  flex-direction: column;
+}
+
+.dk-menu-list button {
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-2);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dk-menu-list button:hover { color: var(--text-1); background: var(--fill-2); }
+
+@media (max-width: 640px) {
+  .dk-bar { flex-direction: column; align-items: stretch; }
+  .dk-bar-actions { justify-content: space-between; }
+  .dk-bar-primary { flex: 1; }
+}
+
+/* ── Landing : badge gratuit, étapes, exemple ─────────── */
+.lpl-free {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.lpl-example {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: color 150ms, border-color 150ms;
+}
+
+.lpl-example:hover { color: var(--accent); border-color: var(--accent-border); }
+
+.lpr-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lpr-step {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lpr-step:last-child { border-bottom: none; }
+
+.lpr-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-fill);
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+}
+
+.lpr-step-title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.lpr-step-desc { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+
+.lpr-nofr-pitch {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+  background: var(--warning-fill);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+}
+
+.lpr-nofr-pitch span { color: var(--accent); }
 
 /* ── Bandeau « pas de version française » ─────────────── */
 .dk-nofr {
@@ -1821,7 +1918,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 1024px) {
   .cmd-left { width: 360px; }
-  .lpr-feat-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 900px) {
@@ -1854,7 +1950,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false })
 }
 
 @media (max-width: 480px) {
-  .lpr-grid, .lpr-feat-grid { grid-template-columns: 1fr; }
+  .lpr-grid { grid-template-columns: 1fr; }
 }
 
 /* Les cibles tactiles descendaient jusqu'à 11px. Le minimum AA de WCAG 2.2

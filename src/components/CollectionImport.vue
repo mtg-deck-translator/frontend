@@ -11,8 +11,8 @@
         <span class="cl-count tabular">{{ collectionSize }}</span>
       </div>
       <div class="cl-actions">
-        <button class="cl-apply" @click="$emit('apply')" title="Cocher toutes les cartes possédées">
-          Appliquer
+        <button class="cl-apply" title="Recocher les cartes possédées" @click="emit('apply')">
+          Réappliquer
         </button>
         <button class="cl-clear" @click="clearCollection" title="Supprimer la collection">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
@@ -51,7 +51,7 @@ import { ref } from 'vue'
 import { useCollection } from '../composables/useCollection.js'
 import { parseCollectionCSV } from '../services/collectionParser.js'
 
-defineEmits(['apply'])
+const emit = defineEmits(['apply'])
 
 const { hasCollection, collectionName, collectionSize, setCollection, clearCollection } = useCollection()
 
@@ -67,6 +67,10 @@ async function onFile(e) {
     const text = await file.text()
     const map = parseCollectionCSV(text)
     setCollection(map, file.name.replace(/\.csv$/i, ''))
+    // Personne n'importe une collection pour ne pas s'en servir : appliquer
+    // demandait un second clic et un état intermédiaire pour une action à
+    // issue unique.
+    emit('apply')
   } catch (err) {
     parseError.value = err.message
   } finally {
