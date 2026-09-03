@@ -2219,58 +2219,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
    Le rail collait tout en haut et laissait 800px de vide dessous, pendant que
    le panneau droit alignait trois étapes dans le même vide. La page n'était
    pas composée : elle était empilée. */
-@media (min-width: 900px) {
-  .lp-left {
-    justify-content: center;
-    padding: 40px 40px 32px;
-  }
 
-  /* .lpl-input-section portait flex:1 et absorbait tout l'espace : le
-     centrage du parent ne pouvait pas s'appliquer, d'où le vide sous la
-     carte. Le pied de colonne descend seul. */
-  .lpl-input-section { flex: 0 0 auto; }
-  .lp-left > :last-child { margin-top: auto; }
-
-  /* « Traduire en » devient redondant maintenant que le bouton dit
-     « Traduire ce deck », et son libellé poussait le sélecteur de langue
-     sous le bouton. */
-  .lpl-lang-label { display: none; }
-  .lpl-footer-lang { flex: 0 0 auto; }
-
-  .lpl-hero { margin-bottom: 8px; }
-  .lpl-title { font-size: clamp(30px, 2.6vw, 42px); }
-
-  /* Borner le contenu à 720px créait DEUX vides au lieu d'un sur un écran
-     large. On se sert de la largeur au lieu de la fuir : les étapes passent
-     côte à côte, la collection et l'avertissement partagent une ligne, et les
-     decks récents remplissent la grille. */
-  .lp-right {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 28px;
-    padding: 40px 44px;
-  }
-
-  .lpr-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-
-  .lpr-steps {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  .lpr-step { flex-direction: column; gap: 10px; }
-
-  .lpr-foot {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    align-items: stretch;
-  }
-
-  .lpr-coll, .lpr-nofr-pitch { margin: 0; }
-}
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
 /* Raccourci mobile uniquement : sur grand écran le champ est visible et
@@ -2500,6 +2449,64 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 /* ── Media queries, regroupées en fin de feuille ────────
    Une media query n'augmente pas la spécificité : placée avant la
    règle qu'elle doit annuler, elle perd la cascade en silence. */
+
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence.
+   TOUT nouveau bloc @media va ICI, jamais au milieu du fichier. */
+
+@media (min-width: 900px) {
+  .lp-left {
+    justify-content: center;
+    padding: 40px 40px 32px;
+  }
+
+  /* .lpl-input-section portait flex:1 et absorbait tout l'espace : le
+     centrage du parent ne pouvait pas s'appliquer, d'où le vide sous la
+     carte. Le pied de colonne descend seul. */
+  .lpl-input-section { flex: 0 0 auto; }
+  .lp-left > :last-child { margin-top: auto; }
+
+  /* « Traduire en » devient redondant maintenant que le bouton dit
+     « Traduire ce deck », et son libellé poussait le sélecteur de langue
+     sous le bouton. */
+  .lpl-lang-label { display: none; }
+  .lpl-footer-lang { flex: 0 0 auto; }
+
+  .lpl-hero { margin-bottom: 8px; }
+  .lpl-title { font-size: clamp(30px, 2.6vw, 42px); }
+
+  /* Borner le contenu à 720px créait DEUX vides au lieu d'un sur un écran
+     large. On se sert de la largeur au lieu de la fuir : les étapes passent
+     côte à côte, la collection et l'avertissement partagent une ligne, et les
+     decks récents remplissent la grille. */
+  .lp-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    padding: 40px 44px;
+  }
+
+  .lpr-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 210px)); }
+
+  .lpr-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .lpr-step { flex-direction: column; gap: 10px; }
+
+  .lpr-foot {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .lpr-coll, .lpr-nofr-pitch { margin: 0; }
+}
 
 @media (max-width: 640px) {
   /* Le presse-papier devient l'action principale, et la carte de saisie se
