@@ -2510,6 +2510,10 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+    /* Même respiration entre les rangées qu'entre les colonnes : en passant
+       ces blocs en grille je leur avais mis margin:0, ce qui collait la
+       deuxième rangée contre la première. */
+    margin-top: 12px;
     align-items: stretch;
   }
 
