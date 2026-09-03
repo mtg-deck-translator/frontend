@@ -387,11 +387,13 @@ a {
 }
 
 [data-theme="light"] {
-  --bg-app: #f7f3ec;
-  --bg-canvas: #f1ece2;
+  /* #f7f3ec ne se distinguait pas de l'ancien #fafaf9 : trois points d'écart,
+     la chaleur ne se voyait pas. On assume le papier. */
+  --bg-app: #efe9dd;
+  --bg-canvas: #e7dfd0;
   --canvas-glow: rgba(232, 98, 44, 0.05);
-  --surface-1: #fdfbf7;
-  --surface-2: #fffdfa;
+  --surface-1: #fbf8f2;
+  --surface-2: #fdfbf7;
   --surface-3: #ffffff;
   --surface-sunk: rgba(28, 26, 23, 0.05);
   --surface-menu: #ffffff;

@@ -29,8 +29,8 @@
               <div class="lpl-brand">
                 <div class="lpl-logo">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <rect x="1" y="1" width="14" height="14" rx="3" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="1.2"/>
-                    <path d="M4 6h8M4 9h5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round"/>
+                    <rect x="1" y="1" width="14" height="14" rx="3" fill="var(--accent-fill-hover)" stroke="var(--accent)" stroke-width="1.2"/>
+                    <path d="M4 6h8M4 9h5" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round"/>
                   </svg>
                 </div>
                 <div>
@@ -2212,6 +2212,33 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-menu-list button:hover { color: var(--text-1); background: var(--fill-2); }
 
 
+
+/* ── Composition de la page d'accueil sur grand écran ──
+   Le rail collait tout en haut et laissait 800px de vide dessous, pendant que
+   le panneau droit alignait trois étapes dans le même vide. La page n'était
+   pas composée : elle était empilée. */
+@media (min-width: 900px) {
+  .lp-left {
+    justify-content: center;
+    padding: 40px 40px 32px;
+  }
+
+  .lpl-hero { margin-bottom: 8px; }
+  .lpl-title { font-size: clamp(30px, 2.6vw, 42px); }
+
+  .lp-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* Les étapes deviennent une colonne lisible plutôt qu'une bande étirée. */
+  .lpr-steps { max-width: 560px; }
+  .lpr-nofr-pitch, .lpr-coll { max-width: 560px; }
+}
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
 /* Raccourci mobile uniquement : sur grand écran le champ est visible et
