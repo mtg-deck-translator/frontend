@@ -1124,12 +1124,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   flex-direction: column;
 }
 
-@media (min-width: 641px) {
-  .cmd-app {
-    height: 100dvh;
-    overflow: hidden;
-  }
-}
+
 
 .cmd-layout {
   display: flex;
@@ -1137,9 +1132,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   min-height: 0;
 }
 
-@media (min-width: 641px) {
-  .cmd-layout { overflow: hidden; }
-}
+
 
 /* ══ Left panel ═════════════════════════════════════════ */
 .cmd-left {
@@ -1899,91 +1892,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-more { display: none; }
 .dk-stat-owned { display: none; }
 
-@media (max-width: 640px) {
-  /* Mesuré au navigateur : 561px d'en-tête avant la première carte sur un
-     écran de 844. Tout ce bloc sert à ramener ça sous 200px — sur téléphone,
-     la liste est le contenu, le reste est de la navigation. */
-  .cmd-left--deck {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    padding: 10px 16px 10px;
-    background: var(--bg-app);
-    border-bottom: 1px solid var(--border-subtle);
-  }
 
-  .dk-left { gap: 0; }
-  .dk-back { margin-bottom: 4px; font-size: 12px; }
-  .dk-info { margin-bottom: 0; }
-  .dk-stats { gap: 6px; margin-top: 2px; }
-  .dk-stat { padding: 2px 7px; font-size: 10.5px; }
-
-  /* Le sélecteur de langue ne sert pas à chaque instant : il rejoint le pli. */
-  .dk-lang { display: none; }
-  .dk-left-body.open .dk-lang { display: block; margin: 12px 0 0; }
-
-  /* Le rail déplié occupait 900px : on lui donne sa propre zone de défilement
-     plutôt que de repousser la liste hors de l'écran. */
-  .dk-left-body.open {
-    max-height: 60vh;
-    overflow-y: auto;
-    margin-top: 10px;
-  }
-
-  .dk-coll-stats { font-size: 15px; }
-  .dk-coll-header { margin-bottom: 2px; }
-  .dk-filters { gap: 6px; }
-  .dk-filter-btn { padding: 8px 6px; }
-  .dkf-count { font-size: 12px; }
-
-  /* Le panneau droit reprend la main sur la hauteur restante. */
-  .dk-right { padding: 14px 16px 0; }
-
-  /* La barre du bas est collée : sans cette réserve, elle recouvre la
-     dernière ligne de la liste. */
-  .dk-scroll { padding-bottom: 96px; }
-
-  .dk-toolbar { gap: 8px; margin-bottom: 10px; }
-  .dk-sort-label { display: none; }
-  .dk-view-btn { padding: 7px 12px; }
-
-  /* Trois lignes de texte et un bouton pleine largeur pour un avertissement,
-     c'était un tiers de l'écran. */
-  .dk-nofr { padding: 10px 12px; gap: 8px; align-items: center; }
-  .dk-nofr-sub { display: none; }
-  .dk-nofr-text { font-size: 12.5px; }
-  .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; }
-
-  .dk-more {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 44px;
-    margin-top: 12px;
-    padding: 10px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-2);
-    background: var(--fill-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    cursor: pointer;
-  }
-
-  .dk-more-chevron { transition: transform 200ms; }
-  .dk-more-chevron.open { transform: rotate(180deg); }
-
-  .dk-left-body { display: none; }
-  .dk-left-body.open { display: block; }
-
-  /* Le taux de possession migre dans l'en-tête : replié, c'est la seule
-     information de progression encore visible. */
-  .dk-stat-owned { display: inline; }
-
-  .dk-name { font-size: 17px; }
-  .dk-sep { margin: 12px 0; }
-}
 
 /* Encoche et barre gestuelle : sans ça, la barre du bas passe dessous. */
 @supports (padding: env(safe-area-inset-bottom)) {
@@ -1996,72 +1905,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 .dk-stat-missing { display: none; }
 
-@media (max-width: 640px) {
-  .mob-tabs {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 40;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    background: var(--surface-3);
-    border-top: 1px solid var(--border);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
 
-  .mob-tab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    min-height: 56px;
-    padding: 6px 4px;
-    font-size: 11px;
-    color: var(--text-3);
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .mob-tab.active { color: var(--accent); }
-  .mob-tab:disabled { opacity: 0.4; cursor: default; }
-  .mob-tab-icon { font-size: 17px; line-height: 1; }
-  .mob-tab-label { font-weight: 500; }
-
-  .mob-tab-badge {
-    font-family: var(--font-mono);
-    font-size: 9.5px;
-    color: var(--text-4);
-  }
-
-  .mob-tab.active .mob-tab-badge { color: var(--accent); }
-
-  /* Le rail disparaît : son contenu vit désormais dans les onglets et le
-     menu. Seul l'en-tête reste, ramené à l'essentiel. */
-  .dk-more, .dk-left-body { display: none !important; }
-  .dk-stat-missing { display: inline; }
-
-  /* La barre du fil rouge se pose au-dessus des onglets. */
-  .dk-bar { position: static; margin-bottom: 12px; }
-  .dk-scroll { padding-bottom: 24px; }
-  .dk-right { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
-
-  /* Une seule vue de lecture : le besoin « je reconnais l'illustration » est
-     servi, en mieux, par le mode Pointer en plein écran. */
-  .dk-views { display: none; }
-
-  /* Les contrôles descendent de l'ancien rail dans la barre d'outils, mais
-     empilés ils repoussaient la liste à 2 lignes visibles. Filtres et
-     recherche sur une ligne chacun, tri rangé dans le menu. */
-  .dk-toolbar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 8px; }
-  .dk-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .dk-filter-btn { padding: 6px 4px; min-height: 40px; }
-  .dkf-label { font-size: 10.5px; }
-  .dk-sort { display: none; }
-  .dk-search { min-height: 40px; }
-}
 
 .dk-point-btn {
   width: 100%;
@@ -2246,15 +2090,11 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   border-radius: 6px;
 }
 
-@media (max-width: 640px) { .dk-menu-sort { display: block; } }
+
 
 .dk-menu-list button:hover { color: var(--text-1); background: var(--fill-2); }
 
-@media (max-width: 640px) {
-  .dk-bar { flex-direction: column; align-items: stretch; }
-  .dk-bar-actions { justify-content: space-between; }
-  .dk-bar-primary { flex: 1; }
-}
+
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
 .lpl-paste-btn {
@@ -2281,46 +2121,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
    sur grand écran. */
 .lpl-resume { display: none; }
 
-@media (max-width: 640px) {
-  .lpl-resume { display: block; margin: 4px 0 16px; }
 
-  .lpl-resume-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    color: var(--text-3);
-    margin-bottom: 8px;
-  }
-
-  .lpl-resume-row {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    padding-bottom: 4px;
-  }
-
-  .lpl-resume-chip {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    max-width: 190px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    font-size: 12.5px;
-    color: var(--text-2);
-    background: var(--fill-1);
-    border: 1px solid var(--border-subtle);
-    border-radius: 999px;
-    white-space: nowrap;
-    cursor: pointer;
-  }
-
-  .lpl-resume-name { overflow: hidden; text-overflow: ellipsis; }
-  .lpl-resume-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
-}
 
 .lpl-free {
   font-family: var(--font-mono);
@@ -2495,6 +2296,237 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 .dk-nofr-close:hover { color: var(--text-2); background: var(--fill-2); }
 
+
+
+/* ── Responsive ──────────────────────────────────────── */
+
+
+
+
+
+
+
+
+/* Les cibles tactiles descendaient jusqu'à 11px. Le minimum AA de WCAG 2.2
+   (2.5.8) est 24px ; 44px est la recommandation confortable. */
+
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
+@media (min-width: 641px) {
+  .cmd-app {
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 641px) {
+  .cmd-layout { overflow: hidden; }
+}
+
+@media (max-width: 640px) {
+  /* Mesuré au navigateur : 561px d'en-tête avant la première carte sur un
+     écran de 844. Tout ce bloc sert à ramener ça sous 200px — sur téléphone,
+     la liste est le contenu, le reste est de la navigation. */
+  .cmd-left--deck {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 10px 16px 10px;
+    background: var(--bg-app);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .dk-left { gap: 0; }
+  .dk-back { margin-bottom: 4px; font-size: 12px; }
+  .dk-info { margin-bottom: 0; }
+  .dk-stats { gap: 6px; margin-top: 2px; }
+  .dk-stat { padding: 2px 7px; font-size: 10.5px; }
+
+  /* Le sélecteur de langue ne sert pas à chaque instant : il rejoint le pli. */
+  .dk-lang { display: none; }
+  .dk-left-body.open .dk-lang { display: block; margin: 12px 0 0; }
+
+  /* Le rail déplié occupait 900px : on lui donne sa propre zone de défilement
+     plutôt que de repousser la liste hors de l'écran. */
+  .dk-left-body.open {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+
+  .dk-coll-stats { font-size: 15px; }
+  .dk-coll-header { margin-bottom: 2px; }
+  .dk-filters { gap: 6px; }
+  .dk-filter-btn { padding: 8px 6px; }
+  .dkf-count { font-size: 12px; }
+
+  /* Le panneau droit reprend la main sur la hauteur restante. */
+  .dk-right { padding: 14px 16px 0; }
+
+  /* La barre du bas est collée : sans cette réserve, elle recouvre la
+     dernière ligne de la liste. */
+  .dk-scroll { padding-bottom: 96px; }
+
+  .dk-toolbar { gap: 8px; margin-bottom: 10px; }
+  .dk-sort-label { display: none; }
+  .dk-view-btn { padding: 7px 12px; }
+
+  /* Trois lignes de texte et un bouton pleine largeur pour un avertissement,
+     c'était un tiers de l'écran. */
+  .dk-nofr { padding: 10px 12px; gap: 8px; align-items: center; }
+  .dk-nofr-sub { display: none; }
+  .dk-nofr-text { font-size: 12.5px; }
+  .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; }
+
+  .dk-more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    background: var(--fill-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .dk-more-chevron { transition: transform 200ms; }
+  .dk-more-chevron.open { transform: rotate(180deg); }
+
+  .dk-left-body { display: none; }
+  .dk-left-body.open { display: block; }
+
+  /* Le taux de possession migre dans l'en-tête : replié, c'est la seule
+     information de progression encore visible. */
+  .dk-stat-owned { display: inline; }
+
+  .dk-name { font-size: 17px; }
+  .dk-sep { margin: 12px 0; }
+}
+
+@media (max-width: 640px) {
+  .mob-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--surface-3);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mob-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
+    padding: 6px 4px;
+    font-size: 11px;
+    color: var(--text-3);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mob-tab.active { color: var(--accent); }
+  .mob-tab:disabled { opacity: 0.4; cursor: default; }
+  .mob-tab-icon { font-size: 17px; line-height: 1; }
+  .mob-tab-label { font-weight: 500; }
+
+  .mob-tab-badge {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--text-4);
+  }
+
+  .mob-tab.active .mob-tab-badge { color: var(--accent); }
+
+  /* Le rail disparaît : son contenu vit désormais dans les onglets et le
+     menu. Seul l'en-tête reste, ramené à l'essentiel. */
+  .dk-more, .dk-left-body { display: none !important; }
+  .dk-stat-missing { display: inline; }
+
+  /* La barre du fil rouge se pose au-dessus des onglets. */
+  .dk-bar { position: static; margin-bottom: 12px; }
+  .dk-scroll { padding-bottom: 24px; }
+  .dk-right { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+
+  /* Une seule vue de lecture : le besoin « je reconnais l'illustration » est
+     servi, en mieux, par le mode Pointer en plein écran. */
+  .dk-views { display: none; }
+
+  /* Les contrôles descendent de l'ancien rail dans la barre d'outils, mais
+     empilés ils repoussaient la liste à 2 lignes visibles. Filtres et
+     recherche sur une ligne chacun, tri rangé dans le menu. */
+  .dk-toolbar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 8px; }
+  .dk-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .dk-filter-btn { padding: 6px 4px; min-height: 40px; }
+  .dkf-label { font-size: 10.5px; }
+  .dk-sort { display: none; }
+  .dk-search { min-height: 40px; }
+}
+
+@media (max-width: 640px) { .dk-menu-sort { display: block; } }
+
+@media (max-width: 640px) {
+  .dk-bar { flex-direction: column; align-items: stretch; }
+  .dk-bar-actions { justify-content: space-between; }
+  .dk-bar-primary { flex: 1; }
+}
+
+@media (max-width: 640px) {
+  .lpl-resume { display: block; margin: 4px 0 16px; }
+
+  .lpl-resume-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .lpl-resume-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 4px;
+  }
+
+  .lpl-resume-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    max-width: 190px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    background: var(--fill-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .lpl-resume-name { overflow: hidden; text-overflow: ellipsis; }
+  .lpl-resume-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
+}
+
 @media (max-width: 640px) {
   /* Version compacte : trois lignes plus un bouton pleine largeur
      occupaient un tiers de l'écran pour un avertissement. */
@@ -2510,7 +2542,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   .dk-bar-primary { padding: 11px 14px; font-size: 12.5px; }
 }
 
-/* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 1024px) {
   .cmd-left { width: 360px; }
 }
@@ -2548,8 +2579,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   .lpr-grid { grid-template-columns: 1fr; }
 }
 
-/* Les cibles tactiles descendaient jusqu'à 11px. Le minimum AA de WCAG 2.2
-   (2.5.8) est 24px ; 44px est la recommandation confortable. */
 @media (pointer: coarse) {
   .dk-action-btn, .dk-filter-btn, .dlt-btn, .lpl-mode-tab, .dk-toc-item {
     min-height: 44px;

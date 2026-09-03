@@ -130,6 +130,10 @@ function handleToggleAll() {
   box-shadow: 0 4px 24px var(--shadow-tint-1);
 }
 
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
 @media (pointer: coarse) {
   /* 15px de haut, collé aux cases à cocher : une erreur de visée cochait une
      catégorie entière. */

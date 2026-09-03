@@ -385,6 +385,10 @@ function groupPrice(group) {
   background: var(--surface-menu);
 }
 
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
 @media (max-width: 640px) {
   /* Le panneau de survol prenait 220px sur 390 — 56 % de la largeur — pour
      afficher « Survolez une carte » sur un écran sans survol, et écrasait la

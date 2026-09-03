@@ -103,11 +103,7 @@ async function copyAgain() {
   padding: 16px;
 }
 
-@media (min-width: 640px) {
-  .cm-overlay {
-    align-items: center;
-  }
-}
+
 
 .cm-panel {
   background: var(--surface);
@@ -235,6 +231,16 @@ async function copyAgain() {
 .cm-panel-leave-to .cm-panel {
   transform: translateY(16px);
   opacity: 0;
+}
+
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
+@media (min-width: 640px) {
+  .cm-overlay {
+    align-items: center;
+  }
 }
 
 @media (max-width: 640px) {

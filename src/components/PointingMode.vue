@@ -235,6 +235,10 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
 @media (min-width: 900px) {
   .pt-body { display: grid; grid-template-columns: 300px 1fr; align-items: center; gap: 24px; }
   .pt-info, .pt-actions, .pt-undo { grid-column: 2; justify-self: start; text-align: left; }

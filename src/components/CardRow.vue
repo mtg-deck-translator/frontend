@@ -242,6 +242,11 @@ const previewStyle = computed(() => {
 /* Mesuré : la case fait 22x22 — sous le minimum WCAG 2.5.8 de 24px — et c'est
    la cible la plus répétée de l'app (81 fois sur un deck EDH). Taper le nom ne
    faisait rien : la zone active représentait 1,4 % d'une ligne de 356x95. */
+
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
 @media (pointer: coarse) {
   .cr-row { cursor: pointer; }
   .cr-check { width: 28px; height: 28px; }
