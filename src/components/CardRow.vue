@@ -182,6 +182,10 @@ const previewStyle = computed(() => {
 }
 
 .cr-fr {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 14px;
   font-weight: 600;
   color: var(--text-4);

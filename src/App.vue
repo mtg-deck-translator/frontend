@@ -1763,13 +1763,59 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-stat-owned { display: none; }
 
 @media (max-width: 640px) {
+  /* Mesuré au navigateur : 561px d'en-tête avant la première carte sur un
+     écran de 844. Tout ce bloc sert à ramener ça sous 200px — sur téléphone,
+     la liste est le contenu, le reste est de la navigation. */
   .cmd-left {
     position: sticky;
     top: 0;
     z-index: 5;
-    padding-bottom: 12px;
+    padding: 10px 16px 10px;
     background: var(--bg-app);
+    border-bottom: 1px solid var(--border-subtle);
   }
+
+  .dk-left { gap: 0; }
+  .dk-back { margin-bottom: 4px; font-size: 12px; }
+  .dk-info { margin-bottom: 0; }
+  .dk-stats { gap: 6px; margin-top: 2px; }
+  .dk-stat { padding: 2px 7px; font-size: 10.5px; }
+
+  /* Le sélecteur de langue ne sert pas à chaque instant : il rejoint le pli. */
+  .dk-lang { display: none; }
+  .dk-left-body.open .dk-lang { display: block; margin: 12px 0 0; }
+
+  /* Le rail déplié occupait 900px : on lui donne sa propre zone de défilement
+     plutôt que de repousser la liste hors de l'écran. */
+  .dk-left-body.open {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+
+  .dk-coll-stats { font-size: 15px; }
+  .dk-coll-header { margin-bottom: 2px; }
+  .dk-filters { gap: 6px; }
+  .dk-filter-btn { padding: 8px 6px; }
+  .dkf-count { font-size: 12px; }
+
+  /* Le panneau droit reprend la main sur la hauteur restante. */
+  .dk-right { padding: 14px 16px 0; }
+
+  /* La barre du bas est collée : sans cette réserve, elle recouvre la
+     dernière ligne de la liste. */
+  .dk-scroll { padding-bottom: 96px; }
+
+  .dk-toolbar { gap: 8px; margin-bottom: 10px; }
+  .dk-sort-label { display: none; }
+  .dk-view-btn { padding: 7px 12px; }
+
+  /* Trois lignes de texte et un bouton pleine largeur pour un avertissement,
+     c'était un tiers de l'écran. */
+  .dk-nofr { padding: 10px 12px; gap: 8px; align-items: center; }
+  .dk-nofr-sub { display: none; }
+  .dk-nofr-text { font-size: 12.5px; }
+  .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; }
 
   .dk-more {
     display: flex;
