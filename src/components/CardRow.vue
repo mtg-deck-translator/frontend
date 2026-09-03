@@ -186,7 +186,7 @@ const previewStyle = computed(() => {
   overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-4);
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -268,12 +268,20 @@ const previewStyle = computed(() => {
 }
 
 @media (max-width: 640px) {
-  /* Mesuré : « Chambre de croissance des » était coupé net, sans ellipse.
-     Le nom français passe sur deux lignes plutôt que d'être amputé, et le
-     nom anglais descend sous lui au lieu de disputer la largeur. */
-  .cr-row { flex-wrap: wrap; gap: 10px; padding: 11px 12px; }
-  .cr-fr { flex: 1 1 100%; font-size: 13.5px; line-height: 1.35; }
-  .cr-en { flex: 1 1 100%; margin-left: 0; }
-  .cr-price { margin-left: auto; }
+  /* Mesuré au navigateur : « Chambre de croissance des… » était tronqué.
+     Sur une largeur de téléphone, le nom d'une carte Magic ne tient pas sur
+     une ligne — il passe sur deux plutôt que d'être amputé, et le nom anglais
+     descend sous lui au lieu de lui disputer la place. */
+  .cr-row { gap: 10px; padding: 11px 12px; }
+  .cr-names { flex-wrap: wrap; align-items: flex-start; gap: 1px; overflow: visible; }
+  .cr-fr {
+    flex: 1 1 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 13.5px;
+    line-height: 1.35;
+  }
+  .cr-en { flex: 1 1 100%; white-space: normal; overflow: visible; text-overflow: clip; }
 }
 </style>
