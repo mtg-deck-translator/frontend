@@ -136,8 +136,12 @@ function handleToggleAll() {
 
 @media (max-width: 640px) {
   /* 57px pour un titre de section, répété huit fois dans la page. */
-  .cat-head { padding: 10px 0 6px; }
+  /* 65px pour un titre de section, répété huit fois : c'est une carte de
+     moins à chaque fois. */
+  .cat-head { padding: 12px 0 4px; min-height: 0; }
   .cat-label { font-size: 10.5px; }
+  .cat-count, .cat-toggle { font-size: 11px; }
+  .cat-toggle { min-height: 32px; padding: 0 8px; }
 }
 
 @media (pointer: coarse) {

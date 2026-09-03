@@ -444,8 +444,8 @@
               <span class="dk-nofr-icon" aria-hidden="true">⚠</span>
               <p class="dk-nofr-text">
                 <strong>{{ noFrCount }}</strong>
-                {{ noFrCount > 1 ? 'cartes de ce deck n’existent pas' : 'carte de ce deck n’existe pas' }}
-                en {{ currentLanguageLabel }}.
+                <span class="dk-nofr-long">{{ noFrCount > 1 ? 'cartes de ce deck n’existent pas' : 'carte de ce deck n’existe pas' }} en {{ currentLanguageLabel }}.</span>
+                <span class="dk-nofr-short">sans version {{ currentLanguageLabel.toLowerCase() }}</span>
                 <span class="dk-nofr-sub">Leur nom anglais est conservé — c’est celui à donner au vendeur.</span>
               </p>
               <button class="dk-nofr-btn" @click="toggleNoFrFilter">
@@ -2382,6 +2382,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 .dk-nofr-text strong { color: var(--accent); font-weight: 700; }
+.dk-nofr-short { display: none; }
 .dk-nofr-sub { display: block; color: var(--text-3); font-size: 12px; }
 
 .dk-nofr-btn {
@@ -2536,7 +2537,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   /* Trois lignes de texte et un bouton pleine largeur pour un avertissement,
      c'était un tiers de l'écran. */
   .dk-nofr { padding: 10px 12px; gap: 8px; align-items: center; }
-  .dk-nofr-sub { display: none; }
+  .dk-nofr-sub, .dk-nofr-long { display: none; }
+  .dk-nofr-short { display: inline; }
   .dk-nofr-text { font-size: 12.5px; }
   .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; }
 
@@ -2720,8 +2722,12 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 @media (max-width: 640px) {
   /* Version compacte : trois lignes plus un bouton pleine largeur
      occupaient un tiers de l'écran pour un avertissement. */
-  .dk-nofr { flex-wrap: nowrap; align-items: center; gap: 8px; padding: 10px 12px; }
-  .dk-nofr-sub { display: none; }
+  /* 78px parce que le texte passait sur deux lignes. Il tient sur une seule
+     si on le raccourcit : le détail vit dans le filtre qu'il propose. */
+  .dk-nofr { flex-wrap: nowrap; align-items: center; gap: 8px; padding: 8px 12px; }
+  .dk-nofr-text { font-size: 12px; line-height: 1.35; }
+  .dk-nofr-sub, .dk-nofr-long { display: none; }
+  .dk-nofr-short { display: inline; }
   .dk-nofr-text { font-size: 12.5px; }
   .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; white-space: nowrap; }
   .dk-nofr-close { width: 28px; height: 28px; }
