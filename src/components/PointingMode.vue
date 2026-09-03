@@ -240,4 +240,33 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   .pt-info, .pt-actions, .pt-undo { grid-column: 2; justify-self: start; text-align: left; }
   .pt-img { grid-row: 1 / span 3; }
 }
+
+@media (max-width: 640px) {
+  /* Mesuré : après le tap, scrollY restait à 0 et le mode s'ouvrait 707px
+     plus bas — l'écran ne changeait pas, le bouton paraissait mort. En
+     plein écran, il n'y a plus rien à trouver. */
+  .pt {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    border: none;
+    border-radius: 0;
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    justify-content: space-between;
+  }
+
+  .pt-sub { display: none; }
+  .pt-img { max-width: min(78vw, 300px); }
+
+  /* Les boutons descendent dans l'arc du pouce, et « Oui » passe à droite :
+     un droitier atteint le bord droit plus facilement. */
+  .pt-actions { max-width: none; margin-top: auto; }
+  .pt-btn { min-height: 52px; font-size: 15px; }
+  .pt-btn--own { order: 2; }
+
+  /* Raccourcis clavier sur un écran tactile : hors sujet. */
+  .pt-btn kbd, .pt-undo kbd { display: none; }
+}
 </style>

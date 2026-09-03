@@ -4,13 +4,14 @@
     :class="{ checked: isChecked, commander: isCommander, 'is-last': isLast }"
     @mouseenter="onMouseEnter"
     @mouseleave="showPreview = false"
+    @click="$emit('toggle', card.queryName)"
   >
     <button
       class="cr-check"
       role="checkbox"
       :aria-checked="isChecked"
       :aria-label="`${isChecked ? 'Retirer' : 'Marquer'} ${card.frName}`"
-      @click="$emit('toggle', card.queryName)"
+      @click.stop="$emit('toggle', card.queryName)"
       @keydown.space.prevent="$emit('toggle', card.queryName)"
     >
       <svg v-if="isChecked" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -236,6 +237,22 @@ const previewStyle = computed(() => {
   background: var(--fill-2);
   color: var(--text-4);
   border: 1px solid var(--border);
+}
+
+/* Mesuré : la case fait 22x22 — sous le minimum WCAG 2.5.8 de 24px — et c'est
+   la cible la plus répétée de l'app (81 fois sur un deck EDH). Taper le nom ne
+   faisait rien : la zone active représentait 1,4 % d'une ligne de 356x95. */
+@media (pointer: coarse) {
+  .cr-row { cursor: pointer; }
+  .cr-check { width: 28px; height: 28px; }
+
+  /* La cible réelle déborde du dessin, sans déplacer la mise en page. */
+  .cr-check::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
+  .cr-check { position: relative; }
 }
 
 @media (max-width: 640px) {

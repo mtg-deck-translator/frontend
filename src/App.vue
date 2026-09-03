@@ -66,6 +66,24 @@
               <p class="lpl-sub">{{ i18n.hero_sub }}</p>
             </div>
 
+            <!-- Un revenant sur téléphone revient au même deck : ses courses
+                 se font en plusieurs fois. L'historique vivait dans le panneau
+                 droit, à y=622, donc systématiquement sous le pli. -->
+            <div v-if="history.length" class="lpl-resume">
+              <div class="lpl-resume-label">REPRENDRE</div>
+              <div class="lpl-resume-row">
+                <button
+                  v-for="entry in history.slice(0, 4)"
+                  :key="entry.deckId"
+                  class="lpl-resume-chip"
+                  @click="onLoadFromHistory(entry)"
+                >
+                  <span class="lpl-resume-name">{{ entry.deckName }}</span>
+                  <span class="lpl-resume-count">{{ entry.cardCount || '' }}</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Input section -->
             <div class="lpl-input-section">
               <div class="lpl-input-card">
@@ -141,6 +159,18 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Sur téléphone, coller une URL demande un appui long, l'attente
+                   du menu contextuel, puis une visée. Un bouton fait le même
+                   travail en un tap. Jamais au chargement : Chrome afficherait
+                   une demande de permission intrusive. -->
+              <button v-if="canPaste && !isLoading" class="lpl-paste-btn" @click="pasteFromClipboard">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <rect x="3" y="2" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M5.5 2h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                Coller le lien copié
+              </button>
 
               <!-- Sans URL sous la main, le visiteur n'a rien à faire : cul-de-sac. -->
               <button v-if="!isLoading" class="lpl-example" @click="loadExample">
@@ -528,7 +558,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const LANDING_I18N = {
   fr: {
@@ -663,6 +693,7 @@ import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
 import { useExport } from './composables/useExport.js'
 import { useToast } from './composables/useToast.js'
+import { isSupportedUrl } from './services/deckSources.js'
 import { useCollection } from './composables/useCollection.js'
 import { matchDeckToCollection } from './services/collectionParser.js'
 import { getCachedCards, setCachedCards } from './services/storage.js'
@@ -733,7 +764,65 @@ const steps = computed(() => [
 
 // Deck public et stable, choisi pour être petit et complet (commandant,
 // terrains, sorts) : il montre le parcours entier sans faire attendre.
+// Point d'entrée entrant. Sans lui, l'app n'a aucun lien profond : rien à
+// partager, rien à épingler, et la cible de partage du manifeste n'aurait nulle
+// part où déposer ce qu'elle reçoit. Sur téléphone, coller une URL demandait de
+// passer par une autre application et le presse-papier — sept gestes.
+function readIncomingShare() {
+  let params
+  try { params = new URLSearchParams(location.search) } catch { return false }
+
+  // Android envoie tantôt `url`, tantôt `text` (le lien noyé dans du texte).
+  const raw = params.get('url') || params.get('deck') || params.get('text') || ''
+  if (!raw) return false
+
+  const link = (raw.match(/https?:\/\/[^\s]+/) || [])[0]
+  if (link && isSupportedUrl(link)) {
+    inputMode.value = 'url'
+    urlInput.value = link
+  } else if (raw.includes('\n')) {
+    // Une liste collée depuis une autre app, pas un lien.
+    inputMode.value = 'paste'
+    pasteInput.value = raw
+  } else {
+    return false
+  }
+
+  // L'URL de partage ne doit pas rester dans la barre d'adresse : rechargée,
+  // elle relancerait une traduction que l'utilisateur n'a pas demandée.
+  try { history.replaceState({}, '', location.pathname) } catch {}
+  return true
+}
+
+onMounted(() => { if (readIncomingShare()) onTranslate() })
+
 const EXAMPLE_DECK_URL = 'https://archidekt.com/decks/7031486/buffs_by_hans'
+
+const canPaste = typeof navigator !== 'undefined' && !!navigator.clipboard?.readText
+
+async function pasteFromClipboard() {
+  let text
+  try {
+    text = (await navigator.clipboard.readText()).trim()
+  } catch {
+    show('Autorisez l’accès au presse-papier, ou collez à la main.', 'error')
+    return
+  }
+  if (!text) { show('Le presse-papier est vide.', 'info'); return }
+
+  const link = (text.match(/https?:\/\/[^\s]+/) || [])[0]
+  if (link && isSupportedUrl(link)) {
+    inputMode.value = 'url'
+    urlInput.value = link
+  } else if (text.includes('\n')) {
+    inputMode.value = 'paste'
+    pasteInput.value = text
+  } else {
+    show('Aucun lien de deck reconnu dans le presse-papier.', 'error')
+    return
+  }
+  onTranslate()
+}
 
 function loadExample() {
   inputMode.value = 'url'
@@ -2038,6 +2127,71 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
+.lpl-paste-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--fill-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+}
+
+.lpl-paste-btn:hover { color: var(--text-1); background: var(--fill-2); border-color: var(--border-strong); }
+
+/* Bandeau de reprise : mobile uniquement, le panneau droit fait le travail
+   sur grand écran. */
+.lpl-resume { display: none; }
+
+@media (max-width: 640px) {
+  .lpl-resume { display: block; margin: 4px 0 16px; }
+
+  .lpl-resume-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .lpl-resume-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 4px;
+  }
+
+  .lpl-resume-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    max-width: 190px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    color: var(--text-2);
+    background: var(--fill-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .lpl-resume-name { overflow: hidden; text-overflow: ellipsis; }
+  .lpl-resume-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
+}
+
 .lpl-free {
   font-family: var(--font-mono);
   font-size: 9px;

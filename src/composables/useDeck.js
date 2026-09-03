@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { parsePastedList } from '../services/parser.js'
 import { translateBatch } from '../services/scryfall.js'
-import { fetchDeckFromBackend, isSupportedUrl } from '../services/deckSources.js'
+import { fetchDeckFromBackend } from '../services/deckSources.js'
 import { hashString } from '../services/storage.js'
 
 export function useDeck() {

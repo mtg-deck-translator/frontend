@@ -384,4 +384,13 @@ function groupPrice(group) {
   z-index: 2;
   background: var(--surface-menu);
 }
+
+@media (max-width: 640px) {
+  /* Le panneau de survol prenait 220px sur 390 — 56 % de la largeur — pour
+     afficher « Survolez une carte » sur un écran sans survol, et écrasait la
+     grille à une seule colonne : 1 tuile visible, 21 écrans de défilement. */
+  .zoom-panel { display: none; }
+  .visual-layout { grid-template-columns: 1fr; }
+  .visual-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+}
 </style>

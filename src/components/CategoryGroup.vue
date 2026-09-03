@@ -129,4 +129,10 @@ function handleToggleAll() {
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 24px var(--shadow-tint-1);
 }
+
+@media (pointer: coarse) {
+  /* 15px de haut, collé aux cases à cocher : une erreur de visée cochait une
+     catégorie entière. */
+  .cat-toggle { min-height: 44px; padding: 0 10px; }
+}
 </style>

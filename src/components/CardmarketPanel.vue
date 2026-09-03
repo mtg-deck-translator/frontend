@@ -236,4 +236,10 @@ async function copyAgain() {
   transform: translateY(16px);
   opacity: 0;
 }
+
+@media (max-width: 640px) {
+  /* Fermeture de 28px, et 81 lignes enfermées dans 200px de haut. */
+  .cm-close { width: 44px; height: 44px; }
+  .cm-text { max-height: 45dvh; }
+}
 </style>
