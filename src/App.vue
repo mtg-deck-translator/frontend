@@ -15,7 +15,10 @@
     <div class="cmd-layout">
 
       <!-- ══ LEFT PANEL ══════════════════════════════════ -->
-      <div class="cmd-left">
+      <!-- Collant uniquement sur l'écran deck : sur la landing, la carte
+           d'entrée fait 642px et figeait les trois quarts de l'écran pendant
+           que les decks récents défilaient dessous. -->
+      <div class="cmd-left" :class="{ 'cmd-left--deck': status === 'done' }">
 
         <!-- LANDING LEFT -->
         <template v-if="status !== 'done'">
@@ -1766,7 +1769,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   /* Mesuré au navigateur : 561px d'en-tête avant la première carte sur un
      écran de 844. Tout ce bloc sert à ramener ça sous 200px — sur téléphone,
      la liste est le contenu, le reste est de la navigation. */
-  .cmd-left {
+  .cmd-left--deck {
     position: sticky;
     top: 0;
     z-index: 5;
