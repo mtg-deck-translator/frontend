@@ -269,7 +269,14 @@ const previewStyle = computed(() => {
      barre d'outils. Le nom garde ses deux lignes possibles ; le nom anglais
      passe en dessous, sur une seule, tronqué s'il le faut — c'est un repère
      de vérification, pas l'information principale. */
-  .cr-row { gap: 10px; padding: 8px 12px; }
+  /* La case était contre le bord gauche, l'endroit le moins accessible pour
+     un droitier, alors que c'est la cible la plus répétée de l'app. Elle passe
+     à droite, côté pouce ; la quantité la suit pour rester lisible avec elle. */
+  .cr-row { gap: 12px; padding: 8px 16px 8px 18px; }
+  .cr-check { order: 4; }
+  .cr-qty { order: 3; }
+  .cr-names { order: 1; }
+  .cr-right { order: 2; }
   .cr-names { flex-wrap: wrap; align-items: flex-start; gap: 0; overflow: visible; }
   .cr-fr {
     flex: 1 1 100%;

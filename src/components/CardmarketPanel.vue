@@ -244,8 +244,21 @@ async function copyAgain() {
 }
 
 @media (max-width: 640px) {
-  /* Fermeture de 28px, et 81 lignes enfermées dans 200px de haut. */
+  /* Ce n'est pas une boîte de dialogue mais l'aboutissement du parcours :
+     sur téléphone elle occupe l'écran, comme les autres destinations.
+     Auparavant : 81 lignes enfermées dans 200px et une fermeture de 28px. */
+  .cm-overlay { align-items: stretch; padding: 0; }
+  .cm-panel {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
   .cm-close { width: 44px; height: 44px; }
-  .cm-text { max-height: 45dvh; }
+  .cm-text { flex: 1; max-height: none; }
+  .cm-btn { min-height: 52px; font-size: 14px; }
 }
 </style>

@@ -86,7 +86,7 @@
 
             <!-- Input section -->
             <div class="lpl-input-section">
-              <div class="lpl-input-card">
+              <div class="lpl-input-card" :class="{ 'is-folded': foldInputCard }">
                 <div class="lpl-mode-tabs">
                   <button
                     class="lpl-mode-tab"
@@ -160,17 +160,41 @@
                 </div>
               </div>
 
-              <!-- Sur téléphone, coller une URL demande un appui long, l'attente
-                   du menu contextuel, puis une visée. Un bouton fait le même
-                   travail en un tap. Jamais au chargement : Chrome afficherait
-                   une demande de permission intrusive. -->
+              <!-- Un seul chemin par adresse : le bouton lit le presse-papier et
+                   n'ouvre le champ que s'il n'y trouve rien. Deux boutons pour la
+                   même intention décrivaient un mécanisme, pas un usage.
+                   Jamais au chargement : Chrome afficherait une demande de
+                   permission intrusive. -->
               <button v-if="canPaste && !isLoading" class="lpl-paste-btn" @click="pasteFromClipboard">
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <rect x="3" y="2" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                  <path d="M5.5 2h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <rect x="5" y="3" width="10" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M8 3h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
-                Coller le lien copié
+                <span class="lpl-paste-label">Coller un lien de deck</span>
+                <svg class="lpl-paste-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </button>
+
+              <button v-if="!isLoading" class="lpl-list-btn" @click="inputMode = 'paste'">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Coller une liste de cartes
+              </button>
+
+              <!-- Le partage natif n'existe qu'une fois l'app posée sur l'écran
+                   d'accueil, et seulement là où le navigateur le propose. On
+                   invite donc à installer, avec le bénéfice comme argument,
+                   plutôt que d'annoncer une fonction indisponible. -->
+              <div v-if="canInstall" class="lpl-install">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M10 13V3M6.5 6.2L10 2.7l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3.5 12.5v3a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <p>Ajoutez l’app à votre écran d’accueil : vos decks s’enverront depuis Archidekt en un geste.</p>
+                <button @click="promptInstall">Installer</button>
+              </div>
 
               <!-- Sans URL sous la main, le visiteur n'a rien à faire : cul-de-sac. -->
               <button v-if="!isLoading" class="lpl-example" @click="loadExample">
@@ -785,6 +809,13 @@ function runMenu(action) {
 }
 const activeFilter = ref('all')
 const noFrDismissed = ref(false)
+const urlFieldOpen = ref(false)
+
+// Sur téléphone, la carte de saisie se replie tant que l'utilisateur n'a pas
+// demandé le champ : un formulaire vide n'invite à rien, un bouton si.
+const foldInputCard = computed(
+  () => !urlFieldOpen.value && !urlInput.value && !pasteInput.value && inputMode.value === 'url'
+)
 const search = ref('')
 const sort = ref('category')
 // « columns » a disparu : une préférence stockée sur cette vue doit retomber
@@ -843,6 +874,27 @@ onMounted(() => { if (readIncomingShare()) onTranslate() })
 
 const EXAMPLE_DECK_URL = 'https://archidekt.com/decks/7031486/buffs_by_hans'
 
+// beforeinstallprompt n'est émis que si l'installation est réellement
+// possible : pas déjà installée, critères du navigateur remplis. C'est donc
+// lui, et non une détection de plateforme, qui décide d'afficher l'invitation.
+const installEvent = ref(null)
+const canInstall = computed(() => !!installEvent.value)
+
+onMounted(() => {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault()
+    installEvent.value = e
+  })
+  window.addEventListener('appinstalled', () => { installEvent.value = null })
+})
+
+async function promptInstall() {
+  const e = installEvent.value
+  if (!e) return
+  installEvent.value = null
+  try { await e.prompt() } catch {}
+}
+
 const canPaste = typeof navigator !== 'undefined' && !!navigator.clipboard?.readText
 
 async function pasteFromClipboard() {
@@ -863,7 +915,9 @@ async function pasteFromClipboard() {
     inputMode.value = 'paste'
     pasteInput.value = text
   } else {
-    show('Aucun lien de deck reconnu dans le presse-papier.', 'error')
+    inputMode.value = 'url'
+    urlFieldOpen.value = true
+    show('Rien à coller : saisissez l’adresse du deck.', 'info')
     return
   }
   onTranslate()
@@ -1900,6 +1954,58 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   .cmd-app { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 }
 
+/* ── Accueil mobile ───────────────────────────────────── */
+.lpl-list-btn {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--fill-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.lpl-install {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--warning-fill);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  color: var(--accent);
+}
+
+.lpl-install p {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.lpl-install > button {
+  flex: none;
+  min-height: 36px;
+  padding: 0 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-hover);
+  background: var(--accent-fill-hover);
+  border: 1px solid var(--accent-border-hov);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.lpl-paste-label { flex: 1; text-align: left; }
+.lpl-paste-arrow { display: none; }
+
 /* ── Barre d'onglets mobile ───────────────────────────── */
 .mob-tabs { display: none; }
 
@@ -2310,9 +2416,42 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 /* Les cibles tactiles descendaient jusqu'à 11px. Le minimum AA de WCAG 2.2
    (2.5.8) est 24px ; 44px est la recommandation confortable. */
 
+
+
 /* ── Media queries, regroupées en fin de feuille ────────
    Une media query n'augmente pas la spécificité : placée avant la
    règle qu'elle doit annuler, elle perd la cascade en silence. */
+
+/* ── Media queries, regroupées en fin de feuille ────────
+   Une media query n'augmente pas la spécificité : placée avant la
+   règle qu'elle doit annuler, elle perd la cascade en silence. */
+
+@media (max-width: 640px) {
+  /* Le presse-papier devient l'action principale, et la carte de saisie se
+     replie derrière elle : un champ vide n'invite à rien. */
+  .lpl-input-section { display: flex; flex-direction: column; gap: 10px; }
+  .lpl-paste-btn {
+    order: -2;
+    min-height: 60px;
+    padding: 0 18px;
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--text-on-accent);
+    background: var(--accent);
+    border-color: var(--accent);
+    border-radius: 16px;
+    margin-top: 0;
+  }
+  .lpl-paste-btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--text-on-accent); }
+  .lpl-paste-arrow { display: block; }
+
+  .lpl-list-btn { order: -1; display: flex; }
+  .lpl-install { display: flex; }
+  .lpl-example { align-self: center; }
+
+  .lpl-input-card.is-folded { display: none; }
+  .lpl-mode-tabs { display: none; }
+}
 
 @media (min-width: 641px) {
   .cmd-app {
@@ -2475,9 +2614,31 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      empilés ils repoussaient la liste à 2 lignes visibles. Filtres et
      recherche sur une ligne chacun, tri rangé dans le menu. */
   .dk-toolbar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 8px; }
-  .dk-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .dk-filter-btn { padding: 6px 4px; min-height: 40px; }
-  .dkf-label { font-size: 10.5px; }
+  /* Une grille de trois figeait la largeur et interdisait d'en ajouter.
+     En pastilles défilantes, l'actif se lit d'un coup d'œil et la barre
+     accepte autant de filtres qu'on veut. */
+  .dk-filters {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 2px;
+  }
+  .dk-filter-btn {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .dk-filter-btn.active { background: var(--accent-fill-hover); border-color: var(--accent-border-hov); }
+  .dk-filter-btn.active .dkf-label { color: var(--accent-hover); }
+  .dkf-label { font-size: 12.5px; }
+  .dkf-count { font-size: 11px; }
   .dk-sort { display: none; }
   .dk-search { min-height: 40px; }
 }
