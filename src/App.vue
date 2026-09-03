@@ -1300,6 +1300,9 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 .lpl-grad {
+  color: var(--accent);
+  -webkit-text-fill-color: currentColor;
+  background: none;
   color: var(--text-4);
 }
 

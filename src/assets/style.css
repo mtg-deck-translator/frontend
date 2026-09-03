@@ -2,6 +2,8 @@
 @import '@fontsource/inter/500.css';
 @import '@fontsource/inter/600.css';
 @import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/fraunces/700.css';
 
 :root {
   --bg: #FAFAF9;
@@ -19,10 +21,11 @@
   --warning: #F59E0B;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --header-height: 56px;
@@ -294,64 +297,57 @@ a {
      l'écran arrivait au même plan, sans structure lisible. Les surfaces
      sont maintenant opaques et espacées, avec une pointe de chaud dans le
      neutre pour que le noir ne soit pas un noir d'écran éteint. */
-  --bg-app: #0e0e12;
-  --bg-canvas: #08080c;
-  --canvas-glow: rgba(120, 60, 220, 0.18);
-  --surface-1: #17171d;
-  --surface-2: #1b1b22;
-  --surface-3: #202028;
-  --surface-sunk: #0a0a0e;
-  --surface-menu: #22222b;
+  --bg-app: #1c1a17;
+  --bg-canvas: #171512;
+  --canvas-glow: rgba(232, 98, 44, 0.07);
+  --surface-1: #232019;
+  --surface-2: #27231b;
+  --surface-3: #2b2720;
+  --surface-sunk: #131110;
+  --surface-menu: #2b2720;
 
-  /* Remplissages d'état */
-  --fill-1: rgba(255, 255, 255, 0.055);
-  --fill-2: rgba(255, 255, 255, 0.095);
-  --fill-3: rgba(255, 255, 255, 0.14);
-  --fill-4: rgba(255, 255, 255, 0.22);
+  --fill-1: rgba(245, 241, 234, 0.05);
+  --fill-2: rgba(245, 241, 234, 0.09);
+  --fill-3: rgba(245, 241, 234, 0.14);
+  --fill-4: rgba(245, 241, 234, 0.22);
 
-  /* Bordures */
-  --border-subtle: rgba(255, 255, 255, 0.09);
-  --border: rgba(255, 255, 255, 0.14);
-  --border-strong: rgba(255, 255, 255, 0.22);
-  --border-focus: rgba(255, 255, 255, 0.38);
+  --border-subtle: rgba(245, 241, 234, 0.10);
+  --border: rgba(245, 241, 234, 0.16);
+  --border-strong: rgba(245, 241, 234, 0.26);
+  --border-focus: rgba(245, 241, 234, 0.42);
 
-  /* Texte — --text-4 est fixé à .55 (5,9:1) et non .35 : le palier le plus
-     faible portait le nom des cartes, à 3,19:1, sous le seuil AA. */
-  --text-1: #ffffff;
-  --text-2: rgba(255, 255, 255, 0.78);
-  --text-3: rgba(255, 255, 255, 0.62);
-  --text-4: rgba(255, 255, 255, 0.55);
-  --text-on-accent: #09090b;
-  --text-inverse: #09090b;
+  --text-1: #f5f1ea;
+  --text-2: rgba(245, 241, 234, 0.80);
+  --text-3: rgba(245, 241, 234, 0.62);
+  --text-4: rgba(245, 241, 234, 0.52);
+  --text-on-accent: #1c1a17;
+  --text-inverse: #1c1a17;
 
-  /* Accent — ambre, la couleur réellement utilisée par l'interface */
-  --accent: #f59e0b;
-  --accent-hover: #fbbf24;
-  --accent-fill: rgba(245, 158, 11, 0.08);
-  --accent-fill-hover: rgba(245, 158, 11, 0.14);
-  --accent-border: rgba(245, 158, 11, 0.22);
-  --accent-border-hov: rgba(245, 158, 11, 0.35);
-  --accent-glow: rgba(245, 158, 11, 0.15);
+  --accent: #e8622c;
+  --accent-hover: #f97b47;
+  --accent-fill: rgba(232, 98, 44, 0.10);
+  --accent-fill-hover: rgba(232, 98, 44, 0.17);
+  --accent-border: rgba(232, 98, 44, 0.26);
+  --accent-border-hov: rgba(232, 98, 44, 0.42);
+  --accent-glow: rgba(232, 98, 44, 0.18);
 
-  /* Sémantique */
-  --success: #4ade80;
-  --success-fill: rgba(34, 197, 94, 0.08);
-  --success-border: rgba(34, 197, 94, 0.24);
-  --danger: #fca5a5;
-  --danger-fill: rgba(239, 68, 68, 0.08);
-  --danger-border: rgba(239, 68, 68, 0.22);
-  --warning: #fbbf24;
-  --warning-fill: rgba(245, 158, 11, 0.08);
-  --info: #60a5fa;
-  --info-fill: rgba(59, 130, 246, 0.08);
+  --success: #7fb069;
+  --success-fill: rgba(127, 176, 105, 0.10);
+  --success-border: rgba(127, 176, 105, 0.26);
+  --danger: #e07a5f;
+  --danger-fill: rgba(224, 122, 95, 0.10);
+  --danger-border: rgba(224, 122, 95, 0.26);
+  --warning: #d9a441;
+  --warning-fill: rgba(217, 164, 65, 0.10);
+  --info: #8ba9c4;
+  --info-fill: rgba(139, 169, 196, 0.10);
 
-  /* Voiles et ombres */
-  --scrim: rgba(0, 0, 0, 0.55);
-  --scrim-strong: rgba(0, 0, 0, 0.72);
+  --scrim: rgba(15, 13, 11, 0.62);
+  --scrim-strong: rgba(15, 13, 11, 0.80);
   --shadow-1: 0 2px 10px rgba(0, 0, 0, 0.40);
-  --shadow-2: 0 4px 24px rgba(0, 0, 0, 0.30);
-  --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.55);
-  --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.60);
+  --shadow-2: 0 4px 24px rgba(0, 0, 0, 0.32);
+  --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.50);
+  --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.58);
   --shadow-lg: var(--shadow-4); /* référencé par CardmarketPanel, jamais défini */
 
   /* Teintes d'ombre, extraites pour que le thème clair puisse les adoucir :
@@ -391,57 +387,56 @@ a {
 }
 
 [data-theme="light"] {
-  --bg-app: #fafaf9;
-  --bg-canvas: #f4f4f5;
-  --canvas-glow: rgba(88, 28, 220, 0.05);
-  --surface-1: rgba(255, 255, 255, 0.72);
-  --surface-2: rgba(255, 255, 255, 0.85);
+  --bg-app: #f7f3ec;
+  --bg-canvas: #f1ece2;
+  --canvas-glow: rgba(232, 98, 44, 0.05);
+  --surface-1: #fdfbf7;
+  --surface-2: #fffdfa;
   --surface-3: #ffffff;
-  --surface-sunk: rgba(0, 0, 0, 0.045);
+  --surface-sunk: rgba(28, 26, 23, 0.05);
   --surface-menu: #ffffff;
 
-  --fill-1: rgba(0, 0, 0, 0.035);
-  --fill-2: rgba(0, 0, 0, 0.065);
-  --fill-3: rgba(0, 0, 0, 0.095);
-  --fill-4: rgba(0, 0, 0, 0.14);
+  --fill-1: rgba(28, 26, 23, 0.04);
+  --fill-2: rgba(28, 26, 23, 0.07);
+  --fill-3: rgba(28, 26, 23, 0.11);
+  --fill-4: rgba(28, 26, 23, 0.16);
 
-  --border-subtle: rgba(0, 0, 0, 0.10);
-  --border: rgba(0, 0, 0, 0.15);
-  --border-strong: rgba(0, 0, 0, 0.18);
-  --border-focus: rgba(0, 0, 0, 0.34);
+  --border-subtle: rgba(28, 26, 23, 0.10);
+  --border: rgba(28, 26, 23, 0.16);
+  --border-strong: rgba(28, 26, 23, 0.26);
+  --border-focus: rgba(28, 26, 23, 0.42);
 
-  --text-1: #18181b;
-  --text-2: rgba(24, 24, 27, 0.78);
-  --text-3: rgba(24, 24, 27, 0.62);
-  --text-4: rgba(24, 24, 27, 0.55);
-  --text-on-accent: #ffffff;
-  --text-inverse: #ffffff;
+  --text-1: #1c1a17;
+  --text-2: rgba(28, 26, 23, 0.80);
+  --text-3: rgba(28, 26, 23, 0.62);
+  --text-4: rgba(28, 26, 23, 0.55);
+  --text-on-accent: #fdfbf7;
+  --text-inverse: #fdfbf7;
 
-  /* #f59e0b ne fait que 2,15:1 sur blanc : inutilisable en thème clair. */
-  --accent: #b45309;
-  --accent-hover: #92400e;
-  --accent-fill: rgba(180, 83, 9, 0.07);
-  --accent-fill-hover: rgba(180, 83, 9, 0.12);
-  --accent-border: rgba(180, 83, 9, 0.25);
-  --accent-border-hov: rgba(180, 83, 9, 0.40);
-  --accent-glow: rgba(180, 83, 9, 0.18);
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-fill: rgba(194, 65, 12, 0.08);
+  --accent-fill-hover: rgba(194, 65, 12, 0.14);
+  --accent-border: rgba(194, 65, 12, 0.28);
+  --accent-border-hov: rgba(194, 65, 12, 0.44);
+  --accent-glow: rgba(194, 65, 12, 0.18);
 
-  --success: #15803d;
-  --success-fill: rgba(34, 197, 94, 0.10);
-  --success-border: rgba(21, 128, 61, 0.28);
-  --danger: #b91c1c;
-  --danger-fill: rgba(239, 68, 68, 0.09);
-  --danger-border: rgba(185, 28, 28, 0.25);
-  --warning: #b45309;
-  --warning-fill: rgba(245, 158, 11, 0.12);
-  --info: #1d4ed8;
-  --info-fill: rgba(59, 130, 246, 0.10);
+  --success: #3f6212;
+  --success-fill: rgba(63, 98, 18, 0.09);
+  --success-border: rgba(63, 98, 18, 0.28);
+  --danger: #9f3a26;
+  --danger-fill: rgba(159, 58, 38, 0.08);
+  --danger-border: rgba(159, 58, 38, 0.26);
+  --warning: #92400e;
+  --warning-fill: rgba(217, 164, 65, 0.16);
+  --info: #1e4e6b;
+  --info-fill: rgba(30, 78, 107, 0.09);
 
-  --scrim: rgba(24, 24, 27, 0.35);
-  --scrim-strong: rgba(24, 24, 27, 0.55);
-  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --scrim: rgba(28, 26, 23, 0.36);
+  --scrim-strong: rgba(28, 26, 23, 0.56);
+  --shadow-1: 0 1px 3px rgba(60, 45, 30, 0.09);
+  --shadow-2: 0 4px 12px rgba(60, 45, 30, 0.09);
+  --shadow-3: 0 8px 28px rgba(60, 45, 30, 0.13);
   --shadow-4: 0 20px 44px rgba(0, 0, 0, 0.16);
   --shadow-lg: var(--shadow-4);
 
@@ -496,3 +491,24 @@ a {
   }
   .lpl-spinner { animation-duration: 0.65s !important; animation-iteration-count: infinite !important; }
 }
+
+/* ── Direction « papier sombre » ───────────────────────
+   La hiérarchie vient de la typographie et des filets, pas des fonds :
+   une serif de titrage sur les têtes, des angles nets, et un orange brûlé
+   comme seul accent. */
+h1, h2, .lpl-title, .dk-name, .lpr-step-title, .pt-name, .cm-title, .lpr-section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Les rayons codés en dur d'avant la refonte, ramenés à l'échelle. */
+.lpl-input-card, .lpr-card, .lpr-feat, .cat-cards, .dk-bar, .dk-menu-list,
+.pt, .lpl-paste-btn, .lpl-install, .lpr-nofr-pitch, .lpr-coll, .dk-nofr,
+.lpr-step, .lpl-list-btn, .dk-point-btn, .dk-bar-primary, .cm-panel {
+  border-radius: 6px;
+}
+
+.dk-filter-btn, .lpl-resume-chip, .cr-badge-en, .no-fr-tag { border-radius: 999px; }
+.dk-views, .dk-view-btn, .dk-sort-select, .dk-search, .dk-menu-btn,
+.lpl-mode-tabs, .lpl-mode-tab, .dk-action-btn, .cm-btn { border-radius: 4px; }
