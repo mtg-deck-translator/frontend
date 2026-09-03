@@ -2209,8 +2209,18 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-nofr-close:hover { color: var(--text-2); background: var(--fill-2); }
 
 @media (max-width: 640px) {
-  .dk-nofr { flex-wrap: wrap; }
-  .dk-nofr-btn { width: 100%; }
+  /* Version compacte : trois lignes plus un bouton pleine largeur
+     occupaient un tiers de l'écran pour un avertissement. */
+  .dk-nofr { flex-wrap: nowrap; align-items: center; gap: 8px; padding: 10px 12px; }
+  .dk-nofr-sub { display: none; }
+  .dk-nofr-text { font-size: 12.5px; }
+  .dk-nofr-btn { width: auto; padding: 6px 10px; font-size: 11.5px; white-space: nowrap; }
+  .dk-nofr-close { width: 28px; height: 28px; }
+
+  /* La barre du fil rouge tenait sur deux lignes de texte. */
+  .dk-bar { padding: 10px 12px; gap: 10px; margin-top: 12px; }
+  .dk-bar-text { font-size: 12.5px; }
+  .dk-bar-primary { padding: 11px 14px; font-size: 12.5px; }
 }
 
 /* ── Responsive ──────────────────────────────────────── */

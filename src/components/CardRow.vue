@@ -183,9 +183,7 @@ const previewStyle = computed(() => {
 
 .cr-fr {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 600;
   color: var(--text-4);
@@ -267,5 +265,15 @@ const previewStyle = computed(() => {
 .preview-fade-leave-to {
   opacity: 0;
   transform: scale(0.96);
+}
+
+@media (max-width: 640px) {
+  /* Mesuré : « Chambre de croissance des » était coupé net, sans ellipse.
+     Le nom français passe sur deux lignes plutôt que d'être amputé, et le
+     nom anglais descend sous lui au lieu de disputer la largeur. */
+  .cr-row { flex-wrap: wrap; gap: 10px; padding: 11px 12px; }
+  .cr-fr { flex: 1 1 100%; font-size: 13.5px; line-height: 1.35; }
+  .cr-en { flex: 1 1 100%; margin-left: 0; }
+  .cr-price { margin-left: auto; }
 }
 </style>
