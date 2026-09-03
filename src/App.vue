@@ -2480,10 +2480,14 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      large. On se sert de la largeur au lieu de la fuir : les étapes passent
      côte à côte, la collection et l'avertissement partagent une ligne, et les
      decks récents remplissent la grille. */
+  /* min-height : sans elle le bloc s'arrête à la hauteur de son contenu, et
+     justify-content:center n'a rien à répartir — d'où les 400px de vide en
+     bas plutôt qu'une page composée. */
   .lp-right {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-height: 100%;
     gap: 28px;
     padding: 40px 44px;
   }
