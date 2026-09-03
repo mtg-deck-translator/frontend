@@ -11,14 +11,7 @@
       <button class="pt-close" @click="$emit('close')">Arrêter</button>
     </div>
 
-    <div
-      v-if="current"
-      class="pt-body"
-      :style="dragStyle"
-      @touchstart.passive="onTouchStart"
-      @touchmove.passive="onTouchMove"
-      @touchend="onTouchEnd"
-    >
+    <div v-if="current" class="pt-body">
       <img
         v-if="current.imageUrl"
         :src="current.imageUrl"
@@ -45,7 +38,6 @@
       <button class="pt-undo" :disabled="!history.length" @click="undo">
         ← Annuler la dernière <kbd>←</kbd>
       </button>
-      <p class="pt-swipe-hint">Glissez la carte : à droite si vous l’avez, à gauche sinon.</p>
     </div>
 
     <p v-else class="pt-done">
@@ -111,39 +103,6 @@ function undo() {
     ownedHere.value--
     emit('own', last.name, false)
   }
-}
-
-// Debout devant ses boîtes, on tient le téléphone d'une main et une carte de
-// l'autre. Viser un bouton demande de la précision ; glisser, non.
-const SWIPE_THRESHOLD = 70
-const dragX = ref(0)
-const dragging = ref(false)
-let startX = 0
-
-const dragStyle = computed(() => {
-  if (!dragging.value && !dragX.value) return {}
-  const angle = dragX.value / 22
-  return {
-    transform: `translateX(${dragX.value}px) rotate(${angle}deg)`,
-    transition: dragging.value ? 'none' : 'transform 200ms ease',
-  }
-})
-
-function onTouchStart(e) {
-  startX = e.touches[0].clientX
-  dragging.value = true
-}
-
-function onTouchMove(e) {
-  if (dragging.value) dragX.value = e.touches[0].clientX - startX
-}
-
-function onTouchEnd() {
-  const dx = dragX.value
-  dragging.value = false
-  dragX.value = 0
-  if (dx > SWIPE_THRESHOLD) own()
-  else if (dx < -SWIPE_THRESHOLD) skip()
 }
 
 function onKey(e) {
@@ -262,14 +221,6 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 .pt-undo:not(:disabled):hover { color: var(--text-2); }
 .pt-undo kbd { font-family: var(--font-mono); font-size: 10px; }
 
-.pt-swipe-hint {
-  display: none;
-  margin: 0;
-  text-align: center;
-  font-size: 11.5px;
-  color: var(--text-4);
-}
-
 .pt-done { margin: 0; padding: 32px 0; text-align: center; font-size: 14px; color: var(--text-2); }
 .pt-done strong { color: var(--accent); }
 
@@ -321,7 +272,5 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
   /* Raccourcis clavier sur un écran tactile : hors sujet. */
   .pt-btn kbd, .pt-undo kbd { display: none; }
-  .pt-swipe-hint { display: block; }
-  .pt-body { touch-action: pan-y; will-change: transform; }
 }
 </style>
