@@ -2223,6 +2223,18 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     padding: 40px 40px 32px;
   }
 
+  /* .lpl-input-section portait flex:1 et absorbait tout l'espace : le
+     centrage du parent ne pouvait pas s'appliquer, d'où le vide sous la
+     carte. Le pied de colonne descend seul. */
+  .lpl-input-section { flex: 0 0 auto; }
+  .lp-left > :last-child { margin-top: auto; }
+
+  /* « Traduire en » devient redondant maintenant que le bouton dit
+     « Traduire ce deck », et son libellé poussait le sélecteur de langue
+     sous le bouton. */
+  .lpl-lang-label { display: none; }
+  .lpl-footer-lang { flex: 0 0 auto; }
+
   .lpl-hero { margin-bottom: 8px; }
   .lpl-title { font-size: clamp(30px, 2.6vw, 42px); }
 
