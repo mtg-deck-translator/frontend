@@ -11,8 +11,8 @@
         <span class="cl-count tabular">{{ collectionSize }}</span>
       </div>
       <div class="cl-actions">
-        <button class="cl-apply" title="Recocher les cartes possédées" @click="emit('apply')">
-          Réappliquer
+        <button class="cl-apply" title="Recocher les cartes que vous possédez" @click="emit('apply')">
+          Recocher mes cartes
         </button>
         <button class="cl-clear" @click="clearCollection" title="Supprimer la collection">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">

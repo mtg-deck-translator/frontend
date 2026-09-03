@@ -596,7 +596,7 @@
                   v-if="missingCards.length"
                   class="dk-bar-primary"
                   @click="exportBuyCardmarket"
-                >Préparer ma liste de courses →</button>
+                >Copier pour Cardmarket</button>
                 <div class="dk-menu">
                   <button class="dk-menu-btn" aria-haspopup="true" :aria-expanded="showMenu" @click="showMenu = !showMenu">…</button>
                   <div v-if="showMenu" class="dk-menu-list">
@@ -643,13 +643,13 @@ const LANDING_I18N = {
     step1: 'Collez le lien de votre deck', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — ou votre liste au format texte.',
     step2: 'Cochez ce que vous possédez', step2_desc: 'Pointage rapide carte par carte, ou import de votre collection en CSV.',
     step3: 'Récupérez votre liste de courses', step3_desc: 'Uniquement ce qu’il vous manque, prêt à coller dans une Wantlist Cardmarket.',
-    nofr_pitch: 'Certaines cartes n’existent pas dans votre langue. On vous le dit avant que vous les cherchiez pour rien.', try_example: 'Essayer avec un exemple',
+    nofr_pitch: 'Certaines cartes n’existent pas dans votre langue. On vous le dit avant que vous les cherchiez pour rien.', try_example: 'Voir un deck d’exemple',
     tab_url: 'Lien de deck', tab_paste: 'Coller une liste',
     recent: 'Decks récents', clear_all: 'Effacer tout', cards: 'cartes', owned: 'possédées',
     today: "Aujourd'hui", yesterday: 'Hier', days_ago: n => `Il y a ${n}j`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Coller une liste', mode_paste_short: 'Liste',
     paste_hint: 'Collez votre liste ci-dessous…',
-    btn_translate: 'Traduire', btn_fetching: 'Récupération…', btn_translating: 'Traduction…',
+    btn_translate: 'Traduire ce deck', btn_fetching: 'Récupération…', btn_translating: 'Traduction…',
   },
   de: {
     hero_title_1: 'Kauf nicht doppelt,', hero_title_2: 'was du schon hast.',
@@ -658,12 +658,12 @@ const LANDING_I18N = {
     step1: 'Deck-Link einfügen', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — oder deine Liste als Text.',
     step2: 'Abhaken, was du besitzt', step2_desc: 'Karte für Karte, oder Sammlung als CSV importieren.',
     step3: 'Einkaufsliste erhalten', step3_desc: 'Nur was dir fehlt, bereit für eine Cardmarket-Wantlist.',
-    nofr_pitch: 'Manche Karten gibt es in deiner Sprache nicht. Wir sagen es dir vorher.', try_example: 'Mit einem Beispiel testen',
+    nofr_pitch: 'Manche Karten gibt es in deiner Sprache nicht. Wir sagen es dir vorher.', try_example: 'Beispiel-Deck ansehen',
     tab_url: 'Deck-Link', tab_paste: 'Liste einfügen',
     recent: 'Letzte Decks', clear_all: 'Alle löschen', cards: 'Karten', owned: 'besessen',
     today: 'Heute', yesterday: 'Gestern', days_ago: n => `Vor ${n} Tagen`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Liste einfügen', mode_paste_short: 'Liste',
-    btn_translate: 'Übersetzen', btn_fetching: 'Laden...', btn_translating: 'Übersetzen...',
+    btn_translate: 'Deck übersetzen', btn_fetching: 'Laden...', btn_translating: 'Übersetzen...',
   },
   it: {
     hero_title_1: 'Non ricomprare', hero_title_2: 'ciò che hai già.',
@@ -672,12 +672,12 @@ const LANDING_I18N = {
     step1: 'Incolla il link del mazzo', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — o la tua lista in testo.',
     step2: 'Spunta ciò che possiedi', step2_desc: 'Carta per carta, o importa la collezione in CSV.',
     step3: 'Ottieni la lista della spesa', step3_desc: 'Solo ciò che manca, pronto per una Wantlist Cardmarket.',
-    nofr_pitch: 'Alcune carte non esistono nella tua lingua. Te lo diciamo prima.', try_example: 'Prova con un esempio',
+    nofr_pitch: 'Alcune carte non esistono nella tua lingua. Te lo diciamo prima.', try_example: 'Vedi un mazzo d’esempio',
     tab_url: 'Link del mazzo', tab_paste: 'Incolla una lista',
     recent: 'Deck recenti', clear_all: 'Cancella tutto', cards: 'carte', owned: 'possedute',
     today: 'Oggi', yesterday: 'Ieri', days_ago: n => `${n} giorni fa`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Incolla lista',
-    btn_translate: 'Traduci', btn_fetching: 'Caricamento...', btn_translating: 'Traduzione...',
+    btn_translate: 'Traduci il mazzo', btn_fetching: 'Caricamento...', btn_translating: 'Traduzione...',
   },
   es: {
     hero_title_1: 'No vuelvas a comprar', hero_title_2: 'lo que ya tienes.',
@@ -686,12 +686,12 @@ const LANDING_I18N = {
     step1: 'Pega el enlace de tu mazo', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — o tu lista en texto.',
     step2: 'Marca lo que ya tienes', step2_desc: 'Carta por carta, o importa tu colección en CSV.',
     step3: 'Obtén tu lista de compra', step3_desc: 'Solo lo que falta, listo para una Wantlist de Cardmarket.',
-    nofr_pitch: 'Algunas cartas no existen en tu idioma. Te lo decimos antes.', try_example: 'Probar con un ejemplo',
+    nofr_pitch: 'Algunas cartas no existen en tu idioma. Te lo decimos antes.', try_example: 'Ver un mazo de ejemplo',
     tab_url: 'Enlace del mazo', tab_paste: 'Pegar una lista',
     recent: 'Mazos recientes', clear_all: 'Borrar todo', cards: 'cartas', owned: 'poseídas',
     today: 'Hoy', yesterday: 'Ayer', days_ago: n => `Hace ${n} días`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Pegar lista',
-    btn_translate: 'Traducir', btn_fetching: 'Cargando...', btn_translating: 'Traduciendo...',
+    btn_translate: 'Traducir el mazo', btn_fetching: 'Cargando...', btn_translating: 'Traduciendo...',
   },
   pt: {
     hero_title_1: 'Não compre de novo', hero_title_2: 'o que você já tem.',
@@ -700,12 +700,12 @@ const LANDING_I18N = {
     step1: 'Cole o link do seu deck', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — ou sua lista em texto.',
     step2: 'Marque o que você possui', step2_desc: 'Carta a carta, ou importe sua coleção em CSV.',
     step3: 'Receba sua lista de compras', step3_desc: 'Só o que falta, pronto para uma Wantlist do Cardmarket.',
-    nofr_pitch: 'Algumas cartas não existem no seu idioma. Avisamos antes.', try_example: 'Testar com um exemplo',
+    nofr_pitch: 'Algumas cartas não existem no seu idioma. Avisamos antes.', try_example: 'Ver um deck de exemplo',
     tab_url: 'Link do deck', tab_paste: 'Colar uma lista',
     recent: 'Decks recentes', clear_all: 'Limpar tudo', cards: 'cartas', owned: 'possuídas',
     today: 'Hoje', yesterday: 'Ontem', days_ago: n => `Há ${n} dias`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Colar lista',
-    btn_translate: 'Traduzir', btn_fetching: 'Carregando...', btn_translating: 'Traduzindo...',
+    btn_translate: 'Traduzir o deck', btn_fetching: 'Carregando...', btn_translating: 'Traduzindo...',
   },
   ja: {
     hero_title_1: 'すでに持っているカードを', hero_title_2: '二度と買わない。',
@@ -714,12 +714,12 @@ const LANDING_I18N = {
     step1: 'デッキのURLを貼る', step1_desc: 'Archidekt・Moxfield・MTGTOP8・Tappedout、またはテキストのリスト。',
     step2: '持っているカードにチェック', step2_desc: '一枚ずつ、またはコレクションのCSVを読み込み。',
     step3: '買い物リストを受け取る', step3_desc: '足りないカードだけ。Cardmarketのウォントリストにそのまま貼れます。',
-    nofr_pitch: '一部のカードはあなたの言語では存在しません。探す前にお知らせします。', try_example: 'サンプルで試す',
+    nofr_pitch: '一部のカードはあなたの言語では存在しません。探す前にお知らせします。', try_example: 'サンプルデッキを見る',
     tab_url: 'デッキのURL', tab_paste: 'リストを貼る',
     recent: '最近のデッキ', clear_all: 'すべて削除', cards: 'カード', owned: '所有',
     today: '今日', yesterday: '昨日', days_ago: n => `${n}日前`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'リストを貼り付け',
-    btn_translate: '翻訳', btn_fetching: '取得中...', btn_translating: '翻訳中...',
+    btn_translate: 'デッキを翻訳', btn_fetching: '取得中...', btn_translating: '翻訳中...',
   },
   ko: {
     hero_title_1: '이미 가진 카드를', hero_title_2: '다시 사지 마세요.',
@@ -728,12 +728,12 @@ const LANDING_I18N = {
     step1: '덱 링크 붙여넣기', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout, 또는 텍스트 목록.',
     step2: '보유한 카드 체크', step2_desc: '한 장씩, 또는 컬렉션 CSV 가져오기.',
     step3: '구매 목록 받기', step3_desc: '부족한 카드만. Cardmarket 원트리스트에 바로 붙여넣기.',
-    nofr_pitch: '일부 카드는 해당 언어로 발매되지 않았습니다. 찾기 전에 알려드립니다.', try_example: '예시로 시험해보기',
+    nofr_pitch: '일부 카드는 해당 언어로 발매되지 않았습니다. 찾기 전에 알려드립니다.', try_example: '예시 덱 보기',
     tab_url: '덱 링크', tab_paste: '목록 붙여넣기',
     recent: '최근 덱', clear_all: '모두 지우기', cards: '카드', owned: '보유',
     today: '오늘', yesterday: '어제', days_ago: n => `${n}일 전`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: '목록 붙여넣기',
-    btn_translate: '번역', btn_fetching: '불러오는 중...', btn_translating: '번역 중...',
+    btn_translate: '덱 번역하기', btn_fetching: '불러오는 중...', btn_translating: '번역 중...',
   },
   ru: {
     hero_title_1: 'Не покупайте снова то,', hero_title_2: 'что у вас уже есть.',
@@ -742,12 +742,12 @@ const LANDING_I18N = {
     step1: 'Вставьте ссылку на колоду', step1_desc: 'Archidekt · Moxfield · MTGTOP8 · Tappedout — или список текстом.',
     step2: 'Отметьте свои карты', step2_desc: 'По одной карте или импортом коллекции в CSV.',
     step3: 'Получите список покупок', step3_desc: 'Только недостающее, готовое для Wantlist на Cardmarket.',
-    nofr_pitch: 'Некоторых карт нет на вашем языке. Мы предупредим заранее.', try_example: 'Попробовать на примере',
+    nofr_pitch: 'Некоторых карт нет на вашем языке. Мы предупредим заранее.', try_example: 'Посмотреть пример колоды',
     tab_url: 'Ссылка на колоду', tab_paste: 'Вставить список',
     recent: 'Последние деки', clear_all: 'Очистить всё', cards: 'карт', owned: 'есть',
     today: 'Сегодня', yesterday: 'Вчера', days_ago: n => `${n} дн. назад`,
     mode_url: 'URL (Archidekt / MTGTOP8)', mode_paste: 'Вставить список',
-    btn_translate: 'Перевести', btn_fetching: 'Загрузка...', btn_translating: 'Перевод...',
+    btn_translate: 'Перевести колоду', btn_fetching: 'Загрузка...', btn_translating: 'Перевод...',
   },
 }
 
@@ -2770,9 +2770,10 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 @media (pointer: coarse) {
-  .dk-action-btn, .dk-filter-btn, .dlt-btn, .lpl-mode-tab, .dk-toc-item {
-    min-height: 44px;
+  .dk-action-btn, .dk-filter-btn, .lpl-mode-tab, .dk-menu-list button, .dk-bar-primary {
+    min-height: 48px;
   }
-  .dk-search-clear, .lpl-icon-btn { min-width: 44px; min-height: 44px; }
+  .dk-search-clear, .lpl-icon-btn, .dk-menu-btn, .dk-nofr-close { min-width: 48px; min-height: 48px; }
+  .dk-search { min-height: 48px; }
 }
 </style>

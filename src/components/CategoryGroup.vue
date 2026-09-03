@@ -143,6 +143,6 @@ function handleToggleAll() {
 @media (pointer: coarse) {
   /* 15px de haut, collé aux cases à cocher : une erreur de visée cochait une
      catégorie entière. */
-  .cat-toggle { min-height: 44px; padding: 0 10px; }
+  .cat-toggle { min-height: 48px; padding: 0 12px; }
 }
 </style>

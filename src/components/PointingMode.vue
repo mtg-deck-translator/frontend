@@ -28,10 +28,10 @@
 
       <div class="pt-actions">
         <button class="pt-btn pt-btn--own" @click="own">
-          Oui, je l’ai <kbd>J</kbd>
+          Je l’ai <kbd>J</kbd>
         </button>
         <button class="pt-btn" @click="skip">
-          Non <kbd>N</kbd>
+          Me manque <kbd>N</kbd>
         </button>
       </div>
 

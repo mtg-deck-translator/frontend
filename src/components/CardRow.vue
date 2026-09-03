@@ -117,6 +117,8 @@ const previewStyle = computed(() => {
   padding: 17px 20px;
 }
 
+.cr-row { cursor: pointer; }
+
 .cr-row:hover {
   background: var(--fill-1);
   border-left-color: var(--cat-color, var(--border-focus));
@@ -272,7 +274,11 @@ const previewStyle = computed(() => {
   /* La case était contre le bord gauche, l'endroit le moins accessible pour
      un droitier, alors que c'est la cible la plus répétée de l'app. Elle passe
      à droite, côté pouce ; la quantité la suit pour rester lisible avec elle. */
-  .cr-row { gap: 12px; padding: 8px 16px 8px 18px; }
+  /* Objectif 56px par ligne : sur un écran de 844, chaque ligne gagnée est
+     une carte de plus sous les yeux. Le nom garde le droit de passer sur deux
+     lignes quand il est long — un nom tronqué ne sert à rien chez le vendeur —
+     mais tout le reste est resserré. */
+  .cr-row { gap: 12px; min-height: 56px; padding: 6px 14px 6px 16px; }
   .cr-check { order: 4; }
   .cr-qty { order: 3; }
   .cr-names { order: 1; }
@@ -283,17 +289,23 @@ const previewStyle = computed(() => {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
-    font-size: 13.5px;
-    line-height: 1.3;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
   }
   .cr-en {
     flex: 1 1 100%;
+    font-family: var(--font-mono);
     font-size: 10.5px;
-    line-height: 1.25;
+    font-style: normal;
+    line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .cr-names { gap: 1px; }
+  .cr-qty { min-width: 22px; height: 22px; font-size: 11px; }
+  .cr-check { width: 26px; height: 26px; }
 }
 </style>
 
