@@ -288,27 +288,32 @@ a {
    ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Surfaces */
-  --bg-app: #09090b;
-  --bg-canvas: #06060f;
-  --canvas-glow: rgba(88, 28, 220, 0.14);
-  --surface-1: rgba(24, 24, 27, 0.5);
-  --surface-2: rgba(24, 24, 27, 0.6);
-  --surface-3: rgba(24, 24, 27, 0.8);
-  --surface-sunk: rgba(9, 9, 11, 0.6);
-  --surface-menu: #18181b;
+  /* Surfaces — une échelle d'élévation, pas des voiles.
+     L'ancienne version posait #09090b sur #06060f (trois points d'écart,
+     donc indiscernables) et empilait des rgba(255,255,255,0.04) : tout
+     l'écran arrivait au même plan, sans structure lisible. Les surfaces
+     sont maintenant opaques et espacées, avec une pointe de chaud dans le
+     neutre pour que le noir ne soit pas un noir d'écran éteint. */
+  --bg-app: #0e0e12;
+  --bg-canvas: #08080c;
+  --canvas-glow: rgba(120, 60, 220, 0.18);
+  --surface-1: #17171d;
+  --surface-2: #1b1b22;
+  --surface-3: #202028;
+  --surface-sunk: #0a0a0e;
+  --surface-menu: #22222b;
 
   /* Remplissages d'état */
-  --fill-1: rgba(255, 255, 255, 0.04);
-  --fill-2: rgba(255, 255, 255, 0.07);
-  --fill-3: rgba(255, 255, 255, 0.10);
-  --fill-4: rgba(255, 255, 255, 0.18);
+  --fill-1: rgba(255, 255, 255, 0.055);
+  --fill-2: rgba(255, 255, 255, 0.095);
+  --fill-3: rgba(255, 255, 255, 0.14);
+  --fill-4: rgba(255, 255, 255, 0.22);
 
   /* Bordures */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --border-focus: rgba(255, 255, 255, 0.28);
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --border-focus: rgba(255, 255, 255, 0.38);
 
   /* Texte — --text-4 est fixé à .55 (5,9:1) et non .35 : le palier le plus
      faible portait le nom des cartes, à 3,19:1, sous le seuil AA. */

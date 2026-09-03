@@ -78,6 +78,14 @@
                   class="lpl-resume-chip"
                   @click="onLoadFromHistory(entry)"
                 >
+                  <span class="lpl-resume-pips" aria-hidden="true">
+                    <span
+                      v-for="c in (entry.deckColors || [])"
+                      :key="c"
+                      class="lpl-resume-pip"
+                      :style="MTG_COLOR_STYLES[c]"
+                    />
+                  </span>
                   <span class="lpl-resume-name">{{ entry.deckName }}</span>
                   <span class="lpl-resume-count">{{ entry.cardCount || '' }}</span>
                 </button>
@@ -2259,16 +2267,17 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   padding: 0;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .lpr-step {
   display: flex;
   gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 16px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
 }
-
-.lpr-step:last-child { border-bottom: none; }
 
 .lpr-step-num {
   flex-shrink: 0;
@@ -2676,6 +2685,9 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     padding-bottom: 4px;
   }
 
+  .lpl-resume-pips { display: flex; gap: -2px; }
+  .lpl-resume-pip { width: 9px; height: 9px; border-radius: 50%; display: block; }
+
   .lpl-resume-chip {
     flex: 0 0 auto;
     scroll-snap-align: start;
@@ -2687,8 +2699,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     padding: 8px 14px;
     font-size: 12.5px;
     color: var(--text-2);
-    background: var(--fill-1);
-    border: 1px solid var(--border-subtle);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
     border-radius: 999px;
     white-space: nowrap;
     cursor: pointer;
