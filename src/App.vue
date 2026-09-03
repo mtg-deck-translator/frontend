@@ -319,7 +319,7 @@
           <div class="lp-right">
 
             <!-- Recent decks -->
-            <div v-if="history.length" class="lpr-section">
+            <div v-if="history.length" class="lpr-section lpr-section--history">
               <div class="lpr-section-head">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
@@ -2653,6 +2653,12 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 @media (max-width: 640px) {
   .lpl-resume { display: block; margin: 4px 0 16px; }
+
+  /* Le bandeau « REPRENDRE » ci-dessus reprend déjà l'historique, en pastilles.
+     La grille de grandes cartes faisait doublon : une seule colonne sous 480px
+     avec un aspect-ratio 5/7 donnait des cartes de 326x456 sur un écran de 844,
+     et une page de 2091px pour deux decks. */
+  .lpr-section--history { display: none; }
 
   .lpl-resume-label {
     font-family: var(--font-mono);
