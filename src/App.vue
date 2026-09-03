@@ -223,6 +223,7 @@
                 <span class="dk-stat">{{ cards.length }} cartes</span>
                 <span v-if="totalPrice > 0" class="dk-stat dk-stat-price">{{ formatPrice(totalPrice) }}</span>
                 <span class="dk-stat dk-stat-owned">{{ ownedCount }} / {{ cards.length }} poss.</span>
+                <span v-if="missingPrice > 0" class="dk-stat dk-stat-missing">manque {{ formatPrice(missingPrice) }}</span>
               </div>
               <!-- Changer de langue imposait auparavant de quitter le deck. -->
               <div class="dk-lang">
@@ -273,39 +274,6 @@
             </div>
 
             <div class="dk-sep"/>
-
-            <!-- Les filtres passent devant la recherche : « À trouver » est
-                 l'information la plus consultée, la recherche est ponctuelle. -->
-            <div class="dk-filters">
-              <button
-                v-for="tab in DK_TABS"
-                :key="tab.value"
-                class="dk-filter-btn"
-                :class="{ active: activeFilter === tab.value }"
-                @click="activeFilter = tab.value"
-              >
-                <span class="dkf-label">{{ tab.label }}</span>
-                <span class="dkf-count">{{ filterCounts[tab.value] }}</span>
-              </button>
-            </div>
-
-            <div class="dk-search">
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/>
-                <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-              <input
-                class="dk-search-input"
-                :value="search"
-                placeholder="Chercher une carte..."
-                @input="search = $event.target.value"
-              />
-              <button v-if="search" class="dk-search-clear" aria-label="Effacer la recherche" @click="search = ''">
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
 
             </div>
           </div>
@@ -468,6 +436,38 @@
                   @click="layout = v.value"
                 >{{ v.label }}</button>
               </div>
+            <!-- Les filtres passent devant la recherche : « À trouver » est
+                   l'information la plus consultée, la recherche est ponctuelle. -->
+              <div class="dk-filters">
+                <button
+                  v-for="tab in DK_TABS"
+                  :key="tab.value"
+                  class="dk-filter-btn"
+                  :class="{ active: activeFilter === tab.value }"
+                  @click="activeFilter = tab.value"
+                >
+                  <span class="dkf-label">{{ tab.label }}</span>
+                  <span class="dkf-count">{{ filterCounts[tab.value] }}</span>
+                </button>
+              </div>
+
+              <div class="dk-search">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                <input
+                  class="dk-search-input"
+                  :value="search"
+                  placeholder="Chercher une carte..."
+                  @input="search = $event.target.value"
+                />
+                <button v-if="search" class="dk-search-clear" aria-label="Effacer la recherche" @click="search = ''">
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
               <label class="dk-sort">
                 <span class="dk-sort-label">Trier</span>
                 <select class="dk-sort-select" :value="sort" @change="sort = $event.target.value">
@@ -506,6 +506,42 @@
                 @toggle="toggleCard"
               />
             </div>
+
+            <!-- Sur téléphone il n'y a qu'une zone, pas deux : empiler le rail
+                 du bureau puis le replier dans un tiroir donnait 35 % de
+                 l'écran en chrome permanent et enfermait l'étape 2 dans un
+                 accordéon fermé — pendant que la barre du bas réclamait de la
+                 faire. Les trois étapes deviennent trois destinations, dans
+                 l'arc du pouce. -->
+            <nav class="mob-tabs" aria-label="Étapes">
+              <button
+                class="mob-tab"
+                :class="{ active: !pointing && !showCardmarket }"
+                @click="pointing = false"
+              >
+                <span class="mob-tab-icon" aria-hidden="true">📋</span>
+                <span class="mob-tab-label">Liste</span>
+              </button>
+              <button
+                class="mob-tab"
+                :class="{ active: pointing }"
+                :disabled="!missingCards.length"
+                @click="pointing = true"
+              >
+                <span class="mob-tab-icon" aria-hidden="true">✋</span>
+                <span class="mob-tab-label">Pointer</span>
+                <span v-if="missingCards.length" class="mob-tab-badge">{{ missingCards.length }}</span>
+              </button>
+              <button
+                class="mob-tab"
+                :disabled="!missingCards.length"
+                @click="exportBuyCardmarket"
+              >
+                <span class="mob-tab-icon" aria-hidden="true">🛒</span>
+                <span class="mob-tab-label">Ma liste</span>
+                <span v-if="missingPrice > 0" class="mob-tab-badge">{{ formatPrice(missingPrice) }}</span>
+              </button>
+            </nav>
 
             <!-- Le fil rouge : une seule action suivante, qui change selon
                  l'état. On ne propose pas d'acheter un deck entier à quelqu'un
@@ -1946,6 +1982,73 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 @supports (padding: env(safe-area-inset-bottom)) {
   .dk-bar { margin-bottom: env(safe-area-inset-bottom); }
   .cmd-app { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+}
+
+/* ── Barre d'onglets mobile ───────────────────────────── */
+.mob-tabs { display: none; }
+
+.dk-stat-missing { display: none; }
+
+@media (max-width: 640px) {
+  .mob-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--surface-3);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mob-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
+    padding: 6px 4px;
+    font-size: 11px;
+    color: var(--text-3);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mob-tab.active { color: var(--accent); }
+  .mob-tab:disabled { opacity: 0.4; cursor: default; }
+  .mob-tab-icon { font-size: 17px; line-height: 1; }
+  .mob-tab-label { font-weight: 500; }
+
+  .mob-tab-badge {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--text-4);
+  }
+
+  .mob-tab.active .mob-tab-badge { color: var(--accent); }
+
+  /* Le rail disparaît : son contenu vit désormais dans les onglets et le
+     menu. Seul l'en-tête reste, ramené à l'essentiel. */
+  .dk-more, .dk-left-body { display: none !important; }
+  .dk-stat-missing { display: inline; }
+
+  /* La barre du fil rouge se pose au-dessus des onglets. */
+  .dk-bar { position: static; margin-bottom: 12px; }
+  .dk-scroll { padding-bottom: 24px; }
+  .dk-right { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+
+  /* Une seule vue de lecture : le besoin « je reconnais l'illustration » est
+     servi, en mieux, par le mode Pointer en plein écran. */
+  .dk-views { display: none; }
+
+  /* Les contrôles descendent de l'ancien rail dans la barre d'outils. */
+  .dk-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .dk-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .dk-sort { justify-content: flex-end; }
 }
 
 .dk-point-btn {
