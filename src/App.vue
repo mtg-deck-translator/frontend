@@ -2214,8 +2214,11 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
+/* Raccourci mobile uniquement : sur grand écran le champ est visible et
+   Ctrl+V fait le travail, le bouton doublonnait avec la carte de saisie
+   juste au-dessus. */
 .lpl-paste-btn {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -2443,6 +2446,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      replie derrière elle : un champ vide n'invite à rien. */
   .lpl-input-section { display: flex; flex-direction: column; gap: 10px; }
   .lpl-paste-btn {
+    display: flex;
     order: -2;
     min-height: 60px;
     padding: 0 18px;
