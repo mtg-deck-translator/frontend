@@ -571,6 +571,13 @@
                     <button @click="runMenu(exportAll)">Copier la liste complète</button>
                     <button @click="runMenu(exportDownload)">Exporter en .txt</button>
                     <button @click="runMenu(exportPrint)">Imprimer</button>
+                    <button class="dk-menu-sort" @click="showMenu = false">
+                      Trier :
+                      <select :value="sort" @click.stop @change="sort = $event.target.value">
+                        <option value="category">Catégorie</option>
+                        <option value="price">Prix décroissant</option>
+                      </select>
+                    </button>
                     <button v-if="hasAnyCollection" @click="runMenu(downloadCollection)">Exporter ma collection (.csv)</button>
                   </div>
                 </div>
@@ -2045,10 +2052,15 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      servi, en mieux, par le mode Pointer en plein écran. */
   .dk-views { display: none; }
 
-  /* Les contrôles descendent de l'ancien rail dans la barre d'outils. */
-  .dk-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  /* Les contrôles descendent de l'ancien rail dans la barre d'outils, mais
+     empilés ils repoussaient la liste à 2 lignes visibles. Filtres et
+     recherche sur une ligne chacun, tri rangé dans le menu. */
+  .dk-toolbar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 8px; }
   .dk-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .dk-sort { justify-content: flex-end; }
+  .dk-filter-btn { padding: 6px 4px; min-height: 40px; }
+  .dkf-label { font-size: 10.5px; }
+  .dk-sort { display: none; }
+  .dk-search { min-height: 40px; }
 }
 
 .dk-point-btn {
@@ -2222,6 +2234,19 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   border-radius: 8px;
   cursor: pointer;
 }
+
+.dk-menu-sort { display: none; }
+.dk-menu-sort select {
+  margin-left: 6px;
+  padding: 4px 6px;
+  font-size: 12.5px;
+  color: var(--text-1);
+  background: var(--fill-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+@media (max-width: 640px) { .dk-menu-sort { display: block; } }
 
 .dk-menu-list button:hover { color: var(--text-1); background: var(--fill-2); }
 

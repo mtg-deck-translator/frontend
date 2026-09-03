@@ -260,17 +260,28 @@ const previewStyle = computed(() => {
      Sur une largeur de téléphone, le nom d'une carte Magic ne tient pas sur
      une ligne — il passe sur deux plutôt que d'être amputé, et le nom anglais
      descend sous lui au lieu de lui disputer la place. */
-  .cr-row { gap: 10px; padding: 11px 12px; }
-  .cr-names { flex-wrap: wrap; align-items: flex-start; gap: 1px; overflow: visible; }
+  /* 95px par ligne ne laissait que 2 lignes visibles sous l'en-tête et la
+     barre d'outils. Le nom garde ses deux lignes possibles ; le nom anglais
+     passe en dessous, sur une seule, tronqué s'il le faut — c'est un repère
+     de vérification, pas l'information principale. */
+  .cr-row { gap: 10px; padding: 8px 12px; }
+  .cr-names { flex-wrap: wrap; align-items: flex-start; gap: 0; overflow: visible; }
   .cr-fr {
     flex: 1 1 100%;
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
     font-size: 13.5px;
-    line-height: 1.35;
+    line-height: 1.3;
   }
-  .cr-en { flex: 1 1 100%; white-space: normal; overflow: visible; text-overflow: clip; }
+  .cr-en {
+    flex: 1 1 100%;
+    font-size: 10.5px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>
 
