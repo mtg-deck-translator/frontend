@@ -2502,12 +2502,18 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
   .lpr-step { flex-direction: column; gap: 10px; }
 
+  /* Même grille que les étapes, sinon la césure entre les deux blocs tombe
+     au milieu d'une carte du dessus : deux grilles empilées ne font pas une
+     composition. La collection occupe deux colonnes, l'avertissement une —
+     il est court, il n'en demande pas plus. */
   .lpr-foot {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     align-items: stretch;
   }
+
+  .lpr-coll { grid-column: span 2; }
 
   .lpr-coll, .lpr-nofr-pitch { margin: 0; }
 }
