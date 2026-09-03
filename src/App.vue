@@ -2457,8 +2457,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 @media (min-width: 900px) {
   .lp-left {
-    justify-content: center;
-    padding: 40px 40px 32px;
+    justify-content: flex-start;
+    padding: 36px 40px 32px;
   }
 
   /* .lpl-input-section portait flex:1 et absorbait tout l'espace : le
@@ -2480,16 +2480,16 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      large. On se sert de la largeur au lieu de la fuir : les étapes passent
      côte à côte, la collection et l'avertissement partagent une ligne, et les
      decks récents remplissent la grille. */
-  /* min-height : sans elle le bloc s'arrête à la hauteur de son contenu, et
-     justify-content:center n'a rien à répartir — d'où les 400px de vide en
-     bas plutôt qu'une page composée. */
+  /* Les deux colonnes démarrent sur la même ligne. Centrer le panneau droit
+     le faisait commencer 200px plus bas que le logo : l'œil lisait un trou en
+     haut à droite et une masse qui tombe. Du blanc en bas de page est normal ;
+     du blanc en haut ne l'est pas. */
   .lp-right {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    min-height: 100%;
+    justify-content: flex-start;
     gap: 28px;
-    padding: 40px 44px;
+    padding: 36px 44px 48px;
   }
 
   .lpr-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 210px)); }
