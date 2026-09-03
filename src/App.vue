@@ -413,6 +413,7 @@
               <!-- Collection persistante affichée dès l'accueil : c'est elle
                    qui fait la différence entre un utilitaire à usage unique et
                    un outil où l'on revient. -->
+              <div class="lpr-foot">
               <div v-if="hasAnyCollection" class="lpr-coll">
                 <div class="lpr-coll-head">
                   <span class="lpr-coll-dot" aria-hidden="true">✓</span>
@@ -428,6 +429,7 @@
               <p class="lpr-nofr-pitch">
                 <span aria-hidden="true">⚠</span> {{ i18n.nofr_pitch }}
               </p>
+              </div>
             </div>
 
           </div>
@@ -2238,18 +2240,36 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   .lpl-hero { margin-bottom: 8px; }
   .lpl-title { font-size: clamp(30px, 2.6vw, 42px); }
 
+  /* Borner le contenu à 720px créait DEUX vides au lieu d'un sur un écran
+     large. On se sert de la largeur au lieu de la fuir : les étapes passent
+     côte à côte, la collection et l'avertissement partagent une ligne, et les
+     decks récents remplissent la grille. */
   .lp-right {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 48px 40px;
+    gap: 28px;
+    padding: 40px 44px;
   }
 
-  /* Les étapes deviennent une colonne lisible plutôt qu'une bande étirée. */
-  .lpr-steps { max-width: 560px; }
-  .lpr-nofr-pitch, .lpr-coll { max-width: 560px; }
+  .lpr-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+  .lpr-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .lpr-step { flex-direction: column; gap: 10px; }
+
+  .lpr-foot {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .lpr-coll, .lpr-nofr-pitch { margin: 0; }
 }
 
 /* ── Landing : badge gratuit, étapes, exemple ─────────── */
