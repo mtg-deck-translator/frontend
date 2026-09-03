@@ -790,7 +790,9 @@ function readIncomingShare() {
 
   // L'URL de partage ne doit pas rester dans la barre d'adresse : rechargée,
   // elle relancerait une traduction que l'utilisateur n'a pas demandée.
-  try { history.replaceState({}, '', location.pathname) } catch {}
+  // window.history explicitement : `history` est ici la ref des decks récents,
+  // et `history.replaceState` levait une exception avalée par le catch.
+  try { window.history.replaceState({}, '', window.location.pathname) } catch {}
   return true
 }
 
