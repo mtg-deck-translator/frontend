@@ -512,3 +512,14 @@ h1, h2, .lpl-title, .dk-name, .lpr-step-title, .pt-name, .cm-title, .lpr-section
 .dk-filter-btn, .lpl-resume-chip, .cr-badge-en, .no-fr-tag { border-radius: 999px; }
 .dk-views, .dk-view-btn, .dk-sort-select, .dk-search, .dk-menu-btn,
 .lpl-mode-tabs, .lpl-mode-tab, .dk-action-btn, .cm-btn { border-radius: 4px; }
+
+/* Tokens de première génération, encore référencés par CardmarketPanel,
+   HistoryPanel, LanguageSelector, CollectionImport et ProgressBar. Ils sont
+   rebranchés sur la palette « papier sombre » plutôt que laissés en doublon :
+   c'est ce qui gardait le fond de page sur l'ancien #0A0A0A. */
+:root, :root[data-theme="light"], :root[data-theme="dark"] {
+  --bg: var(--bg-app);
+  --surface: var(--surface-1);
+  --accent-subtle: var(--accent-fill);
+  --header-height: 0px;
+}
