@@ -134,6 +134,12 @@ function handleToggleAll() {
    Une media query n'augmente pas la spécificité : placée avant la
    règle qu'elle doit annuler, elle perd la cascade en silence. */
 
+@media (max-width: 640px) {
+  /* 57px pour un titre de section, répété huit fois dans la page. */
+  .cat-head { padding: 10px 0 6px; }
+  .cat-label { font-size: 10.5px; }
+}
+
 @media (pointer: coarse) {
   /* 15px de haut, collé aux cases à cocher : une erreur de visée cochait une
      catégorie entière. */

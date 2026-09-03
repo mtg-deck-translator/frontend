@@ -2338,11 +2338,16 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     border-bottom: 1px solid var(--border-subtle);
   }
 
+  /* L'en-tête faisait 161px pour trois informations. Le retour et le nom
+     partagent une ligne, et le prix total disparaît : celui qui compte —
+     ce qui manque — vit dans l'onglet « Ma liste ». */
   .dk-left { gap: 0; }
-  .dk-back { margin-bottom: 4px; font-size: 12px; }
+  .dk-back { margin-bottom: 2px; font-size: 11.5px; }
   .dk-info { margin-bottom: 0; }
-  .dk-stats { gap: 6px; margin-top: 2px; }
-  .dk-stat { padding: 2px 7px; font-size: 10.5px; }
+  .dk-name { font-size: 15.5px; line-height: 1.25; }
+  .dk-stats { gap: 5px; margin-top: 3px; }
+  .dk-stat { padding: 1px 6px; font-size: 10px; }
+  .dk-stat-price { display: none; }
 
   /* Le sélecteur de langue ne sert pas à chaque instant : il rejoint le pli. */
   .dk-lang { display: none; }
@@ -2407,7 +2412,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
      information de progression encore visible. */
   .dk-stat-owned { display: inline; }
 
-  .dk-name { font-size: 17px; }
   .dk-sep { margin: 12px 0; }
 }
 
