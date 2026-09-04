@@ -1,5 +1,5 @@
 <template>
-  <div class="cmd-app">
+  <div class="cmd-app" :style="appStyle">
 
     <!-- History overlay -->
     <Transition name="history-fade">
@@ -43,6 +43,12 @@
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
                     <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="lpl-icon-btn" :title="`Habillage : ${SKIN_LABELS[skin]} — cliquer pour changer`" @click="toggleSkin">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 1.6l6.4 6.4L8 14.4 1.6 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                    <path v-if="skin === 'arcane'" d="M8 4.4L11.6 8 8 11.6 4.4 8z" fill="currentColor"/>
                   </svg>
                 </button>
                 <button class="lpl-icon-btn" :title="theme === 'dark' ? 'Mode clair' : 'Mode sombre'" @click="toggleTheme">
@@ -603,6 +609,7 @@
                   <button class="dk-menu-btn" aria-haspopup="true" :aria-expanded="showMenu" @click="showMenu = !showMenu">…</button>
                   <div v-if="showMenu" class="dk-menu-list">
                     <button @click="runMenu(exportAll)">Copier la liste complète</button>
+                    <button @click="runMenu(toggleSkin)">Habillage : {{ SKIN_LABELS[skin] }}</button>
                     <button @click="runMenu(exportDownload)">Exporter en .txt</button>
                     <button @click="runMenu(exportPrint)">Imprimer</button>
                     <button class="dk-menu-sort" @click="showMenu = false">
@@ -768,6 +775,7 @@ import { useLanguage } from './composables/useLanguage.js'
 import { useChecklist } from './composables/useChecklist.js'
 import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
+import { useSkin } from './composables/useSkin.js'
 import { useExport } from './composables/useExport.js'
 import { useToast } from './composables/useToast.js'
 import { isSupportedUrl } from './services/deckSources.js'
@@ -837,6 +845,7 @@ watch(layout, v => localStorage.setItem('deck-layout', v))
 
 // --- Composables ---
 const { theme, toggle: toggleTheme } = useTheme()
+const { skin, toggle: toggleSkin, SKIN_LABELS } = useSkin()
 const { language, setLanguage, LANGUAGES } = useLanguage()
 const i18n = computed(() => LANDING_I18N[language.value] || LANDING_I18N.fr)
 
@@ -959,6 +968,31 @@ function setAll(keys, value) {
   setAllBase(keys, value)
   for (const k of keys) rememberOwned(k, value)
 }
+
+// ── L'app boit les couleurs du deck ────────────────────────────────────
+// Le skin « arcane » construit son rail supérieur, sa marque, ses jauges et
+// le halo du canevas à partir de `--deck-chroma` : un deck Dimir affiche donc
+// une app bleu-noir, un mono-rouge une app rouge. Les jetons ne sont posés
+// qu'ici, en variables CSS ; le skin « papier » les ignore, ce qui rend ce
+// calcul sans effet quand il est actif.
+const deckColors = computed(() =>
+  COLOR_ORDER.filter(c => cards.value.some(card => (card.colorIdentity || []).includes(c)))
+)
+
+const MANA_VARS = { W: 'var(--mana-w)', U: 'var(--mana-u)', B: 'var(--mana-b)', R: 'var(--mana-r)', G: 'var(--mana-g)' }
+
+const appStyle = computed(() => {
+  const cs = deckColors.value
+  if (!cs.length) return {}
+  // Un dégradé à une seule butée n'est pas un dégradé : un deck mono-couleur
+  // doit quand même remplir le rail, donc on double la teinte.
+  const stops = (cs.length === 1 ? [cs[0], cs[0]] : cs).map(c => MANA_VARS[c])
+  return {
+    '--deck-chroma': `linear-gradient(90deg, ${stops.join(', ')})`,
+    '--deck-tint': MANA_VARS[cs[0]],
+  }
+})
+
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
 const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 const { show } = useToast()

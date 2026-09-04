@@ -1,0 +1,689 @@
+/* ════════════════════════════════════════════════════════════════════════
+   SKIN « ARCANE » — habillage alternatif
+   ════════════════════════════════════════════════════════════════════════
+
+   Ce fichier ne remplace rien : il s'ajoute. Sans l'attribut
+   `data-skin="arcane"` sur <html>, pas une seule de ces règles ne s'applique
+   et le site rend exactement comme la direction « papier » d'origine.
+
+   L'intention
+   -----------
+   Tous les outils Magic se ressemblent : un tableau de bord gris, des tables
+   denses, un accent bleu. Ils empruntent leur langage au SaaS, pas au jeu.
+   Or Magic a une identité visuelle que personne n'exploite comme système de
+   design : ses cinq couleurs de mana, et le cadre de carte lui-même.
+
+   Arcane part de là :
+     1. La couleur vient du deck. Un deck bleu-noir affiche une app bleu-noir.
+        C'est `--deck-chroma`, posé par App.vue depuis l'identité colorielle
+        des cartes. Chaque deck a donc sa propre teinte — aucun concurrent ne
+        fait ça, et c'est gratuit en CSS.
+     2. Les angles sont taillés, pas arrondis. Les panneaux portent une
+        encoche en biseau haut-gauche / bas-droite : le geste du cadre de
+        carte, transposé en interface.
+     3. La hiérarchie vient de la typographie gravée (Cinzel en capitales
+        pour les titres, Space Grotesk pour l'interface, mono pour tous les
+        chiffres) et d'un filet coloré par catégorie, pas de fonds empilés.
+     4. L'élévation est une lueur, pas une ombre. Sur une encre froide, une
+        ombre noire ne se voit pas ; une lueur violette, si.
+
+   La spécificité
+   --------------
+   Les composants utilisent `<style scoped>`, ce qui ajoute un `[data-v-…]`
+   à chaque sélecteur — soit une classe de spécificité en plus. Le préfixe
+   `html[data-skin="arcane"]:root` pèse (0,2,1) et passe donc devant un
+   `.foo[data-v-…]` à (0,2,0), sans avoir à sortir un seul `!important`.
+   Il est constant dans tout le fichier : ne pas l'alléger.
+
+   Et comme partout ailleurs dans ce projet : les media queries sont
+   regroupées en fin de fichier. Une media query n'augmente pas la
+   spécificité — placée avant la règle qu'elle annule, elle perd en silence.
+   ════════════════════════════════════════════════════════════════════════ */
+
+@import '@fontsource/cinzel/latin-600.css';
+@import '@fontsource/cinzel/latin-700.css';
+@import '@fontsource/space-grotesk/latin-400.css';
+@import '@fontsource/space-grotesk/latin-500.css';
+@import '@fontsource/space-grotesk/latin-700.css';
+
+/* ── 1. Jetons — variante sombre (le mode natif du skin) ───────────────── */
+
+:root[data-skin="arcane"] {
+  /* Encre froide, délibérément à l'opposé du papier chaud de « papier » :
+     on doit voir qu'on a changé d'app, pas qu'on a bougé un curseur. */
+  --bg-app: #0b0d14;
+  --bg-canvas: #07080d;
+  --canvas-glow: rgba(124, 108, 255, 0.10);
+  --surface-1: #11131d;
+  --surface-2: #161a26;
+  --surface-3: #1c2130;
+  --surface-sunk: #06070b;
+  --surface-menu: #161a26;
+
+  --fill-1: rgba(196, 205, 255, 0.04);
+  --fill-2: rgba(196, 205, 255, 0.08);
+  --fill-3: rgba(196, 205, 255, 0.13);
+  --fill-4: rgba(196, 205, 255, 0.20);
+
+  --border-subtle: rgba(150, 165, 220, 0.12);
+  --border: rgba(150, 165, 220, 0.20);
+  --border-strong: rgba(150, 165, 220, 0.34);
+  --border-focus: rgba(150, 165, 220, 0.55);
+
+  --text-1: #eaeefb;
+  --text-2: rgba(234, 238, 251, 0.80);
+  --text-3: rgba(234, 238, 251, 0.62);
+  --text-4: rgba(234, 238, 251, 0.50);
+
+  /* Violet clair : lisible comme texte sur l'encre (6,8:1) et assez lumineux
+     pour porter du texte sombre quand il sert de fond de bouton (6,8:1
+     également). Un violet moyen aurait échoué des deux côtés. */
+  --accent: #9b8cff;
+  --accent-hover: #b4a8ff;
+  --accent-fill: rgba(155, 140, 255, 0.11);
+  --accent-fill-hover: rgba(155, 140, 255, 0.18);
+  --accent-border: rgba(155, 140, 255, 0.30);
+  --accent-border-hov: rgba(155, 140, 255, 0.50);
+  --accent-glow: rgba(124, 108, 255, 0.35);
+  --text-on-accent: #0b0d14;
+  --text-inverse: #0b0d14;
+
+  --btn-primary-bg: #9b8cff;
+  --btn-primary-bg-hover: #b4a8ff;
+  --btn-primary-glow: rgba(124, 108, 255, 0.32);
+  --btn-primary-glow-hover: rgba(124, 108, 255, 0.48);
+
+  --success: #4bc98a;
+  --success-fill: rgba(75, 201, 138, 0.11);
+  --success-border: rgba(75, 201, 138, 0.28);
+  --danger: #ff6a52;
+  --danger-fill: rgba(255, 106, 82, 0.11);
+  --danger-border: rgba(255, 106, 82, 0.28);
+  --warning: #f0c04a;
+  --warning-fill: rgba(240, 192, 74, 0.07);
+  --info: #4d9bff;
+  --info-fill: rgba(77, 155, 255, 0.11);
+
+  --scrim: rgba(4, 5, 9, 0.68);
+  --scrim-strong: rgba(4, 5, 9, 0.86);
+
+  /* Élévation par la lueur. Une ombre noire sur #07080d est invisible :
+     ce qui détache un panneau ici, c'est le halo violet et le liseré clair. */
+  --shadow-1: 0 1px 0 rgba(196, 205, 255, 0.06), 0 2px 12px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 1px 0 rgba(196, 205, 255, 0.07), 0 6px 24px rgba(9, 6, 30, 0.7);
+  --shadow-3: 0 1px 0 rgba(196, 205, 255, 0.08), 0 10px 34px rgba(9, 6, 30, 0.8), 0 0 32px var(--accent-glow);
+  --shadow-4: 0 1px 0 rgba(196, 205, 255, 0.10), 0 24px 60px rgba(2, 2, 8, 0.9), 0 0 48px var(--accent-glow);
+  --shadow-lg: var(--shadow-4);
+  --shadow-tint-1: rgba(0, 0, 0, 0.45);
+  --shadow-tint-2: rgba(0, 0, 0, 0.60);
+  --shadow-tint-3: rgba(0, 0, 0, 0.75);
+
+  /* Les cinq couleurs de mana, calibrées pour l'encre. Elles ne servent pas
+     de décoration : ce sont les jetons dont tout le reste dérive. */
+  --mana-w: #f2e3bd;
+  --mana-u: #4d9bff;
+  --mana-b: #a98bf0;
+  --mana-r: #ff6a52;
+  --mana-g: #4bc98a;
+
+  /* Repli quand aucun deck n'est chargé : le spectre complet. App.vue
+     remplace cette valeur par les seules couleurs du deck ouvert. */
+  --deck-chroma: linear-gradient(
+    90deg,
+    var(--mana-w) 0%,
+    var(--mana-u) 26%,
+    var(--mana-b) 50%,
+    var(--mana-r) 74%,
+    var(--mana-g) 100%
+  );
+  --deck-tint: var(--accent);
+
+  /* Couleurs de catégorie, réaccordées sur la palette de mana plutôt que sur
+     la roue générique de Tailwind. */
+  --cat-commander: #f0c04a;
+  --cat-creature: #4bc98a;
+  --cat-instant: #4d9bff;
+  --cat-sorcery: #a98bf0;
+  --cat-artifact: #b9c2d6;
+  --cat-enchantment: #f78fc2;
+  --cat-planeswalker: #ff9b3d;
+  --cat-land: #c8a06a;
+  --cat-other: #8d97ad;
+  --cat-zone: #8d97ad;
+  --cat-custom: #9fa9bf;
+
+  --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', 'Trajan Pro', 'Iowan Old Style', Georgia, serif;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+
+  /* Profondeur du biseau des panneaux. En dessous de 16px il ne se lit plus
+     sur un bloc large ; au-delà il mange le contenu.
+     `.dk-collection` a été retiré de la liste des biseautés : son premier
+     libellé colle au bord haut-gauche, et le biseau lui coupait la première
+     lettre. Un panneau ne peut porter l'encoche que si son contenu est en
+     retrait d'au moins --notch. */
+  --notch: 16px;
+  --deck-bg-opacity: 0.09;
+}
+
+/* ── 2. Jetons — variante claire ───────────────────────────────────────── */
+/* Pas un « papier » : une planche d'imprimeur froide, bleutée, pour que le
+   skin garde son identité quand on bascule en clair. */
+
+:root[data-skin="arcane"][data-theme="light"] {
+  --bg-app: #eef0f7;
+  --bg-canvas: #e3e6f1;
+  --canvas-glow: rgba(76, 53, 212, 0.07);
+  --surface-1: #ffffff;
+  --surface-2: #f8f9fd;
+  --surface-3: #ffffff;
+  --surface-sunk: rgba(20, 22, 40, 0.05);
+  --surface-menu: #ffffff;
+
+  --fill-1: rgba(20, 22, 40, 0.04);
+  --fill-2: rgba(20, 22, 40, 0.07);
+  --fill-3: rgba(20, 22, 40, 0.12);
+  --fill-4: rgba(20, 22, 40, 0.18);
+
+  --border-subtle: rgba(20, 22, 40, 0.11);
+  --border: rgba(20, 22, 40, 0.18);
+  --border-strong: rgba(20, 22, 40, 0.30);
+  --border-focus: rgba(20, 22, 40, 0.48);
+
+  --text-1: #12141f;
+  --text-2: rgba(18, 20, 31, 0.80);
+  --text-3: rgba(18, 20, 31, 0.62);
+  --text-4: rgba(18, 20, 31, 0.55);
+
+  --accent: #4c35d4;
+  --accent-hover: #3a26ad;
+  --accent-fill: rgba(76, 53, 212, 0.08);
+  --accent-fill-hover: rgba(76, 53, 212, 0.14);
+  --accent-border: rgba(76, 53, 212, 0.28);
+  --accent-border-hov: rgba(76, 53, 212, 0.46);
+  --accent-glow: rgba(76, 53, 212, 0.22);
+  --text-on-accent: #ffffff;
+  --text-inverse: #ffffff;
+
+  --btn-primary-bg: #4c35d4;
+  --btn-primary-bg-hover: #3a26ad;
+  --btn-primary-glow: rgba(76, 53, 212, 0.24);
+  --btn-primary-glow-hover: rgba(76, 53, 212, 0.36);
+
+  --success: #16794a;
+  --success-fill: rgba(22, 121, 74, 0.09);
+  --success-border: rgba(22, 121, 74, 0.28);
+  --danger: #c2341c;
+  --danger-fill: rgba(194, 52, 28, 0.08);
+  --danger-border: rgba(194, 52, 28, 0.26);
+  --warning: #92400e;
+  --warning-fill: rgba(240, 192, 74, 0.20);
+  --info: #1b4fa8;
+  --info-fill: rgba(27, 79, 168, 0.09);
+
+  --scrim: rgba(18, 20, 31, 0.38);
+  --scrim-strong: rgba(18, 20, 31, 0.58);
+
+  --shadow-1: 0 1px 2px rgba(30, 30, 70, 0.10);
+  --shadow-2: 0 4px 14px rgba(30, 30, 70, 0.11);
+  --shadow-3: 0 10px 30px rgba(30, 30, 70, 0.15);
+  --shadow-4: 0 22px 50px rgba(30, 30, 70, 0.20);
+  --shadow-lg: var(--shadow-4);
+  --shadow-tint-1: rgba(30, 30, 70, 0.07);
+  --shadow-tint-2: rgba(30, 30, 70, 0.11);
+  --shadow-tint-3: rgba(30, 30, 70, 0.18);
+
+  /* Les mêmes cinq teintes, assombries : l'ivoire du blanc et le vert clair
+     tombaient sous 2:1 sur fond blanc, illisibles en texte comme en filet. */
+  --mana-w: #a1852f;
+  --mana-u: #1b5fd0;
+  --mana-b: #6b3fc4;
+  --mana-r: #c2341c;
+  --mana-g: #16794a;
+
+  --cat-commander: #9a6a00;
+  --cat-creature: #16794a;
+  --cat-instant: #1b5fd0;
+  --cat-sorcery: #6b3fc4;
+  --cat-artifact: #4a5468;
+  --cat-enchantment: #b4266e;
+  --cat-planeswalker: #b45309;
+  --cat-land: #7c5a2a;
+  --cat-other: #4a5468;
+  --cat-zone: #4a5468;
+  --cat-custom: #4a5468;
+
+  --deck-bg-opacity: 0.05;
+}
+
+/* ── 3. Formes : on dégonfle tous les rayons ───────────────────────────── */
+/* Le skin « papier » arrondit à 6px, l'app d'origine allait jusqu'à 20px.
+   Ici tout est taillé. Règle universelle plutôt qu'une liste de cent
+   sélecteurs : la spécificité du préfixe suffit à passer devant les styles
+   scopés, et les rares formes qui doivent rester rondes sont rétablies
+   juste en dessous. */
+
+html[data-skin="arcane"]:root * {
+  border-radius: 0;
+}
+
+/* Le spinner est un anneau : carré, il devient un rectangle qui tourne. */
+html[data-skin="arcane"]:root .lpl-spinner {
+  border-radius: 50%;
+}
+
+/* ── 4. Le rail chromatique ────────────────────────────────────────────── */
+/* Signature n°1, visible avant même d'avoir lu un mot : un filet de 3px aux
+   couleurs du deck, en haut de l'écran. Sans deck, c'est le spectre entier. */
+
+html[data-skin="arcane"]:root .cmd-app {
+  position: relative;
+}
+
+html[data-skin="arcane"]:root .cmd-app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: var(--deck-chroma);
+  pointer-events: none;
+}
+
+/* ── 5. Panneaux et canevas ────────────────────────────────────────────── */
+
+html[data-skin="arcane"]:root .cmd-left {
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-app);
+}
+
+/* Le canevas porte la teinte du deck en halo, plus une trame diagonale très
+   basse : de la matière, pas un aplat. */
+html[data-skin="arcane"]:root .cmd-right {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      var(--fill-1) 0 1px,
+      transparent 1px 9px
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 78% 0%,
+      color-mix(in srgb, var(--deck-tint) 16%, transparent) 0%,
+      transparent 68%
+    ),
+    var(--bg-canvas);
+}
+
+/* Le biseau : haut-gauche et bas-droite, comme le coin taillé d'un cadre de
+   carte. Réservé aux blocs qui ne contiennent aucun menu déroulant —
+   clip-path coupe aussi les enfants qui débordent. */
+html[data-skin="arcane"]:root .cat-cards,
+html[data-skin="arcane"]:root .lpr-card,
+html[data-skin="arcane"]:root .lpr-coll,
+html[data-skin="arcane"]:root .lpr-nofr-pitch,
+html[data-skin="arcane"]:root .dk-nofr,
+html[data-skin="arcane"]:root .pt {
+  clip-path: polygon(
+    var(--notch) 0,
+    100% 0,
+    100% calc(100% - var(--notch)),
+    calc(100% - var(--notch)) 100%,
+    0 100%,
+    0 var(--notch)
+  );
+}
+
+/* ── 6. La liste : un filet coloré par catégorie ───────────────────────── */
+/* Signature n°2. `--cat-color` est déjà posé par CategoryGroup sur le groupe :
+   il suffit d'en faire une colonne vertébrale au lieu d'une pastille. */
+
+html[data-skin="arcane"]:root .cat-cards {
+  background: var(--surface-1);
+  border: none;
+  border-left: 2px solid var(--cat-color, var(--accent));
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* L'en-tête devient une ligne de type : libellé gravé à gauche, compte en
+   chiffres monospacés à droite, filet dégradé qui s'éteint. */
+html[data-skin="arcane"]:root .cat-head {
+  border-bottom: none;
+  padding-bottom: 9px;
+  margin-bottom: 0;
+  position: relative;
+}
+
+html[data-skin="arcane"]:root .cat-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cat-color) 0%, transparent 65%);
+  opacity: 0.6;
+}
+
+/* L'étoile devient un losange — le même motif que la case à cocher, repris
+   de la fente des symboles de mana. */
+html[data-skin="arcane"]:root .cat-spark {
+  display: none;
+}
+
+html[data-skin="arcane"]:root .cat-head-left::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  background: var(--cat-color);
+  transform: rotate(45deg);
+}
+
+html[data-skin="arcane"]:root .cat-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+html[data-skin="arcane"]:root .cat-count {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+html[data-skin="arcane"]:root .cat-toggle {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+/* ── 7. Les lignes de cartes ───────────────────────────────────────────── */
+
+html[data-skin="arcane"]:root .cr-row {
+  border-left: 0;
+  padding: 12px 16px;
+}
+
+/* Le survol fait glisser un lavis de la couleur de catégorie depuis la
+   gauche, au lieu d'allumer un fond gris uniforme. */
+html[data-skin="arcane"]:root .cr-row:hover {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cat-color, var(--accent)) 14%, transparent) 0%,
+    transparent 55%
+  );
+  border-left-color: transparent;
+}
+
+/* La quantité quitte sa gélule pour devenir un chiffre de collection,
+   aligné à droite contre le nom. */
+html[data-skin="arcane"]:root .cr-qty {
+  width: 26px;
+  height: auto;
+  background: none;
+  border: none;
+  justify-content: flex-end;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+html[data-skin="arcane"]:root .cr-fr {
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--text-1);
+}
+
+/* Le nom anglais passe en monospace : c'est une référence, pas une phrase. */
+html[data-skin="arcane"]:root .cr-en {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+}
+
+html[data-skin="arcane"]:root .cr-price {
+  font-family: var(--font-mono);
+}
+
+/* Le commandant porte le lavis en permanence et un filet doré à gauche. */
+html[data-skin="arcane"]:root .cr-row.commander {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cat-color, var(--accent)) 16%, transparent) 0%,
+    transparent 62%
+  );
+  box-shadow: inset 2px 0 0 var(--cat-color, var(--accent));
+}
+
+/* ── 8. La case à cocher devient un losange ────────────────────────────── */
+/* Le rond est le geste de toutes les listes du web. Le losange est celui de
+   Magic : c'est la fente dans laquelle se lisent les symboles de mana. */
+
+html[data-skin="arcane"]:root .cr-check {
+  width: 17px;
+  height: 17px;
+  border-width: 1.5px;
+  transform: rotate(45deg);
+  margin: 0 3px;
+}
+
+html[data-skin="arcane"]:root .cr-check svg {
+  transform: rotate(-45deg);
+}
+
+html[data-skin="arcane"]:root .cr-row.checked .cr-check {
+  background: var(--cat-color, var(--accent));
+  border-color: var(--cat-color, var(--accent));
+  color: #0b0d14;
+}
+
+/* ── 9. Typographie gravée ─────────────────────────────────────────────── */
+/* style.css passe déjà ces sélecteurs en `--font-display` avec un
+   interlettrage négatif de -0.02em : réglage juste pour une Fraunces, faux
+   pour une Cinzel, dont les capitales romaines demandent de l'air. */
+
+html[data-skin="arcane"]:root :is(h1, h2, .lpl-title, .dk-name, .lpr-step-title,
+.pt-name, .cm-title, .lpr-section-title) {
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+html[data-skin="arcane"]:root .lpl-title {
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  line-height: 1.22;
+  font-size: clamp(22px, 2.9vw, 30px);
+  font-weight: 700;
+}
+
+/* La deuxième ligne du titre se dégrade vers l'accent. Le spectre complet a
+   été essayé ici et rejeté : cinq couleurs sur une capitale de 30px, ça ne
+   dit plus « Magic », ça dit « clavier RGB », et la moitié des lettres passe
+   sous le seuil de contraste. Le spectre reste là où il porte — le rail,
+   la marque, les jauges : de petites surfaces, lues d'un coup. */
+html[data-skin="arcane"]:root .lpl-grad {
+  background: linear-gradient(100deg, var(--text-1) 0%, var(--accent) 88%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+html[data-skin="arcane"]:root :is(.lpr-section-title, .dk-coll-label,
+.lpr-step-title, .cm-title) {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11.5px;
+}
+
+html[data-skin="arcane"]:root .lpl-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+}
+
+html[data-skin="arcane"]:root .lpl-free {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+/* Tous les chiffres en monospace : c'est ce qui les rend comparables d'une
+   ligne à l'autre, et c'est le registre des informations de collection au
+   bas d'une carte. */
+html[data-skin="arcane"]:root :is(.dk-stat, .lpr-card-count, .lpl-resume-count,
+.dk-coll-pct, .dk-coll-stats, .dkf-count, .tile-price, .tile-qty, .pt-price,
+.progress-count, .lpr-step-num) {
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+/* ── 10. Boutons ───────────────────────────────────────────────────────── */
+/* Micro-capitales espacées : le registre des lignes de type d'une carte. */
+
+html[data-skin="arcane"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.dk-point-btn, .lpr-coll-btn, .dk-nofr-btn, .cm-btn, .lpl-list-btn,
+.lpl-paste-btn) {
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* Le liseré et le halo signalent une action disponible : posés sur l'état
+   désactivé, ils promettaient un bouton cliquable qui ne l'est pas. */
+html[data-skin="arcane"]:root .lpl-translate-btn:not(:disabled) {
+  box-shadow: 0 0 0 1px var(--accent-border), 0 4px 24px var(--btn-primary-glow);
+}
+
+html[data-skin="arcane"]:root .lpl-translate-btn:disabled {
+  box-shadow: none;
+}
+
+html[data-skin="arcane"]:root .lpl-translate-btn:hover:not(:disabled) {
+  box-shadow: 0 0 0 1px var(--accent-border-hov), 0 6px 32px var(--btn-primary-glow-hover);
+}
+
+/* Onglets : un filet sous l'actif plutôt qu'une gélule remplie. La gouttière
+   sombre du conteneur doit partir avec elle, sinon l'onglet actif paraît
+   creusé au lieu d'être souligné. */
+html[data-skin="arcane"]:root .lpl-mode-tabs {
+  padding: 0;
+  gap: 0;
+  background: none;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 2px;
+}
+
+html[data-skin="arcane"]:root .lpl-mode-tab {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+html[data-skin="arcane"]:root .lpl-mode-tab.active {
+  background: none;
+  border-bottom-color: var(--accent);
+  color: var(--text-1);
+}
+
+/* Filtres de la liste : mêmes micro-capitales, actif souligné d'accent. */
+html[data-skin="arcane"]:root :is(.dk-filter-btn, .dk-view-btn) {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* ── 11. La marque : un losange chromatique ────────────────────────────── */
+
+html[data-skin="arcane"]:root .lpl-logo {
+  width: 26px;
+  height: 26px;
+  background: var(--deck-chroma);
+  border: none;
+  transform: rotate(45deg);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+html[data-skin="arcane"]:root .lpl-logo svg {
+  display: none;
+}
+
+/* Les pastilles de couleur d'un deck deviennent des losanges, pour rimer
+   avec la marque et les cases à cocher. */
+html[data-skin="arcane"]:root :is(.lpr-color-pip, .lpl-resume-pip) {
+  transform: rotate(45deg);
+}
+
+/* Les jauges se remplissent aux couleurs du deck. */
+html[data-skin="arcane"]:root :is(.dk-coll-fill, .progress-fill, .pt-progress-fill) {
+  background: var(--deck-chroma);
+}
+
+/* ── 12. Détails ───────────────────────────────────────────────────────── */
+
+html[data-skin="arcane"]:root .lpl-input-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-2);
+}
+
+html[data-skin="arcane"]:root .lpr-card:hover {
+  box-shadow: 0 0 0 1px var(--accent-border), 0 8px 28px var(--shadow-tint-2);
+}
+
+html[data-skin="arcane"]:root .dk-bar {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-3);
+}
+
+/* L'anneau de focus suit la forme taillée : pas d'arrondi hérité. */
+html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
+[tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* ── Media queries, regroupées en fin de feuille ───────────────────────── */
+
+@media (max-width: 640px) {
+  /* Le biseau est un geste d'écran large : à 360px de laize il ampute un
+     coin de texte utile. */
+  html[data-skin="arcane"]:root {
+    --notch: 9px;
+  }
+
+  html[data-skin="arcane"]:root .lpl-title {
+    letter-spacing: 0.03em;
+    font-size: clamp(20px, 6.5vw, 26px);
+  }
+
+  /* La trame diagonale se lit comme du moiré sur un écran dense. */
+  html[data-skin="arcane"]:root .cmd-right {
+    background:
+      radial-gradient(
+        ellipse 90% 40% at 50% 0%,
+        color-mix(in srgb, var(--deck-tint) 14%, transparent) 0%,
+        transparent 70%
+      ),
+      var(--bg-canvas);
+  }
+}

@@ -114,6 +114,18 @@ export function setTheme(value) {
   safeSet('theme', value)
 }
 
+// --- Skin (habillage visuel) ---
+// Distinct du thème clair/sombre : le thème choisit une luminosité, le skin
+// choisit un langage graphique entier (palette, typographie, formes).
+
+export function getSkin() {
+  return safeGet('skin', 'papier')
+}
+
+export function setSkin(value) {
+  safeSet('skin', value)
+}
+
 // --- Simple djb2 hash for paste text ---
 
 export function hashString(str) {
