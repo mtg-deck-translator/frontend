@@ -90,13 +90,13 @@ describe('skin arcane — jetons', () => {
     }
   })
 
-  it('prévoit un repli monochrome pour --deck-chroma', () => {
-    // App.vue ne pose --deck-chroma qu'une fois un deck ouvert. Sans repli,
-    // le rail supérieur serait transparent sur toute la page d'accueil.
-    // Et ce repli doit rester monochrome : un arc-en-ciel permanent en haut
-    // d'écran fait pacotille, la couleur ne doit apparaître que quand elle
-    // dit quelque chose — les couleurs du deck ouvert.
-    expect(STRIPPED).toMatch(/--deck-chroma:\s*var\(--accent\)/)
-    expect(STRIPPED).not.toMatch(/--deck-chroma:\s*linear-gradient/)
+  it('garde la couleur du deck discrète', () => {
+    // --deck-tint est la teinte dominante du deck ouvert. Elle a un repli,
+    // sinon le halo du canevas serait transparent sur l'accueil.
+    expect(STRIPPED).toMatch(/--deck-tint:\s*var\(--accent\)/)
+    // Et elle ne doit jamais redevenir un dégradé multicolore : le bandeau
+    // arc-en-ciel plein cadre était la plus grosse capture d'attention de la
+    // page pour une information purement décorative.
+    expect(STRIPPED).not.toMatch(/--deck-(chroma|tint):\s*linear-gradient/)
   })
 })

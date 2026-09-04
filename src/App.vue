@@ -257,6 +257,18 @@
 
             <div class="dk-info">
               <h2 class="dk-name">{{ deckName }}</h2>
+              <!-- L'identité colorielle du deck. Elle vivait en haut de
+                   l'écran, en bandeau plein cadre : à cet endroit c'était de
+                   la décoration criarde. Ici, sous le nom, c'est le premier
+                   endroit où on la cherche. -->
+              <div v-if="deckColors.length" class="dk-colors" aria-label="Couleurs du deck">
+                <span
+                  v-for="c in deckColors"
+                  :key="c"
+                  class="dk-color-pip"
+                  :style="MTG_COLOR_STYLES[c]"
+                />
+              </div>
               <div class="dk-stats">
                 <span class="dk-stat">{{ cards.length }} cartes</span>
                 <span v-if="totalPrice > 0" class="dk-stat dk-stat-price">{{ formatPrice(totalPrice) }}</span>
@@ -984,18 +996,11 @@ const MANA_VARS = { W: 'var(--mana-w)', U: 'var(--mana-u)', B: 'var(--mana-b)', 
 const appStyle = computed(() => {
   const cs = deckColors.value
   if (!cs.length) return {}
-  // Blocs à bord franc, pas un dégradé. Interpoler entre cinq teintes donne
-  // un arc-en-ciel qui fait pacotille — et qui ne dit rien : on ne lit plus
-  // quelles couleurs le deck joue, seulement une bouillie. Des segments nets
-  // se comptent d'un coup d'œil, comme les pastilles de couleur d'un deck.
-  const step = 100 / cs.length
-  const stops = cs.map(
-    (c, i) => `${MANA_VARS[c]} ${(i * step).toFixed(2)}% ${((i + 1) * step).toFixed(2)}%`
-  )
-  return {
-    '--deck-chroma': `linear-gradient(90deg, ${stops.join(', ')})`,
-    '--deck-tint': MANA_VARS[cs[0]],
-  }
+  // Une seule teinte, celle qui domine le deck, et elle ne sert qu'au halo du
+  // canevas. Le bandeau plein cadre qui affichait les cinq couleurs a été
+  // retiré : les couleurs du deck se lisent maintenant en losanges sous son
+  // nom, là où on les cherche, au lieu de barrer le haut de l'écran.
+  return { '--deck-tint': MANA_VARS[cs[0]] }
 })
 
 const { history, add: addToHistory, clear: clearHistory, getEntryPasteText } = useHistory()
@@ -1775,6 +1780,20 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-back:hover { color: var(--text-3); }
 
 .dk-info { margin-bottom: 16px; }
+
+.dk-colors {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dk-color-pip {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block;
+}
 
 .dk-name {
   font-size: 20px;

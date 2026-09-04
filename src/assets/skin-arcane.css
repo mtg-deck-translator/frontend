@@ -14,10 +14,12 @@
    design : ses cinq couleurs de mana, et le cadre de carte lui-même.
 
    Arcane part de là :
-     1. La couleur vient du deck. Un deck bleu-noir affiche une app bleu-noir.
-        C'est `--deck-chroma`, posé par App.vue depuis l'identité colorielle
-        des cartes. Chaque deck a donc sa propre teinte — aucun concurrent ne
-        fait ça, et c'est gratuit en CSS.
+     1. La couleur obéit à une règle unique, et c'est la règle qui fait le
+        calme : l'accent violet ne désigne QUE l'action principale, la palette
+        de mana ne désigne QUE les catégories de la liste, et rien d'autre
+        n'est coloré. Un prix, un pourcentage, un compteur sont du texte.
+        Le deck garde sa teinte, mais seulement dans le halo du canevas et
+        dans les losanges sous son nom.
      2. Les angles sont taillés, pas arrondis. Les panneaux portent une
         encoche en biseau haut-gauche / bas-droite : le geste du cadre de
         carte, transposé en interface.
@@ -126,13 +128,9 @@
   --mana-r: #ff6a52;
   --mana-g: #4bc98a;
 
-  /* Au repos : rien qu'un accent plein. Le spectre des cinq couleurs a été
-     essayé ici comme valeur par défaut, et il fait pacotille — un arc-en-ciel
-     permanent en haut d'écran, ça ne dit pas « Magic », ça dit « thème de
-     bureau 2004 ». La couleur n'apparaît que lorsqu'elle veut dire quelque
-     chose : App.vue remplace cette valeur par les couleurs du deck ouvert,
-     en blocs à bord franc. */
-  --deck-chroma: var(--accent);
+  /* Teinte dominante du deck ouvert, posée par App.vue. Elle ne sert plus
+     qu'au halo du canevas — assez pour que deux decks n'aient pas la même
+     lumière, trop discret pour entrer en concurrence avec quoi que ce soit. */
   --deck-tint: var(--accent);
 
   /* Couleurs de catégorie, réaccordées sur la palette de mana plutôt que sur
@@ -277,21 +275,11 @@ html[data-skin="arcane"]:root .lpl-spinner {
 /* Signature n°1, visible avant même d'avoir lu un mot : un filet de 3px aux
    couleurs du deck, en haut de l'écran. Sans deck, c'est le spectre entier. */
 
-html[data-skin="arcane"]:root .cmd-app {
-  position: relative;
-}
-
-html[data-skin="arcane"]:root .cmd-app::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 60;
-  background: var(--deck-chroma);
-  pointer-events: none;
-}
+/* Le bandeau chromatique plein cadre a été retiré. Trois pixels sur toute la
+   largeur, à la saturation maximale, tout en haut de l'écran : c'était la
+   plus grosse capture d'attention de la page pour une information purement
+   décorative. Les couleurs du deck disent quelque chose — elles sont passées
+   sous le nom du deck, en losanges, là où on les cherche. */
 
 /* ── 5. Panneaux et canevas ────────────────────────────────────────────── */
 
@@ -383,11 +371,17 @@ html[data-skin="arcane"]:root .cat-head-left::before {
   transform: rotate(45deg);
 }
 
+/* Le libellé passe en texte neutre. La couleur de catégorie reste — mais sur
+   le losange et sur le filet, deux petites surfaces. Colorée aussi, la ligne
+   de titre faisait de chaque en-tête un surlignage : six teintes saturées
+   empilées sur une page, et plus rien qui hiérarchise. La couleur marque, la
+   typographie titre. */
 html[data-skin="arcane"]:root .cat-label {
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.16em;
+  color: var(--text-2);
 }
 
 html[data-skin="arcane"]:root .cat-count {
@@ -732,6 +726,91 @@ html[data-skin="arcane"]:root .cmd-layout:has(.dk-left) .cmd-right {
     var(--bg-canvas);
 }
 
+/* ── 11 quater. Discipline de la couleur ───────────────────────────────── */
+/* Compté sur un écran deck réel : bandeau arc-en-ciel plein cadre, six objets
+   violets (prix, pourcentage, jauge, compteur de filtre, bouton du bandeau,
+   bouton principal), une pastille verte pour la collection, un ambre pour
+   l'avertissement, un or pour le commandant, plus une teinte par catégorie.
+   Le problème n'est pas le nombre de teintes : c'est qu'aucune ne veut dire
+   quoi que ce soit. Le violet désigne à la fois une action, un prix, un
+   pourcentage et un compteur — donc il ne désigne rien.
+   La règle, désormais : l'accent ne marque QUE l'action principale, la
+   palette de mana ne marque QUE les catégories, et tout le reste est du
+   texte. Un seul objet violet par panneau. */
+
+/* Le prix total et le pourcentage possédé sont des chiffres à lire, pas des
+   boutons à cliquer. */
+html[data-skin="arcane"]:root .dk-stat-price {
+  color: var(--text-2);
+  background: var(--fill-2);
+  border-color: var(--border);
+}
+
+html[data-skin="arcane"]:root .dk-coll-pct {
+  color: var(--text-2);
+}
+
+/* La jauge en accent doublait le bouton principal, à quinze pixels de lui. */
+html[data-skin="arcane"]:root .dk-coll-fill {
+  background: var(--text-3);
+}
+
+/* Le compteur de l'onglet actif était violet : l'onglet est déjà signalé
+   comme actif par son fond et sa bordure, le chiffre n'avait rien à ajouter. */
+html[data-skin="arcane"]:root .dk-filter-btn.active .dkf-count {
+  color: var(--text-1);
+}
+
+/* « Voir lesquelles » est une action secondaire dans un bandeau
+   d'information : un bouton fantôme, pas un second bouton principal. */
+html[data-skin="arcane"]:root .dk-nofr-btn {
+  color: var(--text-2);
+  background: var(--fill-2);
+  border-color: var(--border);
+}
+
+html[data-skin="arcane"]:root .dk-nofr-btn:hover {
+  color: var(--text-1);
+  background: var(--fill-3);
+  border-color: var(--border-strong);
+}
+
+/* La collection chargée s'annonçait en vert — un troisième système de couleur
+   dans un rail qui en comptait déjà deux, pour dire « c'est bon », ce que la
+   coche et le nom du fichier disent déjà. */
+html[data-skin="arcane"]:root .col-loaded {
+  background: var(--fill-1);
+  border-color: var(--border-subtle);
+}
+
+html[data-skin="arcane"]:root .cl-apply {
+  color: var(--text-2);
+  border-color: var(--border);
+}
+
+html[data-skin="arcane"]:root .cl-apply:hover {
+  color: var(--text-1);
+  background: var(--fill-2);
+}
+
+/* Le commandant portait trois signaux pour une seule ligne : libellé doré,
+   filet doré, et un lavis doré sur toute la ligne. Le filet suffit. */
+html[data-skin="arcane"]:root .cr-row.commander {
+  background-image: none;
+}
+
+/* Les couleurs du deck, sous son nom. Mêmes losanges que la marque, les cases
+   à cocher et les pastilles de l'accueil. */
+html[data-skin="arcane"]:root .dk-color-pip {
+  transform: rotate(45deg);
+  width: 10px;
+  height: 10px;
+}
+
+html[data-skin="arcane"]:root .dk-colors {
+  gap: 5px;
+}
+
 /* ── 12. Détails ───────────────────────────────────────────────────────── */
 
 html[data-skin="arcane"]:root .lpl-input-card {
@@ -974,11 +1053,7 @@ html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
 
   html[data-skin="arcane"]:root .cr-row.commander {
     background-color: var(--surface-1);
-    background-image: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--cat-color, var(--accent)) 18%, transparent) 0%,
-      transparent 70%
-    );
+    background-image: none;
   }
 
   /* Le nom anglais passe sous le français : dans 475px il leur faut deux
