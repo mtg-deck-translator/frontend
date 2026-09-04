@@ -20,7 +20,16 @@ describe('orderCategories', () => {
 
   it('intercale les catégories personnalisées entre types et zones annexes', () => {
     expect(orderCategories(['Maybeboard', 'Ramp', 'Land', 'Sideboard', 'Creature', 'Other', 'Buff']))
-      .toEqual(['Creature', 'Land', 'Buff', 'Ramp', 'Other', 'Sideboard', 'Maybeboard'])
+      .toEqual(['Creature', 'Buff', 'Ramp', 'Land', 'Other', 'Sideboard', 'Maybeboard'])
+  })
+
+  // Mesuré sur un Commander Archidekt réel : la liste s'ouvrait sur
+  // « Commandant » puis dix-sept terrains à 0,20 €, et le premier écran entier
+  // partait en terrains de base — que personne n'achète. Le deck lui-même,
+  // rangé dans les catégories de l'utilisateur, arrivait après.
+  it('repousse les terrains après les catégories personnalisées', () => {
+    expect(orderCategories(['Land', 'Ramp', 'Commander', 'Removal']))
+      .toEqual(['Commander', 'Ramp', 'Removal', 'Land'])
   })
 
   it('trie les catégories personnalisées par ordre alphabétique', () => {
@@ -29,7 +38,7 @@ describe('orderCategories', () => {
   })
 
   it('dédoublonne les entrées répétées', () => {
-    expect(orderCategories(['Land', 'Land', 'Ramp', 'Ramp'])).toEqual(['Land', 'Ramp'])
+    expect(orderCategories(['Land', 'Land', 'Ramp', 'Ramp'])).toEqual(['Ramp', 'Land'])
   })
 
   it('accepte un Set aussi bien qu’un tableau', () => {

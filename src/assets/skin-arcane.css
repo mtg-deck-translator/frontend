@@ -664,6 +664,74 @@ html[data-skin="arcane"]:root .lpr-foot:has(> :only-child) {
   display: block;
 }
 
+/* ── 11 ter. La barre d'outils du deck ─────────────────────────────────── */
+/* Mesuré à 1889px : quatre grappes de contrôles à x=432, 791, 1269 et 1684,
+   séparées par 222, 223 et 222px de vide, et hautes de 36, 58, 36 et 30px.
+   `justify-content: space-between` sur quatre enfants distribue le vide à
+   parts égales : rien n'est groupé, tout flotte, et le filtre — un contrôle
+   secondaire — est le plus gros objet de la barre.
+   La convention établie (GitHub, Linear, Vercel) tient en une ligne : un
+   groupe à gauche, un groupe à droite, 8px à l'intérieur d'un groupe, et
+   toutes les cibles à la même hauteur. */
+
+html[data-skin="arcane"]:root .dk-toolbar {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+/* Ce qui filtre le contenu reste à gauche, contre la liste ; ce qui la
+   fouille passe à droite. `margin-left: auto` remplace les 222px de vide. */
+html[data-skin="arcane"]:root .dk-search {
+  margin-left: auto;
+  height: 34px;
+}
+
+html[data-skin="arcane"]:root .dk-filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+/* Le compte passe à côté du libellé au lieu d'être empilé dessous : le bouton
+   descend de 58 à 34px, à hauteur du reste de la barre. */
+html[data-skin="arcane"]:root .dk-filter-btn {
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+}
+
+html[data-skin="arcane"]:root .dkf-count {
+  font-size: 11.5px;
+}
+
+html[data-skin="arcane"]:root .dk-views {
+  height: 34px;
+  padding: 3px;
+}
+
+html[data-skin="arcane"]:root .dk-view-btn {
+  height: 26px;
+  padding: 0 12px;
+}
+
+html[data-skin="arcane"]:root .dk-sort-select {
+  height: 34px;
+}
+
+/* La trame oblique est de la matière sur une page aérée ; derrière quarante
+   lignes de texte, c'est du moiré. */
+html[data-skin="arcane"]:root .cmd-layout:has(.dk-left) .cmd-right {
+  background:
+    radial-gradient(
+      ellipse 70% 50% at 78% 0%,
+      color-mix(in srgb, var(--deck-tint) 14%, transparent) 0%,
+      transparent 68%
+    ),
+    var(--bg-canvas);
+}
+
 /* ── 12. Détails ───────────────────────────────────────────────────────── */
 
 html[data-skin="arcane"]:root .lpl-input-card {
@@ -729,8 +797,17 @@ html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
   /* `:has(.lp-left)` : .lp-left n'existe que sur l'accueil. L'écran deck
      garde ses deux colonnes, qui y sont justes — un rail d'outils à côté
      d'une liste longue. */
+  /* `flex: 1` + `min-height: 0` laisse cet élément se comprimer sous la
+     hauteur de son contenu. Tant que .cmd-left et .cmd-right avaient chacun
+     leur `overflow-y: auto`, ils scrollaient en interne et personne ne le
+     voyait. En colonne, avec un overflow visible, le contenu débordait de
+     .cmd-layout sans faire grandir .cmd-app : le bas de la page était peint
+     hors du viewport, sans barre de défilement pour l'atteindre.
+     `flex: 1 0 auto` grandit avec le contenu et ne se comprime plus. */
   html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) {
     flex-direction: column;
+    flex: 1 0 auto;
+    min-height: auto;
   }
 
   html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) .cmd-left {
@@ -746,6 +823,21 @@ html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
     height: auto;
     overflow: visible;
     background: none;
+  }
+
+  /* La coquille d'origine est une fenêtre fixe : `height: 100dvh` +
+     `overflow: hidden` sur .cmd-app, et chaque colonne scrolle en interne.
+     Ça marche pour deux panneaux côte à côte, pas pour une colonne unique
+     plus haute que l'écran — le bas de la page était peint hors du viewport
+     sans aucune barre pour l'atteindre. Sur l'accueil, c'est la page qui
+     scrolle. */
+  html[data-skin="arcane"]:root .cmd-app:has(.lp-left) {
+    height: auto;
+    overflow: visible;
+  }
+
+  html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) {
+    overflow: visible;
   }
 
   /* La trame oblique passe du panneau droit à la page entière : en colonne,
@@ -830,5 +922,76 @@ html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border), transparent);
     transform: skewY(-0.35deg);
+  }
+}
+
+/* ── La liste en colonnes sur grand écran ──────────────────────────────── */
+/* Mesuré à 1889px : chaque ligne de carte fait 1423px de large, et il y a
+   1192px entre le nom de la carte et son prix. Pour savoir ce que coûte une
+   carte, l'œil traverse tout l'écran — bien au-delà de ce qu'un regard
+   embrasse d'un coup. Pendant ce temps un deck de 81 cartes déroule près de
+   quatre mille pixels de défilement.
+   Une ligne de decklist a besoin d'environ 420px, pas de 1423. Comme
+   Archidekt et Moxfield le font dans leur propre vue deck, on met le reste de
+   la largeur au travail : trois colonnes, un tiers du défilement, et le prix
+   revient à portée du nom.
+   Le filet de catégorie reste sur le conteneur ; les 1px d'écart entre les
+   cellules, remplis par la couleur de bordure, dessinent la grille. */
+
+@media (min-width: 1200px) {
+  /* Fond transparent : une catégorie à une carte laisse deux pistes vides, et
+     un fond de conteneur les faisait lire comme des lignes vides à remplir.
+     Ce sont les cellules qui portent la surface — le vide reste du vide. */
+  html[data-skin="arcane"]:root .cat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 0;
+    background: none;
+  }
+
+  /* Les filets sont portés par les cellules, pas par des gouttières remplies
+     d'une couleur de fond : une catégorie à une seule carte laisse deux pistes
+     de grille vides, et ces pistes affichaient la couleur des filets — deux
+     gros blocs gris qui se lisaient comme des lignes fantômes.
+     `background` en raccourci remettrait background-color à transparent :
+     couleur de fond et lavis de survol sont pilotés séparément. */
+  html[data-skin="arcane"]:root .cr-row {
+    background-color: var(--surface-1);
+    background-image: none;
+    border-bottom: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle);
+    padding: 11px 14px;
+  }
+
+  html[data-skin="arcane"]:root .cr-row:hover {
+    background-color: var(--surface-2);
+    background-image: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--cat-color, var(--accent)) 16%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  html[data-skin="arcane"]:root .cr-row.commander {
+    background-color: var(--surface-1);
+    background-image: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--cat-color, var(--accent)) 18%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Le nom anglais passe sous le français : dans 475px il leur faut deux
+     lignes pour tenir tous les deux sans se faire couper, et c'est lui qu'on
+     donne au vendeur. */
+  html[data-skin="arcane"]:root .cr-names {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  html[data-skin="arcane"]:root .cr-en {
+    font-size: 10px;
+    max-width: 100%;
   }
 }

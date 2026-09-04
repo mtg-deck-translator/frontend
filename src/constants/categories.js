@@ -23,13 +23,27 @@ const LEADING = [
   'Artifact',
   'Enchantment',
   'Planeswalker',
-  'Land',
 ]
+
+/** Les terrains passent après les catégories personnalisées.
+ *
+ * Mesuré sur un Commander Archidekt réel : la liste s'ouvrait sur
+ * « Commandant » (1 carte) puis « Terrains » (17 cartes à 0,20 € pièce), et
+ * le premier écran entier était occupé par des terrains de base — que
+ * personne n'achète. Les catégories de l'utilisateur (« Ramp », « Removal »,
+ * « Buff »), c'est-à-dire le deck lui-même, arrivaient après.
+ *
+ * Le travail à faire ici est « qu'est-ce qu'il me manque à acheter ». Les
+ * terrains de base sont la seule catégorie dont la réponse est toujours
+ * « rien » : ils passent en fin de types, avant les zones annexes. C'est
+ * aussi ce que font Archidekt et Moxfield dans leur propre vue deck.
+ */
+const LANDS = ['Land']
 
 /** Zones annexes, toujours repoussées en fin de liste. */
 const TRAILING = ['Other', 'Sideboard', 'Maybeboard']
 
-export const CATEGORY_ORDER = [...LEADING, ...TRAILING]
+export const CATEGORY_ORDER = [...LEADING, ...LANDS, ...TRAILING]
 
 /** Libellés au singulier — en-têtes d'export, pastilles de navigation. */
 export const CATEGORY_FR = {
@@ -113,6 +127,7 @@ export function orderCategories(present) {
   return [
     ...LEADING.filter(cat => seen.has(cat)),
     ...custom,
+    ...LANDS.filter(cat => seen.has(cat)),
     ...TRAILING.filter(cat => seen.has(cat)),
   ]
 }
