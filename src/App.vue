@@ -984,9 +984,14 @@ const MANA_VARS = { W: 'var(--mana-w)', U: 'var(--mana-u)', B: 'var(--mana-b)', 
 const appStyle = computed(() => {
   const cs = deckColors.value
   if (!cs.length) return {}
-  // Un dégradé à une seule butée n'est pas un dégradé : un deck mono-couleur
-  // doit quand même remplir le rail, donc on double la teinte.
-  const stops = (cs.length === 1 ? [cs[0], cs[0]] : cs).map(c => MANA_VARS[c])
+  // Blocs à bord franc, pas un dégradé. Interpoler entre cinq teintes donne
+  // un arc-en-ciel qui fait pacotille — et qui ne dit rien : on ne lit plus
+  // quelles couleurs le deck joue, seulement une bouillie. Des segments nets
+  // se comptent d'un coup d'œil, comme les pastilles de couleur d'un deck.
+  const step = 100 / cs.length
+  const stops = cs.map(
+    (c, i) => `${MANA_VARS[c]} ${(i * step).toFixed(2)}% ${((i + 1) * step).toFixed(2)}%`
+  )
   return {
     '--deck-chroma': `linear-gradient(90deg, ${stops.join(', ')})`,
     '--deck-tint': MANA_VARS[cs[0]],

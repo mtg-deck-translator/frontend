@@ -126,16 +126,13 @@
   --mana-r: #ff6a52;
   --mana-g: #4bc98a;
 
-  /* Repli quand aucun deck n'est chargé : le spectre complet. App.vue
-     remplace cette valeur par les seules couleurs du deck ouvert. */
-  --deck-chroma: linear-gradient(
-    90deg,
-    var(--mana-w) 0%,
-    var(--mana-u) 26%,
-    var(--mana-b) 50%,
-    var(--mana-r) 74%,
-    var(--mana-g) 100%
-  );
+  /* Au repos : rien qu'un accent plein. Le spectre des cinq couleurs a été
+     essayé ici comme valeur par défaut, et il fait pacotille — un arc-en-ciel
+     permanent en haut d'écran, ça ne dit pas « Magic », ça dit « thème de
+     bureau 2004 ». La couleur n'apparaît que lorsqu'elle veut dire quelque
+     chose : App.vue remplace cette valeur par les couleurs du deck ouvert,
+     en blocs à bord franc. */
+  --deck-chroma: var(--accent);
   --deck-tint: var(--accent);
 
   /* Couleurs de catégorie, réaccordées sur la palette de mana plutôt que sur
@@ -613,13 +610,24 @@ html[data-skin="arcane"]:root :is(.dk-filter-btn, .dk-view-btn) {
 
 /* ── 11. La marque : un losange chromatique ────────────────────────────── */
 
+/* Losange dans un losange, d'une seule couleur. Le même losange que les
+   cases à cocher et les pastilles : la marque est le motif de l'interface,
+   pas une vignette de plus. */
 html[data-skin="arcane"]:root .lpl-logo {
-  width: 26px;
-  height: 26px;
-  background: var(--deck-chroma);
-  border: none;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: 1.5px solid var(--accent);
   transform: rotate(45deg);
-  box-shadow: 0 0 18px var(--accent-glow);
+  box-shadow: none;
+}
+
+html[data-skin="arcane"]:root .lpl-logo::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: var(--accent);
 }
 
 html[data-skin="arcane"]:root .lpl-logo svg {
@@ -632,9 +640,28 @@ html[data-skin="arcane"]:root :is(.lpr-color-pip, .lpl-resume-pip) {
   transform: rotate(45deg);
 }
 
-/* Les jauges se remplissent aux couleurs du deck. */
+/* Les jauges restent monochromes : une barre de progression tricolore ne se
+   lit pas comme une progression, elle se lit comme un bug. */
 html[data-skin="arcane"]:root :is(.dk-coll-fill, .progress-fill, .pt-progress-fill) {
-  background: var(--deck-chroma);
+  background: var(--accent);
+}
+
+/* ── 11 bis. Le bandeau « pas de VF » ──────────────────────────────────── */
+/* Il est rempli d'ambre à 7 % : sur le papier chaud d'origine ça se fond,
+   sur l'encre froide ça devient le seul objet tiède de la page et ça se lit
+   comme un post-it kaki. Le signal passe sur un filet latéral — l'ambre reste
+   là où il alerte, sans teinter tout le bloc. */
+
+html[data-skin="arcane"]:root :is(.lpr-nofr-pitch, .dk-nofr) {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--warning);
+}
+
+/* Seul dans sa grille de trois colonnes, il occupait un tiers de la largeur
+   et paraissait échoué en bas à gauche. */
+html[data-skin="arcane"]:root .lpr-foot:has(> :only-child) {
+  display: block;
 }
 
 /* ── 12. Détails ───────────────────────────────────────────────────────── */
@@ -685,5 +712,123 @@ html[data-skin="arcane"]:root :where(button, a, input, textarea, select,
         transparent 70%
       ),
       var(--bg-canvas);
+  }
+}
+
+/* ── Recomposition de l'accueil sur grand écran ────────────────────────── */
+/* La structure d'origine coupe l'écran en deux : un rail de 400px à gauche
+   qui porte tout le parcours, et un canevas à droite qui reste vide aux trois
+   quarts. L'œil n'a pas de fil : il commence en haut à gauche, redescend, puis
+   doit repartir en haut à droite.
+   Arcane remet tout dans une seule colonne descendante — marque, promesse,
+   champ, puis seulement ensuite le mode d'emploi et les decks récents. Une
+   chose à la fois, dans l'ordre où on s'en sert. Le DOM est déjà dans cet
+   ordre : il n'y a pas une ligne de markup à changer, seulement l'axe. */
+
+@media (min-width: 900px) {
+  /* `:has(.lp-left)` : .lp-left n'existe que sur l'accueil. L'écran deck
+     garde ses deux colonnes, qui y sont justes — un rail d'outils à côté
+     d'une liste longue. */
+  html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) {
+    flex-direction: column;
+  }
+
+  html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) .cmd-left {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    border-right: none;
+    background: none;
+  }
+
+  html[data-skin="arcane"]:root .cmd-layout:has(.lp-left) .cmd-right {
+    flex: 0 0 auto;
+    height: auto;
+    overflow: visible;
+    background: none;
+  }
+
+  /* La trame oblique passe du panneau droit à la page entière : en colonne,
+     elle ne couvrait plus que la moitié basse. */
+  html[data-skin="arcane"]:root .cmd-app:has(.lp-left) {
+    background:
+      repeating-linear-gradient(135deg, var(--fill-1) 0 1px, transparent 1px 9px),
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--canvas-glow) 0%, transparent 70%),
+      var(--bg-app);
+  }
+
+  html[data-skin="arcane"]:root .lp-left {
+    width: 100%;
+    max-width: 1060px;
+    height: auto;
+    margin: 0 auto;
+    padding: 40px 32px 0;
+  }
+
+  html[data-skin="arcane"]:root .lpl-topbar {
+    margin-bottom: 64px;
+  }
+
+  html[data-skin="arcane"]:root .lpl-hero {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  html[data-skin="arcane"]:root .lpl-title {
+    font-size: clamp(30px, 3.4vw, 46px);
+    line-height: 1.18;
+  }
+
+  /* Une ligne de texte centrée au-delà de ~500px cesse de se lire : l'œil
+     perd le début de la ligne suivante. */
+  html[data-skin="arcane"]:root .lpl-sub {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Le champ devient le centre de gravité de la page, pas un élément de rail. */
+  html[data-skin="arcane"]:root .lpl-input-section {
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto;
+    flex: 0 0 auto;
+  }
+
+  html[data-skin="arcane"]:root .lpl-example {
+    align-self: center;
+  }
+
+  /* Les plateformes reconnues, juste sous le champ : à cet endroit c'est une
+     réponse à « qu'est-ce que je peux coller ? », plus un pied de colonne.
+     `.lp-left > :last-child { margin-top: auto }` les collait en bas d'une
+     colonne qui n'a plus de bas. */
+  html[data-skin="arcane"]:root .lp-left > .lpl-bottom {
+    margin-top: 26px;
+    padding-top: 0;
+    border-top: none;
+    justify-content: center;
+  }
+
+  html[data-skin="arcane"]:root .lp-right {
+    position: relative;
+    width: 100%;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 60px 32px 64px;
+    gap: 32px;
+  }
+
+  /* Séparateur oblique entre le geste et l'explication. Le biseau des
+     panneaux, les losanges et ce filet parlent la même langue : rien n'est
+     tout à fait d'équerre. */
+  html[data-skin="arcane"]:root .lp-right::before {
+    content: '';
+    position: absolute;
+    top: 26px;
+    left: 32px;
+    right: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    transform: skewY(-0.35deg);
   }
 }

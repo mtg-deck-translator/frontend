@@ -57,18 +57,22 @@ describe('skin arcane — cascade', () => {
     const premiereMedia = STRIPPED.indexOf('@media')
     expect(premiereMedia).toBeGreaterThan(-1)
 
-    // Tout ce qui suit la première @media doit lui appartenir : on compte les
-    // accolades pour trouver où le bloc se referme, et il ne doit plus rien
-    // rester derrière que du blanc.
-    const apres = STRIPPED.slice(premiereMedia)
-    let profondeur = 0
-    let fin = -1
-    for (let i = apres.indexOf('{'); i < apres.length; i++) {
-      if (apres[i] === '{') profondeur++
-      else if (apres[i] === '}' && --profondeur === 0) { fin = i + 1; break }
+    // Après la première @media, il ne doit plus rien rester au niveau racine
+    // que d'autres @media : on referme chaque bloc en comptant les accolades
+    // et on vérifie que ce qui les sépare est vide.
+    let reste = STRIPPED.slice(premiereMedia)
+    while (reste.trim()) {
+      expect(reste.trimStart(), 'une règle hors @media suit une media query').toMatch(/^@media/)
+      const debut = reste.indexOf('{')
+      let profondeur = 0
+      let fin = -1
+      for (let i = debut; i < reste.length; i++) {
+        if (reste[i] === '{') profondeur++
+        else if (reste[i] === '}' && --profondeur === 0) { fin = i + 1; break }
+      }
+      expect(fin, 'bloc @media non refermé').toBeGreaterThan(0)
+      reste = reste.slice(fin)
     }
-    expect(fin, 'bloc @media non refermé').toBeGreaterThan(0)
-    expect(apres.slice(fin).trim(), 'des règles suivent la dernière @media').toBe('')
   })
 })
 
@@ -86,10 +90,13 @@ describe('skin arcane — jetons', () => {
     }
   })
 
-  it('prévoit un repli pour --deck-chroma quand aucun deck n\'est chargé', () => {
+  it('prévoit un repli monochrome pour --deck-chroma', () => {
     // App.vue ne pose --deck-chroma qu'une fois un deck ouvert. Sans repli,
-    // le rail supérieur, la marque et les jauges seraient transparents sur
-    // toute la page d'accueil.
-    expect(STRIPPED).toMatch(/--deck-chroma:\s*linear-gradient/)
+    // le rail supérieur serait transparent sur toute la page d'accueil.
+    // Et ce repli doit rester monochrome : un arc-en-ciel permanent en haut
+    // d'écran fait pacotille, la couleur ne doit apparaître que quand elle
+    // dit quelque chose — les couleurs du deck ouvert.
+    expect(STRIPPED).toMatch(/--deck-chroma:\s*var\(--accent\)/)
+    expect(STRIPPED).not.toMatch(/--deck-chroma:\s*linear-gradient/)
   })
 })
