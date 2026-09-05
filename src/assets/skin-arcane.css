@@ -594,6 +594,20 @@ html[data-skin="arcane"]:root .lpl-mode-tab.active {
   color: var(--text-1);
 }
 
+/* Les outils du pied de rail parlent le même registre que les autres boutons
+   secondaires : micro-capitales espacées, et le libellé du groupe gravé. */
+html[data-skin="arcane"]:root .dk-tool {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+html[data-skin="arcane"]:root .dk-tools-label {
+  font-family: var(--font-display);
+  letter-spacing: 0.14em;
+}
+
 /* Filtres de la liste : mêmes micro-capitales, actif souligné d'accent. */
 html[data-skin="arcane"]:root :is(.dk-filter-btn, .dk-view-btn) {
   text-transform: uppercase;

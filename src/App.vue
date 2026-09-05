@@ -335,6 +335,24 @@
             <div class="dk-sep"/>
 
             </div>
+
+            <!-- Le rail s'arrêtait sous l'import de collection et laissait
+                 quatre cents pixels de vide jusqu'en bas. Ces trois actions
+                 vivaient derrière le « … » de la barre du bas : secondaires,
+                 oui, mais pas au point d'être introuvables. Poussées ici par
+                 `margin-top: auto`, elles occupent le vide sans rien inventer.
+                 « Imprimer » reste dans le menu tant que la feuille
+                 d'impression n'est pas réparée : inutile de mettre en avant
+                 une sortie tronquée. -->
+            <div class="dk-tools">
+              <div class="dk-tools-label">Cette liste</div>
+              <div class="dk-tools-row">
+                <button class="dk-tool" @click="exportAll">Copier tout</button>
+                <button class="dk-tool" @click="exportDownload">Exporter en .txt</button>
+                <button v-if="hasAnyCollection" class="dk-tool" @click="downloadCollection">Ma collection .csv</button>
+              </div>
+            </div>
+
           </div>
         </template>
       </div>
@@ -678,9 +696,9 @@
                 <div class="dk-menu">
                   <button class="dk-menu-btn" aria-haspopup="true" :aria-expanded="showMenu" @click="showMenu = !showMenu">…</button>
                   <div v-if="showMenu" class="dk-menu-list">
-                    <button @click="runMenu(exportAll)">Copier la liste complète</button>
+                    <button class="dk-menu-dup" @click="runMenu(exportAll)">Copier la liste complète</button>
                     <button @click="runMenu(toggleSkin)">Habillage : {{ SKIN_LABELS[skin] }}</button>
-                    <button @click="runMenu(exportDownload)">Exporter en .txt</button>
+                    <button class="dk-menu-dup" @click="runMenu(exportDownload)">Exporter en .txt</button>
                     <button @click="runMenu(exportPrint)">Imprimer</button>
                     <button class="dk-menu-sort" @click="showMenu = false">
                       Trier :
@@ -689,7 +707,7 @@
                         <option value="price">Prix décroissant</option>
                       </select>
                     </button>
-                    <button v-if="hasAnyCollection" @click="runMenu(downloadCollection)">Exporter ma collection (.csv)</button>
+                    <button v-if="hasAnyCollection" class="dk-menu-dup" @click="runMenu(downloadCollection)">Exporter ma collection (.csv)</button>
                   </div>
                 </div>
               </div>
@@ -1924,7 +1942,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 /* Separator */
 .dk-sep {
   height: 1px;
-  background: var(--fill-2);
+  background: var(--border-subtle);
   margin: 16px 0;
   flex-shrink: 0;
 }
@@ -2037,9 +2055,14 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   color: var(--text-1);
 }
 
+/* `--fill-2` sur un fond sombre, c'est 8 % d'opacité : à 0 % de progression la
+   jauge n'était pas discrète, elle était invisible — un trait fantôme dans les
+   trois habillages. Un creux et un filet la font exister vide, ce qui est
+   précisément l'état où elle a le plus à dire. */
 .dk-coll-track {
-  height: 4px;
-  background: var(--fill-2);
+  height: 7px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border-subtle);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -2049,6 +2072,48 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   background: linear-gradient(90deg, var(--accent), var(--accent-hover));
   border-radius: 9999px;
   transition: width 400ms ease;
+}
+
+/* ── Outils de la liste ──────────────────────────────────────────────── */
+/* Épinglés en bas par `margin-top: auto` dans un premier temps, puis remis
+   dans le flux : le rail se lisait alors comme deux îlots séparés par trois
+   cents pixels de rien. Dans le flux, le contenu est continu et le vide qui
+   reste sous lui redevient ce qu'il est — la fin d'un rail, pas un trou.
+   Le `.dk-sep` qui précède fait déjà la séparation, d'où l'absence de filet
+   propre ici. */
+.dk-tools {
+  flex-shrink: 0;
+}
+
+.dk-tools-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  margin-bottom: 10px;
+}
+
+.dk-tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dk-tool {
+  padding: 6px 11px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.dk-tool:hover {
+  color: var(--text-1);
+  border-color: var(--border-strong);
+  background: var(--fill-2);
 }
 
 /* TOC */
@@ -2355,6 +2420,11 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 
 .dk-menu-list button:hover { color: var(--text-1); background: var(--fill-2); }
+
+/* Ces trois entrées sont désormais dans le rail : elles ne servent plus que sur
+   téléphone, où le rail n'existe pas. Révélées dans le bloc mobile en fin de
+   feuille — comme .dk-stat-owned. */
+.dk-menu-dup { display: none; }
 
 
 
@@ -2890,7 +2960,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
   /* Le rail disparaît : son contenu vit désormais dans les onglets et le
      menu. Seul l'en-tête reste, ramené à l'essentiel. */
-  .dk-more, .dk-left-body { display: none !important; }
+  .dk-more, .dk-left-body, .dk-tools { display: none !important; }
+  .dk-menu-dup { display: block; }
   .dk-stat-missing { display: inline; }
 
   /* La barre du fil rouge se pose au-dessus des onglets. */

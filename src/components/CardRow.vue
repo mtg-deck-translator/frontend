@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="rowEl"
     class="cr-row"
     :class="{ checked: isChecked, commander: isCommander, 'is-last': isLast }"
     @mouseenter="onMouseEnter"
@@ -58,45 +59,63 @@ function formatPrice(price) {
 
 const isCommander = computed(() => props.card.category === 'Commander')
 
-// L'aperçu suit le pointeur : il n'a de sens qu'avec une vraie souris.
-// Au tactile, le tap émule un mouseenter sans mouseleave, donc la vignette
-// s'affichait aux coordonnées initiales {0,0}, collée en haut à gauche, en
-// pointer-events:none — impossible à refermer jusqu'au tap suivant.
+// L'aperçu n'a de sens qu'avec une vraie souris. Au tactile, le tap émule un
+// mouseenter sans mouseleave : la vignette restait affichée, en
+// pointer-events:none, impossible à refermer jusqu'au tap suivant.
 const canHover = typeof window !== 'undefined'
   && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
 
-const showPreview = ref(false)
-const mousePos = ref({ x: 0, y: 0 })
-
-function onMouseEnter() { if (canHover) showPreview.value = true }
-
-// Un seul écouteur mousemove partagé par toutes les lignes, attaché
-// uniquement pendant l'affichage d'un aperçu. Auparavant chaque CardRow
-// posait le sien au montage : un deck de 100 cartes, c'était 100 écouteurs
-// globaux qui écrivaient chacun dans un ref et invalidaient un computed à
-// chaque mouvement de souris, en permanence, même sans aperçu affiché.
-function onMouseMove(e) { mousePos.value = { x: e.clientX, y: e.clientY } }
-
-watch(showPreview, visible => {
-  if (visible) document.addEventListener('mousemove', onMouseMove)
-  else document.removeEventListener('mousemove', onMouseMove)
-})
-
-onUnmounted(() => document.removeEventListener('mousemove', onMouseMove))
-
 const PREVIEW_W = 220
-const previewStyle = computed(() => {
-  const { x, y } = mousePos.value
+const PREVIEW_H = 308
+const MARGE = 12
+
+const showPreview = ref(false)
+const rowEl = ref(null)
+const previewStyle = ref({})
+
+// L'aperçu se cale sur la LIGNE, pas sur le curseur.
+//
+// Suivre la souris obligeait à écouter `mousemove` et à recalculer une
+// position à chaque pixel parcouru : la vignette tremblait sous le doigt et se
+// replaçait sans arrêt, alors qu'on la regarde précisément pour comparer un
+// nom français à un visuel — ça demande une image immobile. Ancrée à la ligne
+// survolée, elle se pose une fois et ne bouge plus.
+//
+// Effet de bord agréable : plus un seul écouteur `mousemove` global.
+function placerApercu() {
+  const r = rowEl.value?.getBoundingClientRect()
+  if (!r) return
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const PREVIEW_H = 308
-  let left = x + 16
-  let top = y - PREVIEW_H / 2
-  if (left + PREVIEW_W > vw - 16) left = x - PREVIEW_W - 16
-  if (top < 8) top = 8
-  if (top + PREVIEW_H > vh - 8) top = vh - PREVIEW_H - 8
-  return { left: left + 'px', top: top + 'px' }
+
+  // À droite de la ligne si la place existe, sinon à gauche. C'est le cas
+  // courant : la liste occupe presque toute la largeur du panneau, et
+  // l'aperçu se pose alors au-dessus du rail.
+  let left = r.right + MARGE
+  if (left + PREVIEW_W > vw - MARGE) left = r.left - PREVIEW_W - MARGE
+  if (left < MARGE) left = Math.max(MARGE, vw - PREVIEW_W - MARGE)
+
+  let top = r.top + r.height / 2 - PREVIEW_H / 2
+  top = Math.min(Math.max(MARGE, top), vh - PREVIEW_H - MARGE)
+
+  previewStyle.value = { left: `${left}px`, top: `${top}px` }
+}
+
+function onMouseEnter() {
+  if (!canHover) return
+  placerApercu()
+  showPreview.value = true
+}
+
+// La liste défile dans son propre conteneur, pas dans la page : d'où le
+// `capture`, sans lequel l'aperçu resterait accroché à la position qu'occupait
+// la ligne au moment du survol.
+watch(showPreview, visible => {
+  if (visible) window.addEventListener('scroll', placerApercu, true)
+  else window.removeEventListener('scroll', placerApercu, true)
 })
+
+onUnmounted(() => window.removeEventListener('scroll', placerApercu, true))
 </script>
 
 <style scoped>

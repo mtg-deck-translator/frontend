@@ -428,7 +428,7 @@ html[data-skin="atelier"]:root .lpl-sub {
    capitales, très espacés, petits. Ce registre-là — celui d'un cartouche
    imprimé — revient partout dans le skin. */
 html[data-skin="atelier"]:root :is(.lpr-section-title, .dk-coll-label,
-.lpr-step-title, .cm-title, .lpl-resume-label) {
+.lpr-step-title, .cm-title, .lpl-resume-label, .dk-tools-label) {
   font-family: var(--font-display);
   font-weight: 700;
   font-stretch: 84%;
@@ -692,7 +692,7 @@ html[data-skin="atelier"]:root .cr-row.checked .cr-check {
 
 html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
 .dk-point-btn, .lpr-coll-btn, .cm-btn, .lpl-list-btn, .lpl-paste-btn,
-.dk-nofr-btn) {
+.dk-nofr-btn, .dk-tool) {
   font-family: var(--font-display);
   font-weight: 800;
   font-stretch: 88%;
@@ -735,7 +735,7 @@ html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
 /* Boutons secondaires : filet seul, pas d'ombre — l'ombre est réservée à ce
    qu'on veut qu'on presse. */
 html[data-skin="atelier"]:root :is(.lpr-coll-btn, .dk-nofr-btn, .lpl-paste-btn,
-.lpl-list-btn, .cl-apply) {
+.lpl-list-btn, .cl-apply, .dk-tool) {
   border: var(--rule-hair) solid var(--border-strong);
   background: none;
   color: var(--text-1);
@@ -743,7 +743,7 @@ html[data-skin="atelier"]:root :is(.lpr-coll-btn, .dk-nofr-btn, .lpl-paste-btn,
 }
 
 html[data-skin="atelier"]:root :is(.lpr-coll-btn, .dk-nofr-btn, .lpl-paste-btn,
-.lpl-list-btn, .cl-apply):hover {
+.lpl-list-btn, .cl-apply, .dk-tool):hover {
   background: var(--fill-2);
   color: var(--text-1);
   border-color: var(--border-strong);
