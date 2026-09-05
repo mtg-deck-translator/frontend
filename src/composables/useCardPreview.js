@@ -15,16 +15,31 @@ import { ref } from 'vue'
 // à taille lisible sans recouvrir la liste qu'on est en train de lire.
 const carteSurvolee = ref(null)
 
+// L'effacement est différé de quelques dizaines de millisecondes.
+//
+// En passant d'une ligne à la suivante, le navigateur émet le `mouseleave` de
+// l'ancienne AVANT le `mouseenter` de la nouvelle. Effacer tout de suite fait
+// donc disparaître puis réapparaître l'aperçu entre deux lignes voisines : le
+// fondu rejoue à chaque ligne traversée, et parcourir une liste devient un
+// clignotement. Le délai est annulé dès qu'une autre ligne prend le relais,
+// donc il ne se voit que lorsqu'on quitte vraiment la liste.
+let effacement = null
+const DELAI = 90
+
 export function useCardPreview() {
   return {
     carteSurvolee,
-    survoler(carte) { carteSurvolee.value = carte },
+    survoler(carte) {
+      clearTimeout(effacement)
+      carteSurvolee.value = carte
+    },
     quitter(carte) {
-      // Comparaison sur l'identité : quand le pointeur passe d'une ligne à la
-      // suivante, le `mouseenter` de la nouvelle arrive avant le `mouseleave`
-      // de l'ancienne. Sans cette garde, l'ancienne effacerait la nouvelle et
-      // l'aperçu clignoterait à chaque ligne traversée.
-      if (carteSurvolee.value === carte) carteSurvolee.value = null
+      clearTimeout(effacement)
+      effacement = setTimeout(() => {
+        // Une autre ligne a pu prendre la main entre-temps : on ne referme que
+        // si c'est bien la carte qu'on quittait qui est encore affichée.
+        if (carteSurvolee.value === carte) carteSurvolee.value = null
+      }, DELAI)
     },
   }
 }

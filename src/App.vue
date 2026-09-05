@@ -364,10 +364,17 @@
                  endroit de l'écran où une carte tient en grand sans rien
                  recouvrir — et il était vide. -->
             <div class="dk-preview" aria-hidden="true">
+              <!-- Surtout pas de `:key` sur l'image. Avec une clé qui change à
+                   chaque carte, Vue considère qu'il s'agit d'un autre élément :
+                   <Transition> joue alors la sortie et l'entrée EN MÊME TEMPS,
+                   les deux images coexistent dans le flux, et le conteneur
+                   double de hauteur en balayant toute la colonne — l'effet de
+                   rémanence. Sans clé, Vue réutilise le même <img> et ne change
+                   que son `src` ; la transition ne joue plus qu'à l'apparition
+                   et à la disparition, ce pour quoi elle est là. -->
               <Transition name="apercu-fade">
                 <img
                   v-if="carteSurvolee?.imageUrl"
-                  :key="carteSurvolee.imageUrl"
                   :src="carteSurvolee.imageUrl"
                   :alt="carteSurvolee.frName"
                 />
@@ -2174,6 +2181,16 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   padding-top: 16px;
   background: var(--bg-app);
   pointer-events: none;
+  /* Une seule cellule : même si deux images se retrouvaient un jour montées
+     ensemble, elles se superposeraient au lieu de s'empiler, et le tiroir ne
+     pourrait plus doubler de hauteur. Le correctif est dans le template ;
+     ceci empêche la classe d'erreur de revenir. */
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.dk-preview img {
+  grid-area: 1 / 1;
 }
 
 .dk-preview img {
