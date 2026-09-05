@@ -31,7 +31,29 @@
         </svg>
         Importer collection CSV
       </button>
-      <p class="import-hint">Manabox · DragonShield · Moxfield</p>
+
+      <!-- « Manabox · DragonShield · Moxfield » répondait à « quels formats
+           j'accepte ? », qui est ma question, pas la sienne. Celui qui a sa
+           collection dans Manabox ne sait pas qu'il peut en sortir un fichier,
+           ni où le bouton se cache — et sans ce fichier, le bouton au-dessus
+           ne sert à rien. Replié, ça ne coûte qu'une ligne. -->
+      <details class="import-how">
+        <summary>Où trouver ce fichier ?</summary>
+        <ul class="ih-list">
+          <li>
+            <strong>ManaBox</strong> — onglet <em>Collection</em>, menu en haut
+            à droite, puis l'export CSV. Un binder seul s'exporte de la même
+            façon depuis son propre écran.
+          </li>
+          <li>
+            <strong>DragonShield</strong> et <strong>Moxfield</strong> —
+            l'export CSV de la collection.
+          </li>
+        </ul>
+        <p class="ih-privacy">
+          Le fichier est lu sur votre appareil. Il n'est envoyé nulle part.
+        </p>
+      </details>
     </div>
 
     <p v-if="parseError" class="import-error">{{ parseError }}</p>
@@ -189,11 +211,71 @@ async function onFile(e) {
   background: var(--accent-subtle);
 }
 
-.import-hint {
-  font-size: 10px;
+/* Le repli natif : pas d'état à gérer, et il reste ouvert tant que
+   l'utilisateur ne le referme pas. */
+.import-how {
+  font-size: 11px;
   color: var(--text-3);
+  line-height: 1.5;
+}
+
+.import-how > summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   padding-left: 2px;
-  font-family: var(--font-mono);
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-3);
+  transition: color var(--transition-fast);
+}
+
+/* Safari dessine son propre triangle par-dessus le nôtre. */
+.import-how > summary::-webkit-details-marker { display: none; }
+
+.import-how > summary::before {
+  content: '';
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  transition: transform var(--transition-fast);
+}
+
+.import-how[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.import-how > summary:hover {
+  color: var(--text-2);
+}
+
+.ih-list {
+  margin: 6px 0 0;
+  padding: 0 0 0 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ih-list strong {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.ih-list em {
+  font-style: normal;
+  color: var(--text-2);
+}
+
+/* On demande à quelqu'un de déposer l'inventaire complet de sa collection :
+   la question « où est-ce que ça part ? » se pose avant le clic, pas après. */
+.ih-privacy {
+  margin: 7px 0 0;
+  padding-left: 2px;
+  color: var(--text-4);
 }
 
 .import-error {
