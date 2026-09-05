@@ -46,7 +46,14 @@
                   </svg>
                 </button>
                 <button class="lpl-icon-btn" :title="`Habillage : ${SKIN_LABELS[skin]} — cliquer pour changer`" @click="toggleSkin">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <!-- Trois habillages, trois glyphes : losange évidé (papier),
+                       losange plein (arcane), carré plein (atelier). Un bouton
+                       qui cycle sans dire où il en est ne se distingue pas d'un
+                       bouton cassé. -->
+                  <svg v-if="skin === 'atelier'" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <rect x="2" y="2" width="12" height="12" fill="currentColor"/>
+                  </svg>
+                  <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 1.6l6.4 6.4L8 14.4 1.6 8z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
                     <path v-if="skin === 'arcane'" d="M8 4.4L11.6 8 8 11.6 4.4 8z" fill="currentColor"/>
                   </svg>

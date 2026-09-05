@@ -1,0 +1,1178 @@
+/* ════════════════════════════════════════════════════════════════════════
+   SKIN « ATELIER » — troisième habillage
+   ════════════════════════════════════════════════════════════════════════
+
+   Comme « arcane », ce fichier ne remplace rien : il s'ajoute. Sans
+   `data-skin="atelier"` sur <html>, pas une seule de ces règles ne s'applique.
+
+   L'intention
+   -----------
+   « papier » et « arcane » se ressemblent plus qu'il n'y paraît : tous deux
+   naissent sombres, tous deux sont des ambiances (la chaleur d'un côté, le
+   mystère de l'autre), tous deux empilent des panneaux flottants sur un
+   canevas texturé, tous deux traitent la decklist comme un tableau de bord.
+
+   Trouver une troisième teinte ne suffisait pas. Il fallait changer de
+   métaphore. Or cet outil n'est ni un grimoire ni un dashboard : c'est une
+   liste de courses, lue debout chez le vendeur, sur un téléphone, à une main.
+
+   Atelier part de là : un bon de commande imprimé sur du papier crème, sur
+   lequel on surligne au feutre ce qu'il reste à trouver, et on raye ce qu'on
+   a déjà.
+
+   Les cinq règles
+   ---------------
+   1. DEUX MATIÈRES SEULEMENT : l'encre et le papier. Filets, fonds, textes,
+      bordures — tout est l'un ou l'autre. Pas de gris décoratif, pas de fonds
+      empilés pour faire de la profondeur.
+   2. LE SURLIGNEUR NE MARQUE QU'UNE CHOSE À LA FOIS. Sur l'écran deck, ce qui
+      reste à trouver — et rien d'autre. Sur l'accueil, où il n'y a pas encore
+      de liste, la promesse. Il ne porte JAMAIS de texte : il passe derrière
+      de l'encre, comme un vrai feutre.
+   3. L'ÉLÉVATION EST UNE OMBRE PORTÉE DURE, FLOU ZÉRO. Jamais de halo, jamais
+      de blur. Un bouton pressé se déplace de 4px et perd son ombre : le geste
+      est physique, pas une transition de couleur.
+   4. LES CHIFFRES SONT TOUJOURS EN MONO TABULAIRE. Quantités, prix,
+      pourcentages, numéros de ligne : c'est ce qui les rend comparables d'une
+      ligne à l'autre.
+   5. LES PANNEAUX NE SONT PAS DES BOÎTES POSÉES SUR UN FOND, ce sont les
+      cellules d'une feuille réglée. Filets de 2px d'un bord à l'autre, pas de
+      coins, pas de flottement.
+
+   Ce qui le distingue au premier coup d'œil
+   -----------------------------------------
+   Il est NATIVEMENT CLAIR. Les deux autres naissent sombres et traitent le
+   clair comme une exception ; ici c'est l'inverse, et la variante sombre est
+   un négatif d'épreuve — l'encre devient le papier. Le surligneur, lui, ne
+   s'inverse pas : un feutre reste un feutre.
+
+   La spécificité
+   --------------
+   Même contrainte que « arcane » : les composants utilisent `<style scoped>`,
+   qui ajoute un `[data-v-…]` (0,2,0) à chaque sélecteur. Le préfixe
+   `html[data-skin="atelier"]:root` pèse (0,2,1) et passe devant sans un seul
+   `!important`. Il est constant dans tout le fichier : ne pas l'alléger.
+
+   Et comme partout ailleurs dans ce projet : LES MEDIA QUERIES SONT
+   REGROUPÉES EN FIN DE FICHIER. Une media query n'augmente pas la
+   spécificité — placée avant la règle qu'elle annule, elle perd en silence.
+   `tests/skin-atelier.test.js` vérifie ces trois points.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Archivo variable : un axe de graisse 100→900 ET un axe de chasse 62→125%.
+   C'est ce second axe qui fait le skin — le titre est en 118% de chasse et
+   800 de graisse, les libellés en 84% condensé. Une seule famille porte donc
+   l'affiche et l'interface, et le mono porte les chiffres. */
+@import '@fontsource-variable/archivo/standard.css';
+
+/* ── 1. Jetons — variante CLAIRE, le mode natif du skin ────────────────── */
+
+:root[data-skin="atelier"] {
+  /* Les deux seules matières. Le papier n'est pas blanc et l'encre n'est pas
+     noire : #FFF et #000 sont des couleurs d'écran, pas de presse. */
+  --paper: #F2EEE4;
+  --ink: #14120F;
+  /* Le feutre. Il ne sert que de fond, jamais de couleur de texte. */
+  --marker: #D7FF3E;
+  /* Et ce qu'on écrit DESSUS. En négatif, `--ink` devient crème : du crème
+     sur du chartreuse tombe à 1,5:1, illisible. Le trait de feutre est clair
+     dans les deux thèmes, donc son texte est sombre dans les deux thèmes. */
+  --marker-ink: #14120F;
+
+  --bg-app: #F2EEE4;
+  --bg-canvas: #EAE5D8;
+  /* Le halo radial hérité de la coquille : neutralisé, il n'y a pas de lueur
+     sur du papier. */
+  --canvas-glow: transparent;
+  --surface-1: #F7F4EC;
+  --surface-2: #EAE5D8;
+  --surface-3: #E1DBCB;
+  --surface-sunk: #DED7C6;
+  --surface-menu: #F7F4EC;
+
+  --fill-1: rgba(20, 18, 15, 0.04);
+  --fill-2: rgba(20, 18, 15, 0.07);
+  --fill-3: rgba(20, 18, 15, 0.11);
+  --fill-4: rgba(20, 18, 15, 0.16);
+
+  --border-subtle: rgba(20, 18, 15, 0.15);
+  --border: rgba(20, 18, 15, 0.32);
+  /* Le filet fort EST de l'encre pleine : c'est lui qui dessine la feuille. */
+  --border-strong: #14120F;
+  --border-focus: #14120F;
+
+  --text-1: #14120F;
+  --text-2: rgba(20, 18, 15, 0.78);
+  --text-3: rgba(20, 18, 15, 0.58);
+  --text-4: rgba(20, 18, 15, 0.46);
+
+  /* L'accent est l'encre. Les boutons sont des blocs pleins, pas des surfaces
+     colorées : le chartreuse n'est PAS l'accent, il a son propre jeton et sa
+     propre règle. Un accent qui sert d'action ET de surlignage ne dirait plus
+     rien, c'est exactement le travers corrigé dans « arcane ». */
+  --accent: #14120F;
+  --accent-hover: #000000;
+  --accent-fill: rgba(20, 18, 15, 0.05);
+  --accent-fill-hover: rgba(20, 18, 15, 0.10);
+  --accent-border: rgba(20, 18, 15, 0.32);
+  --accent-border-hov: #14120F;
+  --accent-glow: transparent;
+  --text-on-accent: #F2EEE4;
+  --text-inverse: #F2EEE4;
+
+  --btn-primary-bg: #14120F;
+  --btn-primary-bg-hover: #000000;
+  --btn-primary-glow: transparent;
+  --btn-primary-glow-hover: transparent;
+
+  /* Élévation : décalage dur, flou 0. Pas une seule valeur de blur dans ce
+     fichier — c'est la règle 3, et elle se vérifie à l'œil nu. */
+  --shadow-1: 2px 2px 0 var(--ink);
+  --shadow-2: 4px 4px 0 var(--ink);
+  --shadow-3: 6px 6px 0 var(--ink);
+  --shadow-4: 8px 8px 0 var(--ink);
+  --shadow-lg: var(--shadow-4);
+  --shadow-tint-1: rgba(20, 18, 15, 0.20);
+  --shadow-tint-2: rgba(20, 18, 15, 0.30);
+  --shadow-tint-3: rgba(20, 18, 15, 0.45);
+
+  /* Les états. Assombris pour rester lisibles comme texte sur le papier —
+     un vert d'écran à #22C55E tombe à 2,3:1 sur du crème. */
+  --success: #1F7A3D;
+  --success-fill: rgba(31, 122, 61, 0.10);
+  --success-border: rgba(31, 122, 61, 0.32);
+  --danger: #B3261E;
+  --danger-fill: rgba(179, 38, 30, 0.09);
+  --danger-border: rgba(179, 38, 30, 0.30);
+  --warning: #8A6A00;
+  --warning-fill: rgba(138, 106, 0, 0.09);
+  --info: #1A3FB8;
+  --info-fill: rgba(26, 63, 184, 0.09);
+
+  --scrim: rgba(20, 18, 15, 0.55);
+  --scrim-strong: rgba(20, 18, 15, 0.78);
+  --text-on-scrim: #F2EEE4;
+  --text-on-scrim-muted: rgba(242, 238, 228, 0.72);
+
+  /* Les cinq couleurs, en ENCRES D'IMPRIMERIE et non en néons : ce sont des
+     pigments posés sur du papier crème, pas des pixels sur du noir. Elles ne
+     servent qu'au carré de catégorie et aux losanges de couleur du deck. */
+  --mana-w: #A98F3C;
+  --mana-u: #1A3FB8;
+  --mana-b: #4A3F6B;
+  --mana-r: #B3261E;
+  --mana-g: #1F7A3D;
+  --deck-tint: var(--ink);
+
+  --cat-commander: #8A6A00;
+  --cat-creature: #1F7A3D;
+  --cat-instant: #1A3FB8;
+  --cat-sorcery: #4A3F6B;
+  --cat-artifact: #5C5750;
+  --cat-enchantment: #A03A6B;
+  --cat-planeswalker: #A8541C;
+  --cat-land: #7A6234;
+  --cat-other: #5C5750;
+  --cat-zone: #5C5750;
+  --cat-custom: #5C5750;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  /* Neutralise par précaution l'encoche biseautée d'« arcane » : les deux
+     skins ne se croisent jamais, mais un jeton hérité qui traîne coûte moins
+     cher à déclarer qu'à débusquer. */
+  --notch: 0px;
+  --deck-bg-opacity: 0.07;
+
+  --font-sans: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Archivo Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Les deux épaisseurs de filet : la structure et la ligne de liste. */
+  --rule: 2px;
+  --rule-hair: 1px;
+  /* Le pas de la feuille réglée du canevas. */
+  --pas: 30px;
+}
+
+/* ── 2. Jetons — variante SOMBRE : le négatif d'épreuve ────────────────── */
+/* Ce n'est pas « le même skin en sombre », c'est l'épreuve en négatif :
+   l'encre devient le papier et le papier devient l'encre. Le surligneur,
+   lui, ne bouge pas d'un chiffre — c'est le seul objet qui survit à
+   l'inversion, et c'est précisément ce qui en fait un feutre. */
+
+:root[data-skin="atelier"][data-theme="dark"] {
+  --paper: #141210;
+  --ink: #EDE7D9;
+  --marker: #D7FF3E;
+  --marker-ink: #14120F;
+
+  --bg-app: #141210;
+  --bg-canvas: #0E0D0B;
+  --canvas-glow: transparent;
+  --surface-1: #1B1815;
+  --surface-2: #211E1A;
+  --surface-3: #2A2620;
+  --surface-sunk: #0B0A09;
+  --surface-menu: #1B1815;
+
+  --fill-1: rgba(237, 231, 217, 0.04);
+  --fill-2: rgba(237, 231, 217, 0.08);
+  --fill-3: rgba(237, 231, 217, 0.13);
+  --fill-4: rgba(237, 231, 217, 0.19);
+
+  --border-subtle: rgba(237, 231, 217, 0.16);
+  --border: rgba(237, 231, 217, 0.34);
+  --border-strong: #EDE7D9;
+  --border-focus: #EDE7D9;
+
+  --text-1: #EDE7D9;
+  --text-2: rgba(237, 231, 217, 0.80);
+  --text-3: rgba(237, 231, 217, 0.60);
+  --text-4: rgba(237, 231, 217, 0.48);
+
+  --accent: #EDE7D9;
+  --accent-hover: #FFFFFF;
+  --accent-fill: rgba(237, 231, 217, 0.06);
+  --accent-fill-hover: rgba(237, 231, 217, 0.12);
+  --accent-border: rgba(237, 231, 217, 0.34);
+  --accent-border-hov: #EDE7D9;
+  --accent-glow: transparent;
+  --text-on-accent: #141210;
+  --text-inverse: #141210;
+
+  --btn-primary-bg: #EDE7D9;
+  --btn-primary-bg-hover: #FFFFFF;
+  --btn-primary-glow: transparent;
+  --btn-primary-glow-hover: transparent;
+
+  /* L'ombre portée est claire : sur une épreuve en négatif, c'est le blanc
+     qui décale. Le décalage reste identique — le geste ne change pas. */
+  --shadow-1: 2px 2px 0 var(--ink);
+  --shadow-2: 4px 4px 0 var(--ink);
+  --shadow-3: 6px 6px 0 var(--ink);
+  --shadow-4: 8px 8px 0 var(--ink);
+  --shadow-lg: var(--shadow-4);
+  --shadow-tint-1: rgba(0, 0, 0, 0.40);
+  --shadow-tint-2: rgba(0, 0, 0, 0.55);
+  --shadow-tint-3: rgba(0, 0, 0, 0.72);
+
+  --success: #63C48B;
+  --success-fill: rgba(99, 196, 139, 0.11);
+  --success-border: rgba(99, 196, 139, 0.30);
+  --danger: #F0705C;
+  --danger-fill: rgba(240, 112, 92, 0.11);
+  --danger-border: rgba(240, 112, 92, 0.30);
+  --warning: #E0B44A;
+  --warning-fill: rgba(224, 180, 74, 0.09);
+  --info: #7BA6F5;
+  --info-fill: rgba(123, 166, 245, 0.11);
+
+  --scrim: rgba(8, 7, 6, 0.66);
+  --scrim-strong: rgba(8, 7, 6, 0.86);
+  --text-on-scrim: #EDE7D9;
+  --text-on-scrim-muted: rgba(237, 231, 217, 0.72);
+
+  /* Mêmes teintes, remontées en luminance pour tenir sur l'encre. */
+  --mana-w: #E3CE8C;
+  --mana-u: #7BA6F5;
+  --mana-b: #A995D8;
+  --mana-r: #F0705C;
+  --mana-g: #63C48B;
+  --deck-tint: var(--ink);
+
+  --cat-commander: #E0B44A;
+  --cat-creature: #63C48B;
+  --cat-instant: #7BA6F5;
+  --cat-sorcery: #A995D8;
+  --cat-artifact: #B0A99E;
+  --cat-enchantment: #E08BB4;
+  --cat-planeswalker: #F0A25C;
+  --cat-land: #CBAE72;
+  --cat-other: #B0A99E;
+  --cat-zone: #B0A99E;
+  --cat-custom: #B0A99E;
+
+  --deck-bg-opacity: 0.10;
+}
+
+/* ── 3. Formes : rien n'est arrondi ────────────────────────────────────── */
+/* Même geste qu'« arcane » : une règle universelle plutôt qu'une liste de
+   cent sélecteurs, et les rares formes qui doivent rester rondes rétablies
+   juste en dessous. */
+
+html[data-skin="atelier"]:root * {
+  border-radius: 0;
+}
+
+/* Le spinner est un anneau : carré, c'est un rectangle qui tourne. */
+html[data-skin="atelier"]:root .lpl-spinner {
+  border-radius: 50%;
+}
+
+/* ── 4. La feuille réglée ──────────────────────────────────────────────── */
+/* Le canevas ne porte ni halo ni dégradé : des lignes de repérage horizontales
+   très basses, comme le tramage d'un bon de commande. C'est de la matière
+   imprimée, pas de la lumière. */
+
+html[data-skin="atelier"]:root .cmd-app {
+  background: var(--bg-app);
+}
+
+html[data-skin="atelier"]:root .cmd-left {
+  background: var(--bg-app);
+  border-right: var(--rule) solid var(--border-strong);
+}
+
+html[data-skin="atelier"]:root .cmd-right {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      var(--fill-1) 0 1px,
+      transparent 1px var(--pas)
+    ),
+    var(--bg-canvas);
+}
+
+/* ── 5. Les panneaux sont des cellules, pas des cartes ─────────────────── */
+/* Filet d'encre pleine, ombre portée dure, aucun rayon. Ce qui compte n'est
+   pas le contraste du fond — les surfaces sont presque identiques au papier —
+   mais le trait qui les délimite. */
+
+html[data-skin="atelier"]:root :is(.lpl-input-card, .lpr-card, .lpr-coll,
+.dk-bar, .dk-menu-list, .cm-panel, .pt) {
+  background: var(--surface-1);
+  border: var(--rule) solid var(--border-strong);
+  box-shadow: var(--shadow-2);
+}
+
+/* La carte d'entrée est l'objet principal de l'accueil : une ombre de plus. */
+html[data-skin="atelier"]:root .lpl-input-card {
+  box-shadow: var(--shadow-3);
+}
+
+html[data-skin="atelier"]:root .lpr-card:hover {
+  background: var(--surface-2);
+  box-shadow: var(--shadow-3);
+}
+
+html[data-skin="atelier"]:root .lpr-step {
+  background: var(--surface-1);
+  border: var(--rule-hair) solid var(--border-strong);
+  box-shadow: var(--shadow-1);
+}
+
+/* La liste, elle, n'est pas une cellule : c'est le corps de la feuille.
+   Un filet en haut et en bas, rien sur les côtés — les lignes vont d'un bord
+   à l'autre, comme sur un vrai listing. */
+html[data-skin="atelier"]:root .cat-cards {
+  background: none;
+  border: none;
+  border-top: var(--rule) solid var(--border-strong);
+  border-bottom: var(--rule) solid var(--border-strong);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* Le bandeau d'avertissement : filet de mise en garde à gauche, pas de fond
+   teinté. Un aplat ambre sur du papier crème se lit comme une tache. */
+html[data-skin="atelier"]:root :is(.lpr-nofr-pitch, .dk-nofr) {
+  background: var(--surface-1);
+  border: var(--rule-hair) solid var(--border);
+  border-left: 4px solid var(--warning);
+  box-shadow: none;
+}
+
+/* ── 6. Typographie : le mur de type et le surligneur ──────────────────── */
+/* Le titre porte le hero à lui seul. Chasse étendue (118 %), graisse 800,
+   capitales, interligne 0.9 : à cette échelle la typographie EST la mise en
+   page, et il n'y a plus rien d'autre à regarder. */
+
+html[data-skin="atelier"]:root .lpl-title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 800;
+  font-stretch: 118%;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--text-1);
+  margin-bottom: 16px;
+}
+
+/* LA SIGNATURE DU SKIN. La deuxième ligne du titre n'est pas colorée : elle
+   est SURLIGNÉE. `box-decoration-break: clone` rend le trait de feutre sur
+   chaque ligne quand le titre se replie, au lieu d'une seule bande qui
+   traverse le retour à la ligne.
+   `-webkit-text-fill-color` doit être remis explicitement : « papier » le
+   force à `currentColor`, et un skin qui hérite d'un `transparent` verrait
+   son surligneur vide. */
+html[data-skin="atelier"]:root .lpl-grad {
+  background: var(--marker);
+  color: var(--marker-ink);
+  -webkit-text-fill-color: var(--marker-ink);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.02em 0.14em 0.06em;
+  margin-left: -0.14em;
+}
+
+html[data-skin="atelier"]:root .lpl-sub {
+  color: var(--text-2);
+  font-size: 13.5px;
+  max-width: 42ch;
+}
+
+/* Les titres de section deviennent des intitulés de formulaire : condensés,
+   capitales, très espacés, petits. Ce registre-là — celui d'un cartouche
+   imprimé — revient partout dans le skin. */
+html[data-skin="atelier"]:root :is(.lpr-section-title, .dk-coll-label,
+.lpr-step-title, .cm-title, .lpl-resume-label) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+html[data-skin="atelier"]:root .lpl-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 84%;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 12.5px;
+}
+
+html[data-skin="atelier"]:root .lpl-free {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-skin="atelier"]:root .dk-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 105%;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Règle 4 : tous les chiffres en mono tabulaire. `tabular-nums` en plus du
+   monospace — JetBrains Mono a des chiffres déjà égaux, mais la propriété
+   protège le repli système. */
+html[data-skin="atelier"]:root :is(.dk-stat, .lpr-card-count, .lpl-resume-count,
+.dk-coll-pct, .dk-coll-stats, .dkf-count, .tile-price, .tile-qty, .pt-price,
+.progress-count, .lpr-step-num, .cat-count, .cr-price, .cr-qty) {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* ── 7. La liste : un sommaire imprimé ─────────────────────────────────── */
+/* Ni bloc de fond (« papier ») ni colonne vertébrale colorée (« arcane ») :
+   un intitulé à gauche, une ligne de conduite pointillée, un compte à droite.
+   C'est la forme d'un sommaire — et une decklist EST un sommaire. */
+
+html[data-skin="atelier"]:root .cat-head {
+  border-bottom: none;
+  padding-bottom: 8px;
+  margin-bottom: 0;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* `flex: 1` sur le groupe de gauche, et sa ligne de conduite occupe tout ce
+   qui reste entre le libellé et le compte. */
+html[data-skin="atelier"]:root .cat-head-left {
+  flex: 1;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+html[data-skin="atelier"]:root .cat-head-left::after {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-bottom: var(--rule-hair) dashed var(--border);
+  transform: translateY(-1px);
+}
+
+/* L'étoile disparaît au profit d'un carré d'encre de catégorie : c'est la
+   seule surface colorée d'un en-tête, et elle rime avec la case à cocher. */
+html[data-skin="atelier"]:root .cat-spark {
+  display: none;
+}
+
+html[data-skin="atelier"]:root .cat-head-left::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  background: var(--cat-color, var(--ink));
+}
+
+html[data-skin="atelier"]:root .cat-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 84%;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+html[data-skin="atelier"]:root .cat-count {
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+
+html[data-skin="atelier"]:root .cat-toggle {
+  font-family: var(--font-display);
+  font-stretch: 84%;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 9.5px;
+  font-weight: 700;
+  border-bottom: var(--rule-hair) solid var(--border);
+}
+
+/* ── 8. Les lignes : numérotées, et surlignées tant qu'il faut les trouver ─ */
+/* Le numéro de ligne est un compteur CSS : `001`, `002`… Aucun markup ajouté,
+   et c'est ce qui transforme une liste d'éléments en un listing.
+   Le compteur est remis à zéro par catégorie — on ne cherche pas la 74ᵉ carte
+   du deck, on cherche la 3ᵉ créature. */
+
+html[data-skin="atelier"]:root .cat-cards {
+  counter-reset: ligne;
+}
+
+html[data-skin="atelier"]:root .cr-row {
+  counter-increment: ligne;
+  padding: 11px 16px 11px 12px;
+  gap: 12px;
+  border-bottom: var(--rule-hair) solid var(--border-subtle);
+  /* RÈGLE 2 : le feutre marque ce qui reste à trouver. Il court dans la marge
+     gauche de la liste et s'efface ligne par ligne à mesure qu'on coche —
+     la liste se vide sous les yeux, sans jauge ni pourcentage. */
+  border-left: 4px solid var(--marker);
+}
+
+html[data-skin="atelier"]:root .cr-row::before {
+  content: counter(ligne, decimal-leading-zero);
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--text-4);
+  width: 2.2em;
+}
+
+/* Coché = trouvé : le feutre s'en va. */
+html[data-skin="atelier"]:root .cr-row.checked {
+  border-left-color: transparent;
+}
+
+/* Le survol n'allume pas un fond gris : il épaissit le trait, comme un doigt
+   posé sur la ligne qu'on est en train de lire. */
+html[data-skin="atelier"]:root .cr-row:hover {
+  background: var(--fill-1);
+  border-left-color: var(--marker);
+}
+
+html[data-skin="atelier"]:root .cr-row.checked:hover {
+  border-left-color: var(--border-subtle);
+}
+
+/* La quantité quitte sa gélule : un chiffre nu, précédé du signe de
+   multiplication, comme sur un bon de commande. */
+html[data-skin="atelier"]:root .cr-qty {
+  width: auto;
+  min-width: 30px;
+  height: auto;
+  background: none;
+  border: none;
+  justify-content: flex-end;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+  order: 2;
+}
+
+html[data-skin="atelier"]:root .cr-qty::before {
+  content: '×';
+  margin-right: 1px;
+  color: var(--text-4);
+}
+
+/* Le nom français est ce qu'on lit : il est en pleine encre, pas en gris.
+   « papier » le laisse en --text-2 et ne le passe en --text-1 qu'une fois
+   coché — soit exactement l'inverse de ce qu'on cherche du regard. */
+html[data-skin="atelier"]:root .cr-fr {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--text-1);
+}
+
+/* Le nom anglais est une référence à recopier chez le vendeur, pas une
+   phrase : mono, pas d'italique. */
+html[data-skin="atelier"]:root .cr-en {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--text-4);
+}
+
+/* Trouvé = rayé. Le geste de la liste de courses, littéralement. */
+html[data-skin="atelier"]:root .cr-row.checked .cr-fr {
+  color: var(--text-3);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: var(--text-3);
+}
+
+html[data-skin="atelier"]:root .cr-row.checked .cr-en {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-4);
+}
+
+/* Le commandant : filet d'encre plein à gauche, plus épais. Aucun lavis —
+   un fond teinté sur une seule ligne au milieu de quarante, c'est une tache. */
+html[data-skin="atelier"]:root .cr-row.commander {
+  background: none;
+  padding: 15px 16px 15px 12px;
+  box-shadow: inset 4px 0 0 var(--ink);
+}
+
+html[data-skin="atelier"]:root .cr-badge-en {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  background: none;
+  border: var(--rule-hair) solid var(--border);
+  color: var(--text-3);
+}
+
+/* ── 9. La case à cocher : un carré, et on raye ────────────────────────── */
+/* « papier » a le rond de toutes les listes du web, « arcane » le losange des
+   symboles de mana. Ici c'est le carré à cocher d'un formulaire imprimé — et
+   cocher remplit d'encre, pas de couleur : le feutre a déjà un travail. */
+
+html[data-skin="atelier"]:root .cr-check {
+  width: 19px;
+  height: 19px;
+  border: var(--rule) solid var(--border-strong);
+  background: transparent;
+  color: var(--text-on-accent);
+}
+
+html[data-skin="atelier"]:root .cr-check:hover {
+  background: var(--fill-2);
+  border-color: var(--border-strong);
+}
+
+html[data-skin="atelier"]:root .cr-row.checked .cr-check {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+/* ── 10. Les boutons sont pressables ───────────────────────────────────── */
+/* Bloc d'encre plein, texte papier, filet, ombre portée dure. Au clic il se
+   déplace de 4px et perd son ombre : le bouton s'enfonce réellement sous le
+   doigt. C'est le seul mouvement du skin, et il est mécanique. */
+
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.dk-point-btn, .lpr-coll-btn, .cm-btn, .lpl-list-btn, .lpl-paste-btn,
+.dk-nofr-btn) {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 88%;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11.5px;
+}
+
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.cm-btn, .dk-point-btn) {
+  border: var(--rule) solid var(--border-strong);
+  transition: transform 60ms linear, box-shadow 60ms linear;
+}
+
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.cm-btn, .dk-point-btn):not(:disabled) {
+  box-shadow: var(--shadow-2);
+}
+
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.cm-btn, .dk-point-btn):hover:not(:disabled) {
+  box-shadow: var(--shadow-3);
+  transform: translate(-1px, -1px);
+}
+
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.cm-btn, .dk-point-btn):active:not(:disabled) {
+  box-shadow: none;
+  transform: translate(4px, 4px);
+}
+
+/* Un bouton désactivé ne promet rien : ni ombre, ni relief. */
+html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+.cm-btn, .dk-point-btn):disabled {
+  box-shadow: none;
+  border-color: var(--border);
+  transform: none;
+}
+
+/* Boutons secondaires : filet seul, pas d'ombre — l'ombre est réservée à ce
+   qu'on veut qu'on presse. */
+html[data-skin="atelier"]:root :is(.lpr-coll-btn, .dk-nofr-btn, .lpl-paste-btn,
+.lpl-list-btn, .cl-apply) {
+  border: var(--rule-hair) solid var(--border-strong);
+  background: none;
+  color: var(--text-1);
+  box-shadow: none;
+}
+
+html[data-skin="atelier"]:root :is(.lpr-coll-btn, .dk-nofr-btn, .lpl-paste-btn,
+.lpl-list-btn, .cl-apply):hover {
+  background: var(--fill-2);
+  color: var(--text-1);
+  border-color: var(--border-strong);
+}
+
+html[data-skin="atelier"]:root .lpl-icon-btn {
+  border: var(--rule-hair) solid transparent;
+  color: var(--text-2);
+}
+
+html[data-skin="atelier"]:root .lpl-icon-btn:hover {
+  background: none;
+  border-color: var(--border-strong);
+  color: var(--text-1);
+}
+
+/* ── 11. Onglets et filtres : des onglets de dossier ───────────────────── */
+
+html[data-skin="atelier"]:root .lpl-mode-tabs {
+  padding: 0;
+  gap: 0;
+  background: none;
+  border-bottom: var(--rule) solid var(--border-strong);
+  margin-bottom: 0;
+}
+
+html[data-skin="atelier"]:root .lpl-mode-tab {
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 10.5px;
+  white-space: nowrap;
+  margin-bottom: -2px;
+  color: var(--text-3);
+}
+
+html[data-skin="atelier"]:root .lpl-mode-tab.active {
+  background: none;
+  border-bottom-color: var(--ink);
+  color: var(--text-1);
+}
+
+html[data-skin="atelier"]:root :is(.dk-filter-btn, .dk-view-btn) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 84%;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 10.5px;
+  border: var(--rule-hair) solid var(--border);
+  background: none;
+}
+
+html[data-skin="atelier"]:root :is(.dk-filter-btn, .dk-view-btn).active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* Le compte d'un onglet actif est déjà porté par l'inversion du fond ; le
+   recolorer par-dessus n'ajoute rien et fait un second signal. */
+html[data-skin="atelier"]:root :is(.dk-filter-btn.active .dkf-count,
+.dk-filter-btn.active .dkf-label) {
+  color: var(--paper);
+}
+
+/* Même correction de barre d'outils que dans « arcane », pour la même raison
+   mesurée : quatre grappes réparties par `space-between` sur 1889px, séparées
+   par 222px de vide, et le filtre — un contrôle secondaire — plus haut que le
+   reste. Un groupe à gauche, un groupe à droite, tout à la même hauteur. */
+html[data-skin="atelier"]:root .dk-toolbar {
+  justify-content: flex-start;
+  gap: 8px;
+  border-bottom: var(--rule) solid var(--border-strong);
+  padding-bottom: 10px;
+}
+
+html[data-skin="atelier"]:root .dk-search {
+  margin-left: auto;
+  height: 34px;
+  border: var(--rule-hair) solid var(--border-strong);
+  background: none;
+}
+
+html[data-skin="atelier"]:root .dk-filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+html[data-skin="atelier"]:root .dk-filter-btn {
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+}
+
+html[data-skin="atelier"]:root .dkf-count {
+  font-size: 11.5px;
+}
+
+html[data-skin="atelier"]:root .dk-views {
+  height: 34px;
+  padding: 0;
+  gap: 4px;
+  background: none;
+}
+
+html[data-skin="atelier"]:root .dk-view-btn {
+  height: 34px;
+  padding: 0 12px;
+}
+
+html[data-skin="atelier"]:root .dk-sort-select {
+  height: 34px;
+  border: var(--rule-hair) solid var(--border-strong);
+  background: none;
+}
+
+/* ── 12. La marque : un carré d'encre ──────────────────────────────────── */
+/* Le carré est le motif de tout le skin — la case à cocher, le repère de
+   catégorie, le bloc de surligneur. La marque est ce motif, pas une vignette
+   de plus. */
+
+html[data-skin="atelier"]:root .lpl-logo {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background: var(--ink);
+  border: none;
+  box-shadow: var(--shadow-1);
+}
+
+/* Trois traits de papier dans le carré : les lignes d'une liste. */
+html[data-skin="atelier"]:root .lpl-logo::after {
+  content: '';
+  position: absolute;
+  inset: 8px 7px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--paper) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+html[data-skin="atelier"]:root .lpl-logo svg {
+  display: none;
+}
+
+/* Les couleurs d'un deck restent des carrés : ce sont des pastilles d'encre
+   sur une épreuve, pas des gemmes. */
+html[data-skin="atelier"]:root :is(.lpr-color-pip, .lpl-resume-pip,
+.dk-color-pip) {
+  border-radius: 0;
+  outline: 1px solid var(--border-subtle);
+}
+
+html[data-skin="atelier"]:root .dk-color-pip {
+  width: 10px;
+  height: 10px;
+}
+
+html[data-skin="atelier"]:root .dk-colors {
+  gap: 5px;
+}
+
+html[data-skin="atelier"]:root .lpl-resume-chip {
+  border: var(--rule-hair) solid var(--border-strong);
+  background: none;
+}
+
+html[data-skin="atelier"]:root .lpl-resume-chip:hover {
+  background: var(--fill-2);
+  box-shadow: var(--shadow-1);
+}
+
+/* ── 13. L'illustration passe en trame ─────────────────────────────────── */
+/* Le fond de l'écran deck est l'illustration du commandant, floutée à 60px.
+   Un flou est exactement ce que ce skin s'interdit (règle 3) : on le remplace
+   par un tramage — niveaux de gris poussés, puis une trame de points par
+   dessus. Une risographie, obtenue sans une seule image. */
+
+/* `grayscale + contrast` seuls laissaient une photo reconnaissable en très
+   basse opacité — un fantôme, pas une trame. Le masque en points la découpe
+   réellement en trame d'imprimerie : l'illustration reste lisible comme
+   matière, jamais comme image. */
+html[data-skin="atelier"]:root .cmd-right-bg {
+  filter: grayscale(1) contrast(2.2);
+  -webkit-mask-image: radial-gradient(#000 0.8px, transparent 1px);
+  mask-image: radial-gradient(#000 0.8px, transparent 1px);
+  -webkit-mask-size: 3px 3px;
+  mask-size: 3px 3px;
+}
+
+html[data-skin="atelier"]:root .cmd-right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(
+    var(--fill-2) 0.9px,
+    transparent 1px
+  );
+  background-size: 4px 4px;
+}
+
+/* ── 14. Discipline de la couleur ──────────────────────────────────────── */
+/* Règle 1 : deux matières. Tout ce que la coquille colore « pour faire joli »
+   redevient de l'encre. Le seul objet coloré d'un écran deck est le carré de
+   catégorie ; le seul objet vif, le feutre de la marge. */
+
+html[data-skin="atelier"]:root :is(.dk-coll-fill, .progress-fill,
+.pt-progress-fill) {
+  background: var(--ink);
+}
+
+html[data-skin="atelier"]:root :is(.dk-coll-track, .progress-track) {
+  background: var(--fill-2);
+  border: var(--rule-hair) solid var(--border);
+}
+
+/* Le survol repeignait le prix à la couleur de la catégorie : une teinte de
+   plus, sur une information qui n'en demande aucune. */
+html[data-skin="atelier"]:root .cr-row:hover .cr-price {
+  color: var(--text-1);
+}
+
+html[data-skin="atelier"]:root .dk-stat-price {
+  color: var(--text-1);
+  background: none;
+  border: var(--rule-hair) solid var(--border);
+}
+
+html[data-skin="atelier"]:root .dk-coll-pct {
+  color: var(--text-1);
+}
+
+/* La collection chargée s'annonçait en vert, pour dire « c'est bon » — ce que
+   la coche et le nom du fichier disent déjà. */
+html[data-skin="atelier"]:root .col-loaded {
+  background: none;
+  border: var(--rule-hair) solid var(--border);
+}
+
+html[data-skin="atelier"]:root a {
+  color: var(--text-1);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: var(--rule-hair);
+}
+
+/* ── 15. Détails ───────────────────────────────────────────────────────── */
+
+html[data-skin="atelier"]:root :is(.lpl-url-input, .lpl-textarea, .dk-search-input) {
+  background: none;
+  color: var(--text-1);
+}
+
+html[data-skin="atelier"]:root .lpr-step-num {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+}
+
+html[data-skin="atelier"]:root .lpl-bottom {
+  border-top: var(--rule) solid var(--border-strong);
+}
+
+/* L'aperçu de carte au survol est téléporté hors du composant : sa règle vit
+   dans le bloc <style> NON scopé de CardRow.vue, donc sans [data-v-…]. Le
+   préfixe suffit largement. */
+html[data-skin="atelier"]:root .card-preview {
+  border: var(--rule) solid var(--border-strong);
+  box-shadow: var(--shadow-3);
+}
+
+/* Seul dans sa grille de trois colonnes, le pied de page paraissait échoué
+   en bas à gauche. */
+html[data-skin="atelier"]:root .lpr-foot:has(> :only-child) {
+  display: block;
+}
+
+/* L'anneau de focus est un filet d'encre franc, sans arrondi hérité. */
+html[data-skin="atelier"]:root :where(button, a, input, textarea, select,
+[tabindex]):focus-visible {
+  outline: var(--rule) solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* ── Media queries, regroupées en fin de feuille ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* L'enfoncement du bouton est le seul mouvement du skin — c'est aussi le
+     seul à retirer ici. Le retour visuel reste porté par l'ombre. */
+  html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+  .cm-btn) {
+    transition: none;
+  }
+
+  html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+  .cm-btn, .dk-point-btn):hover:not(:disabled) {
+    transform: none;
+  }
+
+  html[data-skin="atelier"]:root :is(.lpl-translate-btn, .dk-bar-primary,
+  .cm-btn, .dk-point-btn):active:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Le mur de type se resserre, mais garde sa chasse étendue : c'est elle qui
+     signe le skin, pas la taille absolue. */
+  html[data-skin="atelier"]:root .lpl-title {
+    font-size: clamp(30px, 9vw, 40px);
+    line-height: 0.92;
+  }
+
+  /* Un filet de 2px sur toute la hauteur d'un écran de 390px de large mange
+     de la laize pour rien : le rail n'est plus une colonne, c'est la page. */
+  html[data-skin="atelier"]:root .cmd-left {
+    border-right: none;
+    border-bottom: var(--rule) solid var(--border-strong);
+  }
+
+  /* La trame de points, à cette densité de pixels, devient du moiré. */
+  html[data-skin="atelier"]:root .cmd-right::after {
+    display: none;
+  }
+
+  /* Le numéro de ligne coûte 2,2em de laize sur un écran où le nom français
+     tient déjà sur deux lignes. Le feutre de la marge dit la même chose. */
+  html[data-skin="atelier"]:root .cr-row::before {
+    display: none;
+  }
+
+  html[data-skin="atelier"]:root .cr-row {
+    padding: 12px 14px 12px 10px;
+  }
+}
+
+/* ── Le panneau droit devient une planche ──────────────────────────────── */
+/* Mesuré à 1440×900 : le panneau droit de l'accueil fait 940×900px et porte
+   250px de contenu. Les trois quarts sont vides, et l'œil qui a fini de lire
+   le rail de gauche n'a aucune raison d'y monter.
+   « arcane » règle ça en repliant tout en une colonne unique. Atelier assume
+   les deux panneaux — ils cessent d'être « un rail et un canevas » pour
+   devenir les deux pages d'une double page — mais compose la page de droite
+   au lieu de la laisser couler du haut : bloc calibré, centré dans sa hauteur.
+   Le vide devient une marge, pas un oubli. */
+
+@media (min-width: 900px) {
+  html[data-skin="atelier"]:root .lp-right {
+    min-height: 100%;
+    justify-content: center;
+    max-width: 780px;
+    margin: 0 auto;
+    gap: 28px;
+  }
+}
+
+/* ── Grand écran : la double page ──────────────────────────────────────── */
+/* « arcane » remet l'accueil en une colonne unique. Atelier fait l'inverse et
+   assume les deux panneaux — parce qu'ils cessent d'être « un rail et un
+   canevas » pour devenir les deux pages d'une double page imprimée, séparées
+   par un filet d'encre franc. Le rail s'élargit pour que le mur de type ait
+   la place de se déployer : à 400px, un titre de 52px en chasse étendue se
+   replie sur quatre lignes. */
+
+@media (min-width: 1180px) {
+  html[data-skin="atelier"]:root .cmd-left {
+    width: 500px;
+  }
+
+  html[data-skin="atelier"]:root .lp-left {
+    padding: 34px 40px 24px;
+  }
+
+  /* Mesuré à 1600px : à 62px en chasse étendue le titre se replie sur cinq
+     lignes dans un rail de 500px — ce n'est plus une affiche, c'est un
+     paragraphe en capitales. */
+  html[data-skin="atelier"]:root .lpl-title {
+    font-size: clamp(38px, 3vw, 50px);
+  }
+
+  html[data-skin="atelier"]:root .lp-right {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* ── La liste en colonnes sur très grand écran ─────────────────────────── */
+/* Même constat mesuré que dans « arcane » : à 1889px une ligne de carte fait
+   1423px, avec 1192px entre le nom et le prix — l'œil traverse tout l'écran
+   pour lire deux informations liées, et un deck de 81 cartes déroule près de
+   quatre mille pixels. Une ligne de decklist a besoin d'environ 440px.
+   Ici la grille est celle d'un listing imprimé : les filets sont portés par
+   les cellules, et le vide reste du vide. */
+
+@media (min-width: 1500px) {
+  html[data-skin="atelier"]:root .cat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
+    gap: 0;
+  }
+
+  html[data-skin="atelier"]:root .cr-row {
+    border-right: var(--rule-hair) solid var(--border-subtle);
+  }
+
+  /* Le nom anglais passe sous le français : dans 430px il leur faut deux
+     lignes pour tenir sans se faire couper, et c'est lui qu'on donne au
+     vendeur. */
+  html[data-skin="atelier"]:root .cr-names {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  html[data-skin="atelier"]:root .cr-en {
+    font-size: 10px;
+    max-width: 100%;
+  }
+}

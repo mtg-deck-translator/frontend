@@ -1,20 +1,24 @@
 import { ref, watchEffect } from 'vue'
 import { getSkin, setSkin } from '../services/storage.js'
 
-// Deux habillages complets cohabitent. Le skin est orthogonal au thème :
-// « papier » et « arcane » ont chacun leur variante claire et sombre.
+// Trois habillages complets cohabitent. Le skin est orthogonal au thème :
+// chacun a sa variante claire et sa variante sombre.
 //
-//   papier — la direction d'origine : papier chaud, serif Fraunces, orange brûlé.
-//   arcane — encre froide, capitales gravées Cinzel, et la couleur qui vient
-//            du deck lui-même (les cinq couleurs de mana comme système).
+//   papier  — la direction d'origine : papier chaud, serif Fraunces, orange brûlé.
+//   arcane  — encre froide, capitales gravées Cinzel, et la couleur qui vient
+//             du deck lui-même (les cinq couleurs de mana comme système).
+//   atelier — le bon de commande imprimé : papier crème, encre pleine, un
+//             surligneur pour ce qui reste à trouver. Le seul des trois qui
+//             naisse en clair ; son mode sombre est un négatif d'épreuve.
 //
 // L'absence d'attribut vaut « papier » : sans JS, ou avant l'hydratation,
 // le site rend exactement comme avant.
-export const SKINS = ['papier', 'arcane']
+export const SKINS = ['papier', 'arcane', 'atelier']
 
 export const SKIN_LABELS = {
   papier: 'Papier',
   arcane: 'Arcane',
+  atelier: 'Atelier',
 }
 
 export function useSkin() {

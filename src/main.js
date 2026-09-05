@@ -3,6 +3,8 @@ import './assets/style.css'
 // Habillage alternatif « arcane ». Inerte tant que <html> ne porte pas
 // data-skin="arcane" : aucune de ses règles ne matche.
 import './assets/skin-arcane.css'
+// Troisième habillage « atelier » : même mécanique, même inertie.
+import './assets/skin-atelier.css'
 import App from './App.vue'
 
 createApp(App).mount('#app')
