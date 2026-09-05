@@ -442,10 +442,59 @@
               <div v-if="hasAnyCollection" class="lpr-coll">
                 <div class="lpr-coll-head">
                   <span class="lpr-coll-dot" aria-hidden="true">✓</span>
-                  <strong>{{ totalKnown }} cartes</strong> dans votre collection
+                  <strong>{{ fmtNb(totalKnown) }} cartes</strong> dans votre collection
                 </div>
+
+                <!-- « 3195 cartes » ne dit pas d'où elles viennent, alors que
+                     ce sont deux piles différentes qu'on efface séparément :
+                     le fichier importé, et ce qui a été coché à la main deck
+                     après deck. Sans ce détail, « purger » n'a pas de cible. -->
+                <p class="lpr-coll-parts">
+                  <span v-if="csvSize">
+                    {{ fmtNb(csvSize) }} depuis
+                    <em :title="collectionName">{{ collectionName || 'un fichier importé' }}</em>
+                  </span>
+                  <span v-if="csvSize && manualSize" aria-hidden="true"> · </span>
+                  <span v-if="manualSize">{{ fmtNb(manualSize) }} cochées à la main</span>
+                </p>
+
                 <p class="lpr-coll-sub">Elle sera appliquée automatiquement à votre prochain deck.</p>
-                <button class="lpr-coll-btn" @click="downloadCollection">Exporter en .csv</button>
+
+                <div v-if="!collConfirm" class="lpr-coll-actions">
+                  <button class="lpr-coll-btn" @click="downloadCollection">Exporter en .csv</button>
+                  <button class="lpr-coll-btn" @click="collFileInput.click()">
+                    {{ csvSize ? 'Remplacer le fichier' : 'Importer un fichier' }}
+                  </button>
+                  <button class="lpr-coll-btn lpr-coll-btn--danger" @click="collConfirm = true">Effacer…</button>
+                </div>
+
+                <!-- Effacer une collection de plusieurs milliers de cartes est
+                     définitif et ne se répare pas : la confirmation est en
+                     ligne plutôt qu'en `confirm()`, et elle nomme ce qui part. -->
+                <div v-else class="lpr-coll-confirm">
+                  <p class="lpr-coll-warn">Cette suppression est définitive. Exportez d'abord si vous voulez garder une copie.</p>
+                  <div class="lpr-coll-actions">
+                    <button
+                      v-if="csvSize && manualSize"
+                      class="lpr-coll-btn lpr-coll-btn--danger"
+                      @click="onClearCollection('csv')"
+                    >Le fichier seulement ({{ fmtNb(csvSize) }})</button>
+                    <button class="lpr-coll-btn lpr-coll-btn--danger" @click="onClearCollection('all')">
+                      Tout effacer ({{ fmtNb(totalKnown) }})
+                    </button>
+                    <button class="lpr-coll-btn" @click="collConfirm = false">Annuler</button>
+                  </div>
+                </div>
+
+                <p v-if="collError" class="lpr-coll-error">{{ collError }}</p>
+
+                <input
+                  ref="collFileInput"
+                  type="file"
+                  accept=".csv,.txt"
+                  class="lpr-coll-file"
+                  @change="onReplaceCollectionFile"
+                />
               </div>
 
               <!-- Le drapeau « pas de version française » est ce qu'aucun autre
@@ -1015,7 +1064,8 @@ const { copyAll, copyMissing, downloadTxt } = useExport(cards, checkedMap)
 const { show } = useToast()
 const {
   getMap: getCollectionMap, rememberOwned, hasAnyCollection, totalKnown,
-  manualSize, csvSize, clearManual, exportCSV,
+  manualSize, csvSize, clearManual, clearCollection, collectionName,
+  importFromFile, exportCSV,
 } = useCollection()
 
 // --- Computed ---
@@ -1198,6 +1248,36 @@ function downloadCollection() {
 function onForgetCollection() {
   clearManual()
   show('Cartes pointées oubliées', 'info')
+}
+
+// Au-delà de mille cartes, « 3195 » se relit deux fois.
+function fmtNb(n) {
+  return (n ?? 0).toLocaleString('fr-FR')
+}
+
+const collConfirm = ref(false)
+const collError = ref('')
+const collFileInput = ref(null)
+
+function onClearCollection(quoi) {
+  clearCollection()
+  if (quoi === 'all') clearManual()
+  collConfirm.value = false
+  show(quoi === 'all' ? 'Collection effacée' : 'Fichier importé retiré', 'info')
+}
+
+async function onReplaceCollectionFile(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  collError.value = ''
+  try {
+    const n = await importFromFile(file)
+    show(`${fmtNb(n)} cartes importées`, 'success')
+  } catch (err) {
+    collError.value = err.message
+  } finally {
+    e.target.value = ''
+  }
 }
 
 function applyCollection() {
@@ -2418,6 +2498,57 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 .lpr-coll-btn:hover { color: var(--text-1); background: var(--fill-2); }
+
+.lpr-coll-file { display: none; }
+
+/* La composition de la collection : deux piles, deux origines, deux boutons
+   pour les effacer. Sans elle, « Effacer » n'a pas de cible nommée. */
+.lpr-coll-parts {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.lpr-coll-parts em {
+  font-style: normal;
+  color: var(--text-2);
+}
+
+.lpr-coll-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Le rouge n'arrive qu'au moment où l'action devient destructrice : sur le
+   bouton « Effacer… », puis sur les deux choix de la confirmation. */
+.lpr-coll-btn--danger {
+  color: var(--danger);
+  border-color: var(--danger-border, var(--border));
+}
+
+.lpr-coll-btn--danger:hover {
+  color: var(--danger);
+  background: var(--danger-fill, var(--fill-2));
+}
+
+.lpr-coll-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lpr-coll-warn {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.lpr-coll-error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--danger);
+}
 
 .lpr-nofr-pitch {
   margin: 18px 0 0;

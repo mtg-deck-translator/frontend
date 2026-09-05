@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { normalizeName } from '../services/collectionParser.js'
+import { normalizeName, parseCollectionCSV } from '../services/collectionParser.js'
 
 const STORAGE_KEY = 'mtg-collection-v1'
 // Collection construite au fil de l'eau, en cochant les cartes.
@@ -86,6 +86,16 @@ export function useCollection() {
     } catch {}
   }
 
+  /** Lit un CSV et remplace la pile importée. Partagé par les deux endroits
+      qui proposent un import — le rail de l'écran deck et l'accueil — pour
+      qu'ils ne divergent pas sur la gestion d'erreur ou le nom retenu. */
+  async function importFromFile(file) {
+    const text = await file.text()
+    const map = parseCollectionCSV(text)
+    setCollection(map, file.name.replace(/\.csv$/i, ''))
+    return map.size
+  }
+
   function clearCollection() {
     _map.value = null
     _name.value = ''
@@ -121,7 +131,7 @@ export function useCollection() {
   return {
     hasCollection, hasAnyCollection, collectionName, collectionSize,
     csvSize, manualSize, totalKnown,
-    setCollection, clearCollection, clearManual, rememberOwned,
+    setCollection, importFromFile, clearCollection, clearManual, rememberOwned,
     getMap: mergedMap,
     exportCSV: () => toCSV(_manual.value, _map.value),
   }

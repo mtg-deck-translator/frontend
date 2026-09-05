@@ -71,11 +71,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useCollection } from '../composables/useCollection.js'
-import { parseCollectionCSV } from '../services/collectionParser.js'
 
 const emit = defineEmits(['apply'])
 
-const { hasCollection, collectionName, collectionSize, setCollection, clearCollection } = useCollection()
+const { hasCollection, collectionName, collectionSize, importFromFile, clearCollection } = useCollection()
 
 const fileInput = ref(null)
 const parseError = ref('')
@@ -86,9 +85,7 @@ async function onFile(e) {
   parseError.value = ''
 
   try {
-    const text = await file.text()
-    const map = parseCollectionCSV(text)
-    setCollection(map, file.name.replace(/\.csv$/i, ''))
+    await importFromFile(file)
     // Personne n'importe une collection pour ne pas s'en servir : appliquer
     // demandait un second clic et un état intermédiaire pour une action à
     // issue unique.

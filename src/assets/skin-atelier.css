@@ -1002,6 +1002,25 @@ html[data-skin="atelier"]:root a {
   text-decoration-thickness: var(--rule-hair);
 }
 
+/* ── 14 bis. L'action destructrice garde son signal ────────────────────── */
+/* La règle 1 dit « deux matières », mais §10 range les boutons secondaires en
+   filet d'encre — ce qui effaçait le rouge de « Tout effacer » et le rendait
+   impossible à distinguer d'« Annuler ». Un avertissement n'est pas une
+   décoration : `--danger` est un jeton d'état, il a le droit d'exister.
+   Le sélecteur double la classe (0,4,1) pour passer devant le groupe de §10
+   sans dépendre de l'ordre des règles. */
+
+html[data-skin="atelier"]:root .lpr-coll-btn.lpr-coll-btn--danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+html[data-skin="atelier"]:root .lpr-coll-btn.lpr-coll-btn--danger:hover {
+  color: var(--paper);
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
 /* ── 15. Détails ───────────────────────────────────────────────────────── */
 
 html[data-skin="atelier"]:root :is(.lpl-url-input, .lpl-textarea, .dk-search-input) {
