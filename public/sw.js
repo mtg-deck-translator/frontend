@@ -6,7 +6,11 @@
 // /api/* n'est JAMAIS mis en cache : une decklist qui change doit être relue,
 // et une erreur réseau ne doit pas se figer.
 const CACHE = 'mtg-translator-v1'
-const SHELL = ['/', '/favicon.svg', '/manifest.webmanifest']
+// Les symboles de mana sont précachés : ils ne changent jamais, pèsent 12 ko
+// à eux cinq, et sans eux les couleurs d'un deck ne s'affichent pas — or c'est
+// hors ligne, chez le vendeur, que l'app doit rester lisible.
+const MANA = ['W', 'U', 'B', 'R', 'G'].map(c => `/mana/${c}.svg`)
+const SHELL = ['/', '/favicon.svg', '/manifest.webmanifest', ...MANA]
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()))

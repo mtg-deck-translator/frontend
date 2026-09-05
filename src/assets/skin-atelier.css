@@ -899,18 +899,12 @@ html[data-skin="atelier"]:root .lpl-logo svg {
   display: none;
 }
 
-/* Les couleurs d'un deck restent des carrés : ce sont des pastilles d'encre
-   sur une épreuve, pas des gemmes. */
-html[data-skin="atelier"]:root :is(.lpr-color-pip, .lpl-resume-pip,
-.dk-color-pip) {
-  border-radius: 0;
-  outline: 1px solid var(--border-subtle);
-}
-
-html[data-skin="atelier"]:root .dk-color-pip {
-  width: 10px;
-  height: 10px;
-}
+/* Les couleurs d'un deck étaient des carrés d'encre. Ce sont maintenant les
+   symboles officiels de mana : le `border-radius: 0` ne mord pas sur un disque
+   dessiné dans le SVG, et le liseré carré dessinait une boîte autour d'un rond.
+   Les deux partent, la taille forcée aussi. C'est la seule entorse assumée à la
+   règle 1 — ces cinq symboles sont des objets du jeu, pas de la décoration
+   d'interface. */
 
 html[data-skin="atelier"]:root .dk-colors {
   gap: 5px;

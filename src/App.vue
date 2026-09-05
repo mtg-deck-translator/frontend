@@ -92,11 +92,12 @@
                   @click="onLoadFromHistory(entry)"
                 >
                   <span class="lpl-resume-pips" aria-hidden="true">
-                    <span
+                    <img
                       v-for="c in (entry.deckColors || [])"
                       :key="c"
                       class="lpl-resume-pip"
-                      :style="MTG_COLOR_STYLES[c]"
+                      :src="manaIcon(c)"
+                      alt=""
                     />
                   </span>
                   <span class="lpl-resume-name">{{ entry.deckName }}</span>
@@ -269,11 +270,12 @@
                    la décoration criarde. Ici, sous le nom, c'est le premier
                    endroit où on la cherche. -->
               <div v-if="deckColors.length" class="dk-colors" aria-label="Couleurs du deck">
-                <span
+                <img
                   v-for="c in deckColors"
                   :key="c"
                   class="dk-color-pip"
-                  :style="MTG_COLOR_STYLES[c]"
+                  :src="manaIcon(c)"
+                  :alt="MANA_LABELS[c]"
                 />
               </div>
               <div class="dk-stats">
@@ -379,11 +381,12 @@
                     </div>
                     <div class="lpr-card-bottom">
                       <div v-if="(entry.deckColors || []).length" class="lpr-card-colors">
-                        <span
+                        <img
                           v-for="color in (entry.deckColors || [])"
                           :key="color"
                           class="lpr-color-pip"
-                          :style="MTG_COLOR_STYLES[color]"
+                          :src="manaIcon(color)"
+                          :alt="MANA_LABELS[color]"
                         />
                       </div>
                       <span class="lpr-card-count">{{ entry.totalCount }} cartes</span>
@@ -852,12 +855,14 @@ import { getCachedCards, setCachedCards } from './services/storage.js'
 import { categoryLabel, orderCategories } from './constants/categories.js'
 
 const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G']
-const MTG_COLOR_STYLES = {
-  W: { background: '#f1f5f9', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)' },
-  U: { background: '#3b82f6', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.25)' },
-  B: { background: '#3f3f46', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)' },
-  R: { background: '#ef4444', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.2)' },
-  G: { background: '#22c55e', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)' },
+// Les vrais symboles de mana, pas des aplats de couleur. Ils viennent des CDN
+// de Scryfall et sont copiés dans public/mana/ — voir public/mana/SOURCE.md
+// pour la provenance et les droits. Servis depuis l'origine, ils sont
+// précachés par le service worker et restent affichés hors ligne.
+const MANA_LABELS = { W: 'Blanc', U: 'Bleu', B: 'Noir', R: 'Rouge', G: 'Vert' }
+
+function manaIcon(couleur) {
+  return `${import.meta.env.BASE_URL}mana/${couleur}.svg`
 }
 
 const DK_TABS = [
@@ -1799,7 +1804,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .lpr-color-pip {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
   flex-shrink: 0;
   display: block;
 }
@@ -1867,10 +1871,11 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   margin-bottom: 8px;
 }
 
+/* 15px et pas 11 : un aplat de couleur se lit à n'importe quelle taille, un
+   symbole dessiné non. À 11px le glyphe blanc n'était plus qu'un grain. */
 .dk-color-pip {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
   display: block;
 }
@@ -2963,8 +2968,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
     padding-bottom: 4px;
   }
 
-  .lpl-resume-pips { display: flex; gap: -2px; }
-  .lpl-resume-pip { width: 9px; height: 9px; border-radius: 50%; display: block; }
+  .lpl-resume-pips { display: flex; gap: 2px; }
+  .lpl-resume-pip { width: 12px; height: 12px; display: block; }
 
   .lpl-resume-chip {
     flex: 0 0 auto;

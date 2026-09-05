@@ -628,11 +628,11 @@ html[data-skin="arcane"]:root .lpl-logo svg {
   display: none;
 }
 
-/* Les pastilles de couleur d'un deck deviennent des losanges, pour rimer
-   avec la marque et les cases à cocher. */
-html[data-skin="arcane"]:root :is(.lpr-color-pip, .lpl-resume-pip) {
-  transform: rotate(45deg);
-}
+/* Les pastilles étaient tournées de 45° pour rimer avec la marque et les
+   cases à cocher. La rime tombe depuis que ce sont les vrais symboles de mana :
+   un disque tourné reste un disque, seul le glyphe à l'intérieur penche — ça ne
+   se lit plus comme un losange, ça se lit comme une image de travers. Le motif
+   du losange tient toujours ailleurs, là où il porte une forme qu'on dessine. */
 
 /* Les jauges restent monochromes : une barre de progression tricolore ne se
    lit pas comme une progression, elle se lit comme un bug. */
@@ -799,14 +799,9 @@ html[data-skin="arcane"]:root .cr-row.commander {
   background-image: none;
 }
 
-/* Les couleurs du deck, sous son nom. Mêmes losanges que la marque, les cases
-   à cocher et les pastilles de l'accueil. */
-html[data-skin="arcane"]:root .dk-color-pip {
-  transform: rotate(45deg);
-  width: 10px;
-  height: 10px;
-}
-
+/* Les couleurs du deck, sous son nom. Elles étaient tournées de 45° ici aussi ;
+   la taille et la rotation sont parties avec le losange, il ne reste que
+   l'espacement. */
 html[data-skin="arcane"]:root .dk-colors {
   gap: 5px;
 }
