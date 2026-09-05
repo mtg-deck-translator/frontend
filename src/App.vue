@@ -284,10 +284,6 @@
                 <span class="dk-stat dk-stat-owned">{{ ownedCount }} / {{ cards.length }} poss.</span>
                 <span v-if="missingPrice > 0" class="dk-stat dk-stat-missing">manque {{ formatPrice(missingPrice) }}</span>
               </div>
-              <!-- Changer de langue imposait auparavant de quitter le deck. -->
-              <div class="dk-lang">
-                <LanguageSelector :model-value="language" @update:model-value="onChangeLanguage" />
-              </div>
             </div>
 
             <!-- Sur téléphone, tout ceci s'empilait au-dessus de la liste :
@@ -303,9 +299,12 @@
             <!-- Étape 2 du parcours, donc deuxième bloc du rail. Elle était
                  en septième position, sous la ligne de flottaison d'un 13". -->
             <div class="dk-collection">
+              <!-- Le pourcentage a été retiré : « 0 % » et « 0 / 81 poss. »
+                   encodaient le même fait à trente pixels d'écart, dans deux
+                   formats différents, et la jauge juste dessous encode déjà la
+                   proportion. Reste le chiffre précis, celui qu'on relit. -->
               <div class="dk-coll-header">
                 <span class="dk-coll-label">CE QUE VOUS AVEZ</span>
-                <span class="dk-coll-pct">{{ ownedPct }}%</span>
               </div>
               <div class="dk-coll-stats">{{ ownedCount }} / {{ cards.length }} poss.</div>
               <div class="dk-coll-track">
@@ -346,11 +345,33 @@
                  une sortie tronquée. -->
             <div class="dk-tools">
               <div class="dk-tools-label">Cette liste</div>
+              <!-- La langue est un réglage de la liste produite, pas un trait
+                   d'identité du deck : elle vivait sous le nom, entre les
+                   symboles de mana et la collection, là où on ne la cherche
+                   pas. -->
+              <div class="dk-tools-lang">
+                <LanguageSelector :model-value="language" @update:model-value="onChangeLanguage" />
+              </div>
               <div class="dk-tools-row">
                 <button class="dk-tool" @click="exportAll">Copier tout</button>
                 <button class="dk-tool" @click="exportDownload">Exporter en .txt</button>
                 <button v-if="hasAnyCollection" class="dk-tool" @click="downloadCollection">Ma collection .csv</button>
               </div>
+            </div>
+
+            <!-- L'aperçu au survol. Il flottait à côté du curseur, donc contre
+                 la liste qu'on est en train de lire. Le rail est le seul
+                 endroit de l'écran où une carte tient en grand sans rien
+                 recouvrir — et il était vide. -->
+            <div class="dk-preview" aria-hidden="true">
+              <Transition name="apercu-fade">
+                <img
+                  v-if="carteSurvolee?.imageUrl"
+                  :key="carteSurvolee.imageUrl"
+                  :src="carteSurvolee.imageUrl"
+                  :alt="carteSurvolee.frName"
+                />
+              </Transition>
             </div>
 
           </div>
@@ -864,6 +885,7 @@ import { useChecklist } from './composables/useChecklist.js'
 import { useHistory } from './composables/useHistory.js'
 import { useTheme } from './composables/useTheme.js'
 import { useSkin } from './composables/useSkin.js'
+import { useCardPreview } from './composables/useCardPreview.js'
 import { useExport } from './composables/useExport.js'
 import { useToast } from './composables/useToast.js'
 import { isSupportedUrl } from './services/deckSources.js'
@@ -936,6 +958,7 @@ watch(layout, v => localStorage.setItem('deck-layout', v))
 // --- Composables ---
 const { theme, toggle: toggleTheme } = useTheme()
 const { skin, toggle: toggleSkin, SKIN_LABELS } = useSkin()
+const { carteSurvolee } = useCardPreview()
 const { language, setLanguage, LANGUAGES } = useLanguage()
 const i18n = computed(() => LANDING_I18N[language.value] || LANDING_I18N.fr)
 
@@ -1863,6 +1886,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
 /* ══ DECK LEFT ═══════════════════════════════════════════ */
 .dk-left {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 20px 20px 32px;
@@ -1959,7 +1983,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   height: 36px;
   color: var(--text-4);
   transition: border-color 150ms;
-  margin-bottom: 10px;
 }
 .dk-search:focus-within { border-color: var(--border-strong); }
 
@@ -1984,11 +2007,13 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-search-clear:hover { color: var(--text-3); }
 
 /* Filter tabs */
+/* Pas de marge basse ici non plus : dans une rangée flex centrée, elle
+   décalerait le groupe vers le haut. L'espacement des rangées repliées vient
+   du `gap` de .dk-toolbar. */
 .dk-filters {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 4px;
-  margin-bottom: 4px;
 }
 
 .dk-filter-btn {
@@ -2025,7 +2050,21 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-filter-btn.active .dkf-count { color: var(--accent); }
 
 /* Collection */
-.dk-collection { display: flex; flex-direction: column; gap: 8px; }
+/* Un filet au-dessus, comme le .dk-sep qui précède « Cette liste » : les trois
+   blocs du rail — identité du deck, ce que vous avez, cette liste — se lisent
+   alors comme trois sections et non comme une seule coulée. */
+.dk-collection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Le bouton et son explication forment une paire : de l'air au-dessus, rien
+   en dessous. Avec un `gap` uniforme de 8px, les sept éléments du bloc
+   flottaient tous à la même distance et rien ne se groupait. */
+.dk-point-btn { margin-top: 8px; }
 
 .dk-coll-header {
   display: flex;
@@ -2041,12 +2080,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   color: var(--text-4);
 }
 
-.dk-coll-pct {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-}
 
 .dk-coll-stats {
   font-size: 22px;
@@ -2094,6 +2127,10 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   margin-bottom: 10px;
 }
 
+.dk-tools-lang {
+  margin-bottom: 10px;
+}
+
 .dk-tools-row {
   display: flex;
   flex-wrap: wrap;
@@ -2115,6 +2152,46 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   border-color: var(--border-strong);
   background: var(--fill-2);
 }
+
+/* ── L'aperçu de la carte survolée ───────────────────────────────────── */
+/* Une carte lisible fait au moins 480px de haut, et le rail en compte déjà
+   500 de contenu : sur un écran de 900, les deux ne tiennent pas. Se disputer
+   la place donnait une image à moitié posée sur les boutons.
+   D'où un tiroir : collé au bas de la fenêtre, opaque, il recouvre franchement
+   le bas du rail au lieu de s'y superposer à moitié. Il ne paraît que pendant
+   le survol d'une ligne — moment où l'œil est sur la liste, pas sur les
+   outils — et l'identité du deck reste visible au-dessus.
+   `pointer-events: none` : sans ça le tiroir passerait sous le curseur en
+   sortant de la liste et le survol se couperait tout seul. */
+.dk-preview {
+  /* Hors du flux, pas `sticky` : en flux il ajoutait sa hauteur au rail, donc
+     faisait apparaître une barre de défilement à chaque survol et disparaître
+     au suivant. Ancré au bas de .dk-left, il ne déplace jamais rien. */
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  padding-top: 16px;
+  background: var(--bg-app);
+  pointer-events: none;
+}
+
+.dk-preview img {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 100%;
+  /* Le plafond laisse l'en-tête du rail — nom, couleurs, jauge — hors du
+     tiroir : on garde le contexte du deck pendant qu'on regarde la carte. */
+  max-height: calc(100vh - 300px);
+  border-radius: 12px;
+  box-shadow: var(--shadow-3);
+}
+
+.apercu-fade-enter-active,
+.apercu-fade-leave-active { transition: opacity 140ms ease; }
+.apercu-fade-enter-from,
+.apercu-fade-leave-to { opacity: 0; }
 
 /* TOC */
 
@@ -2160,7 +2237,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 .dk-right { display: flex; flex-direction: column; }
 .dk-scroll { flex: 1; min-height: 0; }
 
-.dk-lang { margin-top: 10px; }
 
 /* Le disclosure n'existe que sur téléphone : sur grand écran le rail a la
    place d'afficher tout, et un pli en plus serait un clic pour rien. */
@@ -2320,7 +2396,8 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 }
 
 .dk-sort-select {
-  padding: 6px 10px;
+  height: 36px;
+  padding: 0 10px;
   font-size: 12.5px;
   color: var(--text-2);
   background: var(--fill-1);
@@ -2850,8 +2927,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   .dk-stat-price { display: none; }
 
   /* Le sélecteur de langue ne sert pas à chaque instant : il rejoint le pli. */
-  .dk-lang { display: none; }
-  .dk-left-body.open .dk-lang { display: block; margin: 12px 0 0; }
 
   /* Le rail déplié occupait 900px : on lui donne sa propre zone de défilement
      plutôt que de repousser la liste hors de l'écran. */
@@ -2960,7 +3035,7 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
 
   /* Le rail disparaît : son contenu vit désormais dans les onglets et le
      menu. Seul l'en-tête reste, ramené à l'essentiel. */
-  .dk-more, .dk-left-body, .dk-tools { display: none !important; }
+  .dk-more, .dk-left-body, .dk-tools, .dk-preview { display: none !important; }
   .dk-menu-dup { display: block; }
   .dk-stat-missing { display: inline; }
 

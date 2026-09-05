@@ -1,10 +1,9 @@
 <template>
   <div
-    ref="rowEl"
     class="cr-row"
     :class="{ checked: isChecked, commander: isCommander, 'is-last': isLast }"
     @mouseenter="onMouseEnter"
-    @mouseleave="showPreview = false"
+    @mouseleave="onMouseLeave"
     @click="$emit('toggle', card.queryName)"
   >
     <button
@@ -32,18 +31,12 @@
       <span v-if="card.price != null" class="cr-price">{{ formatPrice(card.price) }}</span>
     </div>
 
-    <Teleport to="body">
-      <Transition name="preview-fade">
-        <div v-if="showPreview && card.imageUrl" class="card-preview" :style="previewStyle">
-          <img :src="card.imageUrl" :alt="card.frName" />
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch, onUnmounted } from 'vue'
+import { computed, onUnmounted } from 'vue'
+import { useCardPreview } from '../composables/useCardPreview.js'
 
 const props = defineProps({
   card: Object,
@@ -60,62 +53,19 @@ function formatPrice(price) {
 const isCommander = computed(() => props.card.category === 'Commander')
 
 // L'aperçu n'a de sens qu'avec une vraie souris. Au tactile, le tap émule un
-// mouseenter sans mouseleave : la vignette restait affichée, en
-// pointer-events:none, impossible à refermer jusqu'au tap suivant.
+// mouseenter sans mouseleave : la vignette restait affichée jusqu'au tap
+// suivant, et en pointer-events:none, donc impossible à refermer.
 const canHover = typeof window !== 'undefined'
   && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
 
-const PREVIEW_W = 220
-const PREVIEW_H = 308
-const MARGE = 12
+// La ligne ne dessine plus l'aperçu : elle dit seulement quelle carte est
+// survolée. C'est le rail de gauche qui l'affiche, en grand.
+const { survoler, quitter } = useCardPreview()
 
-const showPreview = ref(false)
-const rowEl = ref(null)
-const previewStyle = ref({})
+function onMouseEnter() { if (canHover) survoler(props.card) }
+function onMouseLeave() { if (canHover) quitter(props.card) }
 
-// L'aperçu se cale sur la LIGNE, pas sur le curseur.
-//
-// Suivre la souris obligeait à écouter `mousemove` et à recalculer une
-// position à chaque pixel parcouru : la vignette tremblait sous le doigt et se
-// replaçait sans arrêt, alors qu'on la regarde précisément pour comparer un
-// nom français à un visuel — ça demande une image immobile. Ancrée à la ligne
-// survolée, elle se pose une fois et ne bouge plus.
-//
-// Effet de bord agréable : plus un seul écouteur `mousemove` global.
-function placerApercu() {
-  const r = rowEl.value?.getBoundingClientRect()
-  if (!r) return
-  const vw = window.innerWidth
-  const vh = window.innerHeight
-
-  // À droite de la ligne si la place existe, sinon à gauche. C'est le cas
-  // courant : la liste occupe presque toute la largeur du panneau, et
-  // l'aperçu se pose alors au-dessus du rail.
-  let left = r.right + MARGE
-  if (left + PREVIEW_W > vw - MARGE) left = r.left - PREVIEW_W - MARGE
-  if (left < MARGE) left = Math.max(MARGE, vw - PREVIEW_W - MARGE)
-
-  let top = r.top + r.height / 2 - PREVIEW_H / 2
-  top = Math.min(Math.max(MARGE, top), vh - PREVIEW_H - MARGE)
-
-  previewStyle.value = { left: `${left}px`, top: `${top}px` }
-}
-
-function onMouseEnter() {
-  if (!canHover) return
-  placerApercu()
-  showPreview.value = true
-}
-
-// La liste défile dans son propre conteneur, pas dans la page : d'où le
-// `capture`, sans lequel l'aperçu resterait accroché à la position qu'occupait
-// la ligne au moment du survol.
-watch(showPreview, visible => {
-  if (visible) window.addEventListener('scroll', placerApercu, true)
-  else window.removeEventListener('scroll', placerApercu, true)
-})
-
-onUnmounted(() => window.removeEventListener('scroll', placerApercu, true))
+onUnmounted(() => quitter(props.card))
 </script>
 
 <style scoped>
@@ -326,34 +276,4 @@ onUnmounted(() => window.removeEventListener('scroll', placerApercu, true))
   .cr-qty { min-width: 22px; height: 22px; font-size: 11px; }
   .cr-check { width: 26px; height: 26px; }
 }
-</style>
-
-<style>
-.card-preview {
-  position: fixed;
-  z-index: 9000;
-  pointer-events: none;
-  width: 220px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 12px 40px var(--shadow-tint-3);
-}
-
-.card-preview img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.preview-fade-enter-active,
-.preview-fade-leave-active {
-  transition: opacity 120ms ease, transform 120ms ease;
-}
-
-.preview-fade-enter-from,
-.preview-fade-leave-to {
-  opacity: 0;
-  transform: scale(0.96);
-}
-
 </style>

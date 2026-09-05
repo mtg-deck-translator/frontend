@@ -697,7 +697,6 @@ html[data-skin="arcane"]:root .dk-search {
 html[data-skin="arcane"]:root .dk-filters {
   display: flex;
   gap: 4px;
-  margin-bottom: 0;
 }
 
 /* Le compte passe à côté du libellé au lieu d'être empilé dessous : le bouton

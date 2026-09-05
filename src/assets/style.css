@@ -128,7 +128,7 @@ a {
   .export-panel,
   .history-overlay,
   .toast-container,
-  .card-preview {
+  .dk-preview {
     display: none !important;
   }
 

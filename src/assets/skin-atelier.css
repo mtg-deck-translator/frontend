@@ -836,7 +836,6 @@ html[data-skin="atelier"]:root .dk-search {
 html[data-skin="atelier"]:root .dk-filters {
   display: flex;
   gap: 4px;
-  margin-bottom: 0;
 }
 
 html[data-skin="atelier"]:root .dk-filter-btn {
@@ -1032,10 +1031,10 @@ html[data-skin="atelier"]:root .lpl-bottom {
   border-top: var(--rule) solid var(--border-strong);
 }
 
-/* L'aperçu de carte au survol est téléporté hors du composant : sa règle vit
-   dans le bloc <style> NON scopé de CardRow.vue, donc sans [data-v-…]. Le
-   préfixe suffit largement. */
-html[data-skin="atelier"]:root .card-preview {
+/* L'aperçu de carte est désormais ancré dans le rail, plus téléporté sur le
+   curseur. Même traitement que les autres panneaux : filet d'encre, ombre
+   portée dure. */
+html[data-skin="atelier"]:root .dk-preview img {
   border: var(--rule) solid var(--border-strong);
   box-shadow: var(--shadow-3);
 }
