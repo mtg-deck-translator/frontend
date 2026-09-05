@@ -1490,12 +1490,6 @@ watch(deckId, () => { activeFilter.value = 'all'; noFrDismissed.value = false; p
   color: var(--text-1);
 }
 
-.lpl-card-footer :deep(.lang-dropdown) {
-  background: var(--surface-menu);
-  border-color: var(--border);
-  box-shadow: 0 8px 32px var(--shadow-tint-3);
-}
-
 .lpl-card-footer :deep(.lang-option) { color: var(--text-3); }
 .lpl-card-footer :deep(.lang-option:hover) { background: var(--fill-2); color: var(--text-1); }
 .lpl-card-footer :deep(.lang-option.active) { color: var(--accent); }
