@@ -519,8 +519,7 @@
             <div v-if="noFrCount > 0 && !noFrDismissed" class="dk-nofr">
               <span class="dk-nofr-icon" aria-hidden="true">⚠</span>
               <p class="dk-nofr-text">
-                <strong>{{ noFrCount }}</strong>
-                <span class="dk-nofr-long">{{ noFrCount > 1 ? 'cartes de ce deck n’existent pas' : 'carte de ce deck n’existe pas' }} en {{ currentLanguageLabel }}.</span>
+                <strong>{{ noFrCount }}</strong>&nbsp;<span class="dk-nofr-long">{{ noFrCount > 1 ? 'cartes de ce deck n’existent pas' : 'carte de ce deck n’existe pas' }} en {{ currentLanguageLabel }}.</span>
                 <span class="dk-nofr-short">sans version {{ currentLanguageLabel.toLowerCase() }}</span>
                 <span class="dk-nofr-sub">Leur nom anglais est conservé — c’est celui à donner au vendeur.</span>
               </p>
